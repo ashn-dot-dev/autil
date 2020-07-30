@@ -1,0 +1,8 @@
+#!/bin/sh
+
+STATUS=0
+if ! echo 'THIS IS A TEST STRING' | diff - file-write-target; then
+    STATUS=1
+fi
+rm -f file-write-target
+exit "${STATUS}"
