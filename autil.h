@@ -35,6 +35,10 @@ USAGE
 
 
 CHANGELOG
+    Unreleased
+    -------------------
+    + Added function infof
+
     v0.1.0 - 2020-07-30
     -------------------
     + Initial release.
@@ -107,6 +111,10 @@ int_vpcmp(void const* lhs, void const* rhs); // int
 //  int val = DEREF_PTR(int, ptr); // Dereference ptr as if it were an int*.
 #define DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
+// Write a formatted error message to stderr.
+// A newline is automatically appended to the end of the formatted message.
+AUTIL_API void
+infof(char const* fmt, ...);
 // Write a formatted error message to stderr.
 // A newline is automatically appended to the end of the formatted message.
 AUTIL_API void
@@ -317,6 +325,19 @@ int_vpcmp(void const* lhs, void const* rhs)
         return +1;
     }
     return 0;
+}
+
+AUTIL_API void
+infof(char const* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    fputs("info: ", stderr);
+    vfprintf(stderr, fmt, args);
+    fputs("\n", stderr);
+
+    va_end(args);
 }
 
 AUTIL_API void
