@@ -5,6 +5,7 @@
 TESTS = \
 	static.test \
 	custom-allocator.test \
+	infof.test \
 	errorf.test \
 	fatalf.test \
 	xalloc.test \
