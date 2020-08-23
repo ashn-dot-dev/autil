@@ -38,6 +38,8 @@ CHANGELOG
     Unreleased
     -------------------
     + Added function infof
+    + Added macro ARRAY_COUNT
+    + Added macro CSTR_COUNT
 
     v0.1.0 - 2020-07-30
     -------------------
@@ -110,6 +112,11 @@ int_vpcmp(void const* lhs, void const* rhs); // int
 //  void* ptr = some_func();
 //  int val = DEREF_PTR(int, ptr); // Dereference ptr as if it were an int*.
 #define DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
+
+// Number of elements in an array.
+#define ARRAY_COUNT(array_) (sizeof(array_)/sizeof((array_)[0]))
+// Number of characters in a cstring literal, excluding the null-terminator.
+#define CSTR_COUNT(cstr_) (ARRAY_COUNT(cstr_)-1)
 
 // Write a formatted error message to stderr.
 // A newline is automatically appended to the end of the formatted message.
