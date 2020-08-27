@@ -37,9 +37,10 @@ USAGE
 CHANGELOG
     Unreleased
     -------------------
-    + Added function infof
-    + Added macro ARRAY_COUNT
-    + Added macro CSTR_COUNT
+    + Added function infof.
+    + Added macro ARRAY_COUNT.
+    + Added macro CSTR_COUNT.
+    + Fixed missing const qualifier for vec_get parameter self.
 
     v0.1.0 - 2020-07-30
     -------------------
@@ -209,7 +210,7 @@ vec_set(struct vec* self, size_t idx, void const* data);
 // Get a pointer to the value of the vec at position idx.
 // Fatally exits after printing an error message if idx is out of bounds.
 AUTIL_API void*
-vec_get(struct vec* self, size_t idx);
+vec_get(struct vec const* self, size_t idx);
 
 // Insert a copy of the value at data into the vec at position idx.
 // Elements with position greater than or equal to idx are moved back one place.
@@ -553,7 +554,7 @@ vec_set(struct vec* self, size_t idx, void const* data)
 }
 
 AUTIL_API void*
-vec_get(struct vec* self, size_t idx)
+vec_get(struct vec const* self, size_t idx)
 {
     assert(self != NULL);
 
