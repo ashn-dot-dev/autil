@@ -1,6 +1,6 @@
 .POSIX:
 .SUFFIXES:
-.PHONY: test clean format
+.PHONY: all test examples clean format
 .SILENT: clean
 
 C99_DBG = -O0 -g
@@ -22,18 +22,26 @@ SANITIZE = -fsanitize=address -fsanitize=leak -fsanitize=undefined
 CC = c99
 CFLAGS = $(C99_REL)
 
-all: test
+all: test examples
 
 test:
 	@echo '== TEST =='
-	cd test && $(MAKE) CC='$(CC)' CFLAGS='$(CFLAGS)' run
+	cd test && $(MAKE) run CC='$(CC)' CFLAGS='$(CFLAGS)'
+
+examples:
+	@echo '== EXAMPLES =='
+	cd examples && $(MAKE) build CC='$(CC)' CFLAGS='$(CFLAGS)'
 
 clean:
 	@echo '== CLEAN =='
 	cd test && $(MAKE) clean
+	cd examples && $(MAKE) clean
 
 format:
 	@echo '== FORMAT =='
 	clang-format -i \
 		*.h \
-		test/*.h test/*.c
+		$$(find test/ -type f -name '*.h') \
+		$$(find test/ -type f -name '*.c') \
+		$$(find examples/ -type f -name '*.h') \
+		$$(find examples/ -type f -name '*.c')
