@@ -2,3 +2,8 @@
 *.out
 *.o
 *.a
+
+emsdk/
+*.html
+*.js
+*.wasm

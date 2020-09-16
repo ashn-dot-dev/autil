@@ -98,8 +98,9 @@ str_vpcmp(void const* lhs, void const* rhs); // char const*
 AUTIL_API int
 int_vpcmp(void const* lhs, void const* rhs); // int
 
-// Produce a pointer of type TYPE* whose contents is the scalar rvalue val,
-// with automatic storage duration associated with the enclosing block.
+// Produce a pointer of type TYPE* whose contents is the scalar rvalue val.
+// This pointer has automatic storage duration associated with the enclosing
+// block.
 //
 // Example:
 //  int* pint = LOCAL_PTR(int, 42);
@@ -115,9 +116,9 @@ int_vpcmp(void const* lhs, void const* rhs); // int
 #define DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
 // Number of elements in an array.
-#define ARRAY_COUNT(array_) (sizeof(array_)/sizeof((array_)[0]))
+#define ARRAY_COUNT(array_) (sizeof(array_) / sizeof((array_)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
-#define CSTR_COUNT(cstr_) (ARRAY_COUNT(cstr_)-1)
+#define CSTR_COUNT(cstr_) (ARRAY_COUNT(cstr_) - 1)
 
 // Write a formatted error message to stderr.
 // A newline is automatically appended to the end of the formatted message.

@@ -8,4 +8,3 @@ main(void)
     puts("THIS SHOULD GET PRINTED");
     return EXIT_SUCCESS;
 }
-

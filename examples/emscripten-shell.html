@@ -1,0 +1,47 @@
+<html>
+
+<head>
+<style>
+  body {
+    font-size: 18px;
+    font-family: sans-serif;
+    line-height: 1.25;
+    background-color: #404040;
+    color: #ddccaa;
+    padding: 0;
+    margin: 0;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+  }
+  canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+</style>
+</head>
+
+<body>
+<canvas id="canvas">CANVAS ELEMENT NOT SUPPORTED</canvas>
+<script>
+  var Module = {
+    print: function(text) {
+      console.log(text);
+    },
+    printErr: function(text) {
+      console.log(text);
+    },
+    canvas: (function() {
+      var canvas = document.getElementById('canvas');
+      return canvas;
+    })()
+  };
+</script>
+
+{{{ SCRIPT }}}
+
+</body>
+</html>
