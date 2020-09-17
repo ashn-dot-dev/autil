@@ -38,7 +38,7 @@ USAGE
 
 
 CHANGELOG
-    Unreleased
+    v0.2.0 - 2020-09-16
     -------------------
     + Initial release.
     + Added engine initialization, finalization, execution, timing, and other
