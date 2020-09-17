@@ -35,7 +35,7 @@ USAGE
 
 
 CHANGELOG
-    Unreleased
+    v0.2.0 - 2020-09-16
     -------------------
     + Added function infof.
     + Added macro ARRAY_COUNT.
@@ -78,10 +78,6 @@ LICENSE
 
 #ifndef AUTIL_H_INCLUDED
 #define AUTIL_H_INCLUDED
-
-#define AUTIL_VERSION_MAJOR 0
-#define AUTIL_VERSION_MINOR 1
-#define AUTIL_VERSION_PATCH 0
 
 #ifndef AUTIL_API
 #    define AUTIL_API extern
