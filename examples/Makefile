@@ -3,7 +3,8 @@
 .PHONY: build clean
 
 EXAMPLES = \
-	life
+	life \
+	dvd-screensaver
 
 build:
 	@for ex in $(EXAMPLES); do (cd $$ex && $(MAKE)); done
