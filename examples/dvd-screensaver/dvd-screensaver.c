@@ -32,7 +32,7 @@ update_color(struct sprite* spr, struct rgba const* color)
 static uint8_t
 rand_rgb(void)
 {
-    uint8_t const val = rand() % UINT8_MAX;
+    uint8_t const val = (uint8_t)(rand() % UINT8_MAX);
     static uint8_t const min = 0x20;
     return val > min ? val : min;
 }
@@ -49,6 +49,7 @@ update_color_random(struct sprite* spr)
 static int
 runtick(void* ctx)
 {
+    (void)ctx;
     static double time = 0.0;
     static double prev = 0.0;
     double const now = aengn_now();
