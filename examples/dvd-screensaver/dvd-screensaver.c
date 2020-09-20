@@ -104,7 +104,7 @@ main(void)
         return EXIT_FAILURE;
     }
 
-    aengn_run(runtick, dvd);
+    aengn_run(runtick, NULL);
 
     sprite_del(dvd);
     return EXIT_SUCCESS;
