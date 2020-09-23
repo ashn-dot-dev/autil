@@ -4,7 +4,8 @@
 
 EXAMPLES = \
 	life \
-	dvd-screensaver
+	dvd-screensaver \
+	shapes
 
 build:
 	@for ex in $(EXAMPLES); do (cd $$ex && $(MAKE)); done

@@ -11,11 +11,12 @@ DEPENDENCIES
         #include "aengn.h"
 
     This library depends on and links against the development-libraries:
-    1. SDL2
-    2. SDL2_image
+    1. libm
+    2. libSDL2
+    3. libSDL2_image
 
     Linker flags (gcc/clang):
-        -lSDL2 -lSDL2_image
+        -m -lSDL2 -lSDL2_image
 
     Installation (Debian/Ubuntu):
         $ apt-get -y install libsdl2-dev
@@ -38,6 +39,10 @@ USAGE
 
 
 CHANGELOG
+    Unreleased
+    -------------------
+    + Add rendering functions: draw_point, draw_line, and draw_rect.
+
     v0.2.0 - 2020-09-16
     -------------------
     + Initial release.
@@ -86,10 +91,14 @@ LICENSE
 #endif
 
 #include <stdbool.h>
+#include <math.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+// These macros are used in place of the SDL2 SDL_BUTTON_* value-like macros
+// and SDL_BUTTON function-like macro to avoid the somewhat awkward use of
+// SDL_BUTTON(SDL_BUTTON_WHATEVER) bitmask returned by SDL_GetMouseState.
 // clang-format off
 #define MOUSEBUTTON_LEFT   ((int)0)
 #define MOUSEBUTTON_RIGHT  ((int)1)
@@ -227,10 +236,25 @@ load_sprite(char const* path);
 // The call draw_clear(NULL) will clear the screen with an opaque black.
 AENGN_API void
 draw_clear(struct rgba const* color);
+// Draw a point at (x, y).
+// Returns a non-zero value on error.
+AENGN_API int
+draw_point(int x, int y, struct rgba const* color);
+// Draw a line from (x1, y1) to (x2, y2).
+// Returns a non-zero value on error.
+AENGN_API int
+draw_line(int x1, int y1, int x2, int y2, struct rgba const* color);
+// Draw axis-aligned rectangle with one corner at (x1, y1) and the opposite
+// corner at (x2, y2).
+// Returns a non-zero value on error.
+AENGN_API int
+draw_rect(int x1, int y1, int x2, int y2, struct rgba const* color);
 // Draw the provided SDL_Texture with top-left position at (x, y).
+// Returns a non-zero value on error.
 AENGN_API int
 draw_texture(SDL_Texture* tex, int x, int y);
 // Draw the provided sprite with top-left position at (x, y).
+// Returns a non-zero value on error.
 AENGN_API int
 draw_sprite(struct sprite* sprite, int x, int y);
 // Present the results of draw_* calls onto the screen.
@@ -772,6 +796,111 @@ draw_clear(struct rgba const* color)
     }
     SDL_SetRenderDrawColor(g_renderer, color->r, color->g, color->b, color->a);
     SDL_RenderClear(g_renderer);
+}
+
+AENGN_API int
+draw_point(int x, int y, struct rgba const* color)
+{
+    assert(color != NULL);
+
+    SDL_SetRenderDrawColor(g_renderer, color->r, color->g, color->b, color->a);
+    SDL_Rect const rect = {.x = x * g_pixel_scale,
+                           .y = y * g_pixel_scale,
+                           .w = g_pixel_scale,
+                           .h = g_pixel_scale};
+    int const err = SDL_RenderFillRect(g_renderer, &rect);
+    if (err) {
+        errorf("[%s][SDL_RenderFillRect] %s", __func__, SDL_GetError());
+    }
+    return err;
+}
+
+// Optimized line function from the article "Line drawing on a grid" written by
+// Red Blob Games, ported from C# to C99.
+//
+// Vecs xpos and ypos are caller-allocated and should be initialized to hold
+// elements of type int.
+static void
+line_pos_(int x1, int y1, int x2, int y2, struct vec* xpos, struct vec* ypos)
+{
+    assert(xpos != NULL);
+    assert(ypos != NULL);
+
+    vec_resize(xpos, 0);
+    vec_resize(ypos, 0);
+
+    // The number of steps to take is exactly the diagonal distance between
+    // (x1, y1) and (x2, y2).
+    int const dx = x2 - x1;
+    int const dy = y2 - y1;
+    int const abs_dx = abs(dx);
+    int const abs_dy = abs(dy);
+    int const nsteps = abs_dx > abs_dy ? abs_dx : abs_dy;
+
+    double const nsteps_inverse = 1.0 / (double)nsteps;
+    double const xstep = dx * nsteps_inverse;
+    double const ystep = dy * nsteps_inverse;
+
+    // Populate the xpos and ypos vectors with each (x, y) point from (x1, y1)
+    // to (x2, y2). These points are connected by either a pixel edge, or a
+    // corner between the two pixels.
+    double x = (double)x1;
+    double y = (double)y1;
+    for (int step = 0; step <= nsteps; ++step) {
+        int const xround = (int)round(x);
+        int const yround = (int)round(y);
+        vec_insert(xpos, vec_count(xpos), &xround);
+        vec_insert(ypos, vec_count(ypos), &yround);
+
+        x += xstep;
+        y += ystep;
+    }
+}
+
+// The implementation of the draw_line function uses the optim
+// https://www.redblobgames.com/grids/line-drawing.html
+AENGN_API int
+draw_line(int x1, int y1, int x2, int y2, struct rgba const* color)
+{
+    assert(color != NULL);
+
+    struct vec* const xpos = vec_new(sizeof(int));
+    struct vec* const ypos = vec_new(sizeof(int));
+    line_pos_(x1, y1, x2, y2, xpos, ypos);
+
+    int err = 0;
+    assert(vec_count(xpos) == vec_count(ypos));
+    size_t const npoints = vec_count(xpos);
+    for (size_t i = 0; i < npoints; ++i) {
+        err |= draw_point(
+            DEREF_PTR(int, vec_get(xpos, i)),
+            DEREF_PTR(int, vec_get(ypos, i)),
+            color);
+    }
+    if (err) {
+        errorf("[%s][draw_point] Failed to draw point(s)", __func__);
+    }
+
+    vec_del(xpos);
+    vec_del(ypos);
+    return err;
+}
+
+AENGN_API int
+draw_rect(int x1, int y1, int x2, int y2, struct rgba const* color)
+{
+    assert(color != NULL);
+
+    int err = 0;
+    err |= draw_line(x1, y1, x2, y1, color);
+    err |= draw_line(x1, y2, x2, y2, color);
+    err |= draw_line(x1, y1, x1, y2, color);
+    err |= draw_line(x2, y1, x2, y2, color);
+
+    if (err) {
+        errorf("[%s][draw_line] Failed to draw rect line(s)", __func__);
+    }
+    return err;
 }
 
 static void

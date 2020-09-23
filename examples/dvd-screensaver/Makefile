@@ -4,7 +4,7 @@
 
 CC = c99
 CFLAGS = -DNDEBUG
-LDLIBS = -lSDL2 -lSDL2_image
+LDLIBS = -lm -lSDL2 -lSDL2_image
 TARGET = dvd-screensaver
 SRCS = $(TARGET).c
 

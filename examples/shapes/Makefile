@@ -5,13 +5,12 @@
 CC = c99
 CFLAGS = -DNDEBUG
 LDLIBS = -lm -lSDL2 -lSDL2_image
-TARGET = life
+TARGET = shapes
 SRCS = $(TARGET).c
 
 EMSHELL = --shell-file ../emscripten-shell.html
-EMEMBED = # None (normally something like => --embed-file assets)
 EMFLAGS = \
-	$(EMSHELL) $(EMEMBED) \
+	$(EMSHELL) \
 	-s USE_SDL=2 \
 	-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'
 
