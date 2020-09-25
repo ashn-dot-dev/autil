@@ -51,7 +51,7 @@ CHANGELOG
       screen_w, screen_h, pixel_scale.
     + Added input state retrieval functions: scankey_state, virtkey_state,
       mousebutton_state, mousepos_x, mousepos_y, and associated macros.
-    + Added type sprite, type rgva, and associated functions / macros:
+    + Added type sprite, type rgba, and associated functions / macros:
       sprite_new, sprite_del, sprite_w, sprite_h, sprite_set_pixel,
       sprite_get_pixel, sprite_update_texture, and RGBA_LOCAL_PTR.
     + Added resource loading functions: load_surface, load_texture, and
@@ -107,7 +107,7 @@ LICENSE
 // clang-format on
 
 // Returns non-zero if should quit.
-typedef int (*onupdate_fn)(void* ctx);
+typedef int (*runtick_fn)(void* ctx);
 
 // Initialize the engine and create a window with screen_w and screen_h virtual
 // pixels each composed of pixel_scale by pixel_scale physical pixels.
@@ -118,10 +118,10 @@ aengn_init(int screen_w, int screen_h, int pixel_scale);
 // application. This function may be registered with atexit.
 AENGN_API void
 aengn_fini(void);
-// Start the main application loop, calling the user-provided update function
+// Start the main application loop, calling the user-provided runtick function
 // once per tick of the main loop.
 AENGN_API void
-aengn_run(onupdate_fn update, void* ctx);
+aengn_run(runtick_fn runtick, void* ctx);
 // Returns the number of seconds elapsed since the invocation of aengn_run.
 AENGN_API double
 aengn_now(void);
@@ -426,8 +426,8 @@ aengn_fini(void)
 // With either function we need these adaptor variables to properly forward the
 // update and ctx parameters to the callback.
 // clang-format off
-static onupdate_fn g_run__main_loop_body__update = NULL;
-static void*       g_run__main_loop_body__ctx    = NULL;
+static runtick_fn g_run__main_loop_body__update = NULL;
+static void*      g_run__main_loop_body__ctx    = NULL;
 // clang-format on
 // Compatible with em_callback_func (Emscripten v2.0.2+).
 static void
@@ -439,7 +439,7 @@ aengn_run__main_loop_body(void)
 }
 
 AENGN_API void
-aengn_run(onupdate_fn update, void* ctx)
+aengn_run(runtick_fn update, void* ctx)
 {
     g_run__main_loop_body__update = update;
     g_run__main_loop_body__ctx = ctx;

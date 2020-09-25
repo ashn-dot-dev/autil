@@ -57,7 +57,7 @@ static void
 main_fini(void);
 
 static int
-onupdate(void* ctx);
+runtick(void* ctx);
 static int
 hinput(void);
 static void
@@ -82,7 +82,7 @@ main(int argc, char** argv)
     }
     atexit(main_fini);
 
-    aengn_run(onupdate, NULL);
+    aengn_run(runtick, NULL);
     return EXIT_SUCCESS;
 }
 
@@ -202,7 +202,7 @@ main_fini(void)
 }
 
 static int
-onupdate(void* ctx)
+runtick(void* ctx)
 {
     (void)ctx;
     static double time_accumulator = 0.0;
