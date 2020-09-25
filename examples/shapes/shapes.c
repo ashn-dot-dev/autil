@@ -72,8 +72,7 @@ runtick(void* ctx)
         struct shape const s = {
             .kind = selected,
             .p1 = tmp_shape_start,
-            .p2 = (struct point){.x = mousepos_x(), .y = mousepos_y()}
-        };
+            .p2 = (struct point){.x = mousepos_x(), .y = mousepos_y()}};
         vec_insert(shapes, vec_count(shapes), &s);
     }
 
@@ -106,8 +105,7 @@ runtick(void* ctx)
         struct shape const s = {
             .kind = selected,
             .p1 = tmp_shape_start,
-            .p2 = (struct point){.x = mousepos_x(), .y = mousepos_y()}
-        };
+            .p2 = (struct point){.x = mousepos_x(), .y = mousepos_y()}};
         // The shape itself.
         draw_shape(&s);
         // Start point.

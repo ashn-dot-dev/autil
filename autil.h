@@ -566,6 +566,7 @@ AUTIL_API void
 vec_insert(struct vec* self, size_t idx, void const* data)
 {
     assert(self != NULL);
+
     if (idx > self->count) {
         fatalf("[%s] Invalid index", __func__);
     }
