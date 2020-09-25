@@ -41,7 +41,7 @@ static void
 draw_shape(struct shape const* s);
 
 int
-main(int argc, char** argv)
+main(void)
 {
     if (aengn_init(CELLS_W, CELLS_H, PIXEL_SCALE) != 0) {
         return EXIT_FAILURE;
@@ -58,6 +58,8 @@ main(int argc, char** argv)
 static int
 runtick(void* ctx)
 {
+    (void)ctx;
+
     // Escape => Quit.
     if (virtkey_state(SDLK_ESCAPE)->released) {
         return 1;
