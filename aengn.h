@@ -817,6 +817,7 @@ draw_point(int x, int y, struct rgba const* color)
 
 // Optimized line function from the article "Line drawing on a grid" written by
 // Red Blob Games, ported from C# to C99.
+// https://www.redblobgames.com/grids/line-drawing.html
 //
 // Vecs xpos and ypos are caller-allocated and should be initialized to hold
 // elements of type int.
@@ -857,8 +858,6 @@ line_pos_(int x1, int y1, int x2, int y2, struct vec* xpos, struct vec* ypos)
     }
 }
 
-// The implementation of the draw_line function uses the optim
-// https://www.redblobgames.com/grids/line-drawing.html
 AENGN_API int
 draw_line(int x1, int y1, int x2, int y2, struct rgba const* color)
 {
