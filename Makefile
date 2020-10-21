@@ -1,6 +1,11 @@
 .POSIX:
 .SUFFIXES:
-.PHONY: all test examples clean format
+.PHONY: \
+	all \
+	test \
+	examples \
+	clean \
+	format
 .SILENT: clean
 
 C99_DBG = -O0 -g
@@ -24,24 +29,41 @@ CFLAGS = $(C99_REL)
 
 all: test examples
 
-test:
-	@echo '== TEST =='
-	cd test && $(MAKE) run CC='$(CC)' CFLAGS='$(CFLAGS)'
-
-examples:
-	@echo '== EXAMPLES =='
-	cd examples && $(MAKE) build CC='$(CC)' CFLAGS='$(CFLAGS)'
+TESTS = \
+	test/static.test \
+	test/custom-allocator.test \
+	test/infof.test \
+	test/errorf.test \
+	test/fatalf.test \
+	test/xalloc.test \
+	test/xallocn.test \
+	test/file_read.test \
+	test/file_write.test \
+	test/vec_reserve.test \
+	test/vec_resize.test \
+	test/vec_insert.test \
+	test/vec_remove.test \
+	test/vec_set.test \
+	test/vec_get.test \
+	test/map_insert.test \
+	test/map_remove.test \
+	test/map_lookup.test \
+	test/map.example.test
+test: $(TESTS)
+	(cd test/ && sh test-all.sh)
 
 clean:
-	@echo '== CLEAN =='
-	cd test && $(MAKE) clean
+	rm -f $(TESTS)
 	cd examples && $(MAKE) clean
 
 format:
-	@echo '== FORMAT =='
 	clang-format -i \
 		*.h \
 		$$(find test/ -type f -name '*.h') \
 		$$(find test/ -type f -name '*.c') \
 		$$(find examples/ -type f -name '*.h') \
 		$$(find examples/ -type f -name '*.c')
+
+.SUFFIXES: .c .test
+.c.test:
+	$(CC) -o $@ $(CFLAGS) $<
