@@ -7,3 +7,7 @@ emsdk/
 *.html
 *.js
 *.wasm
+
+examples/dvd
+examples/life
+examples/shapes
