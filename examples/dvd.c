@@ -88,7 +88,8 @@ runtick(void* ctx)
 
     draw_clear(NULL);
     draw_sprite(dvd, x, y);
-    draw_show();
+
+    aengn_end_frame();
     return 0;
 }
 
