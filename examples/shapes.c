@@ -117,8 +117,8 @@ runtick(void* ctx)
             draw_point(mousepos_x(), mousepos_y(), &RGBA_PURPLE);
         }
     }
-    draw_show();
 
+    aengn_end_frame();
     return 0;
 }
 

@@ -42,6 +42,7 @@ CHANGELOG
     Unreleased
     -------------------
     + Add rendering functions: draw_point, draw_line, and draw_rect.
+    + Rename draw_show to aengn_end_frame.
 
     v0.2.0 - 2020-09-16
     -------------------
@@ -125,6 +126,10 @@ aengn_run(runtick_fn runtick, void* ctx);
 // Returns the number of seconds elapsed since the invocation of aengn_run.
 AENGN_API double
 aengn_now(void);
+// Present the results of draw_* calls onto the screen.
+// Calling this function conceptually "ends" the current frame.
+AENGN_API void
+aengn_end_frame(void);
 
 // Returns the width of the screen in virtual pixels.
 // The width of the display area in physical pixels can be calculated with:
@@ -257,10 +262,6 @@ draw_texture(SDL_Texture* tex, int x, int y);
 // Returns a non-zero value on error.
 AENGN_API int
 draw_sprite(struct sprite* sprite, int x, int y);
-// Present the results of draw_* calls onto the screen.
-// Calling this function conceptually "ends" the current frame.
-AENGN_API void
-draw_show(void);
 
 #endif // AENGN_H_INCLUDED
 
@@ -451,6 +452,8 @@ aengn_run(runtick_fn update, void* ctx)
     g_fps_period_start = now;
     g_fps_period_count = 0;
 
+    draw_clear(NULL);
+    aengn_end_frame();
 #ifdef __EMSCRIPTEN__
     em_callback_func const main_loop_body = aengn_run__main_loop_body;
     emscripten_set_main_loop(main_loop_body, 0, 1);
@@ -467,6 +470,133 @@ aengn_now(void)
     Uint64 const now = SDL_GetPerformanceCounter();
     Uint64 const elapsed = now - g_run_start;
     return (double)elapsed / (double)SDL_GetPerformanceFrequency();
+}
+
+static void
+process_event_(SDL_Event const* event)
+{
+    assert(event != NULL);
+
+    // SDL_QuitEvent
+    if (event->type == SDL_QUIT) {
+        g_should_quit = true;
+    }
+
+    // SDL_KeyboardEvent
+    SDL_Scancode scankey = (SDL_Scancode)0xDEADBEEF;
+    SDL_Keycode virtkey = (SDL_Keycode)0xDEADBEEF;
+    struct button_state* scanstate = NULL;
+    struct button_state* virtstate = NULL;
+    if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
+        scankey = event->key.keysym.scancode;
+        virtkey = event->key.keysym.sym;
+        scanstate = map_lookup(g_scankey_map, &scankey);
+        virtstate = map_lookup(g_virtkey_map, &virtkey);
+        if (scanstate == NULL) {
+            map_insert(
+                g_scankey_map, &scankey, &BUTTON_STATE_DEFAULT, NULL, NULL);
+            scanstate = map_lookup(g_scankey_map, &scankey);
+        }
+        if (virtstate == NULL) {
+            map_insert(
+                g_virtkey_map, &virtkey, &BUTTON_STATE_DEFAULT, NULL, NULL);
+            virtstate = map_lookup(g_virtkey_map, &virtkey);
+        }
+        assert(scanstate != NULL);
+        assert(virtstate != NULL);
+    }
+    if (event->type == SDL_KEYDOWN) {
+        assert(scanstate != NULL);
+        assert(virtstate != NULL);
+        scanstate->pressed = true;
+        virtstate->pressed = true;
+        scanstate->down = true;
+        virtstate->down = true;
+    }
+    if (event->type == SDL_KEYUP) {
+        assert(scanstate != NULL);
+        assert(virtstate != NULL);
+        scanstate->released = true;
+        virtstate->released = true;
+        scanstate->down = false;
+        virtstate->down = false;
+    }
+
+    // SDL_MouseButtonEvent
+    struct button_state* mousebtnstate = NULL;
+    if (event->type == SDL_MOUSEBUTTONDOWN
+        || event->type == SDL_MOUSEBUTTONUP) {
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_LEFT];
+        }
+        if (event->button.button == SDL_BUTTON_RIGHT) {
+            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_RIGHT];
+        }
+        if (event->button.button == SDL_BUTTON_MIDDLE) {
+            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_MIDDLE];
+        }
+    }
+    if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONDOWN) {
+        mousebtnstate->pressed = true;
+        mousebtnstate->down = true;
+    }
+    if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONUP) {
+        mousebtnstate->released = true;
+        mousebtnstate->down = false;
+    }
+}
+
+AENGN_API void
+aengn_end_frame(void)
+{
+    // Render the frame.
+    SDL_RenderPresent(g_renderer);
+
+    // Since a frame has just ended, perform FPS calculations.
+    Uint64 const ONE_SECOND = SDL_GetPerformanceFrequency();
+    Uint64 const now = SDL_GetPerformanceCounter();
+    Uint64 const fps_period_elapsed = now - g_fps_period_start;
+    g_fps_period_count += 1;
+    if (fps_period_elapsed >= ONE_SECOND) {
+        double const sec = (double)fps_period_elapsed / (double)ONE_SECOND;
+        double const fps = (double)g_fps_period_count / sec;
+        char title[256] = {0};
+        snprintf(title, ARRAY_COUNT(title) - 1, "FPS: %0.2f", fps);
+        SDL_SetWindowTitle(g_window, title);
+        g_fps_period_start = now;
+        g_fps_period_count = 0;
+    }
+    // From this moment on we consider all work done part of the *next* frame
+    // since any future work will have happened *after* the user was shown the
+    // result of previous draw calls (i.e. the content of the frame).
+    g_frame_start = now;
+
+    // Clear previous frame's input state.
+    struct vec const* const scankeys = map_vals(g_scankey_map);
+    for (size_t i = 0; i < vec_count(scankeys); ++i) {
+        struct button_state* const sk = vec_get(scankeys, i);
+        assert(sk != NULL);
+        sk->pressed = false;
+        sk->released = false;
+    }
+    struct vec const* const virtkeys = map_vals(g_virtkey_map);
+    for (size_t i = 0; i < vec_count(virtkeys); ++i) {
+        struct button_state* const vk = vec_get(virtkeys, i);
+        assert(vk != NULL);
+        vk->pressed = false;
+        vk->released = false;
+    }
+    for (size_t i = 0; i < MOUSEBUTTON_COUNT; ++i) {
+        struct button_state* const btn = &g_mousebutton_state[i];
+        btn->pressed = false;
+        btn->released = false;
+    }
+
+    // Process all new input state for the next frame.
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        process_event_(&event);
+    }
 }
 
 AENGN_API int
@@ -900,133 +1030,6 @@ draw_rect(int x1, int y1, int x2, int y2, struct rgba const* color)
         errorf("[%s][draw_line] Failed to draw rect line(s)", __func__);
     }
     return err;
-}
-
-static void
-process_event_(SDL_Event const* event)
-{
-    assert(event != NULL);
-
-    // SDL_QuitEvent
-    if (event->type == SDL_QUIT) {
-        g_should_quit = true;
-    }
-
-    // SDL_KeyboardEvent
-    SDL_Scancode scankey = (SDL_Scancode)0xDEADBEEF;
-    SDL_Keycode virtkey = (SDL_Keycode)0xDEADBEEF;
-    struct button_state* scanstate = NULL;
-    struct button_state* virtstate = NULL;
-    if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
-        scankey = event->key.keysym.scancode;
-        virtkey = event->key.keysym.sym;
-        scanstate = map_lookup(g_scankey_map, &scankey);
-        virtstate = map_lookup(g_virtkey_map, &virtkey);
-        if (scanstate == NULL) {
-            map_insert(
-                g_scankey_map, &scankey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            scanstate = map_lookup(g_scankey_map, &scankey);
-        }
-        if (virtstate == NULL) {
-            map_insert(
-                g_virtkey_map, &virtkey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            virtstate = map_lookup(g_virtkey_map, &virtkey);
-        }
-        assert(scanstate != NULL);
-        assert(virtstate != NULL);
-    }
-    if (event->type == SDL_KEYDOWN) {
-        assert(scanstate != NULL);
-        assert(virtstate != NULL);
-        scanstate->pressed = true;
-        virtstate->pressed = true;
-        scanstate->down = true;
-        virtstate->down = true;
-    }
-    if (event->type == SDL_KEYUP) {
-        assert(scanstate != NULL);
-        assert(virtstate != NULL);
-        scanstate->released = true;
-        virtstate->released = true;
-        scanstate->down = false;
-        virtstate->down = false;
-    }
-
-    // SDL_MouseButtonEvent
-    struct button_state* mousebtnstate = NULL;
-    if (event->type == SDL_MOUSEBUTTONDOWN
-        || event->type == SDL_MOUSEBUTTONUP) {
-        if (event->button.button == SDL_BUTTON_LEFT) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_LEFT];
-        }
-        if (event->button.button == SDL_BUTTON_RIGHT) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_RIGHT];
-        }
-        if (event->button.button == SDL_BUTTON_MIDDLE) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_MIDDLE];
-        }
-    }
-    if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONDOWN) {
-        mousebtnstate->pressed = true;
-        mousebtnstate->down = true;
-    }
-    if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONUP) {
-        mousebtnstate->released = true;
-        mousebtnstate->down = false;
-    }
-}
-
-AENGN_API void
-draw_show(void)
-{
-    // Render the frame.
-    SDL_RenderPresent(g_renderer);
-
-    // Since a frame has just ended, perform FPS calculations.
-    Uint64 const ONE_SECOND = SDL_GetPerformanceFrequency();
-    Uint64 const now = SDL_GetPerformanceCounter();
-    Uint64 const fps_period_elapsed = now - g_fps_period_start;
-    g_fps_period_count += 1;
-    if (fps_period_elapsed >= ONE_SECOND) {
-        double const sec = (double)fps_period_elapsed / (double)ONE_SECOND;
-        double const fps = (double)g_fps_period_count / sec;
-        char title[256] = {0};
-        snprintf(title, ARRAY_COUNT(title) - 1, "FPS: %0.2f", fps);
-        SDL_SetWindowTitle(g_window, title);
-        g_fps_period_start = now;
-        g_fps_period_count = 0;
-    }
-    // From this moment on we consider all work done part of the *next* frame
-    // since any future work will have happened *after* the user was shown the
-    // result of previous draw calls (i.e. the content of the frame).
-    g_frame_start = now;
-
-    // Clear previous frame's input state.
-    struct vec const* const scankeys = map_vals(g_scankey_map);
-    for (size_t i = 0; i < vec_count(scankeys); ++i) {
-        struct button_state* const sk = vec_get(scankeys, i);
-        assert(sk != NULL);
-        sk->pressed = false;
-        sk->released = false;
-    }
-    struct vec const* const virtkeys = map_vals(g_virtkey_map);
-    for (size_t i = 0; i < vec_count(virtkeys); ++i) {
-        struct button_state* const vk = vec_get(virtkeys, i);
-        assert(vk != NULL);
-        vk->pressed = false;
-        vk->released = false;
-    }
-    for (size_t i = 0; i < MOUSEBUTTON_COUNT; ++i) {
-        struct button_state* const btn = &g_mousebutton_state[i];
-        btn->pressed = false;
-        btn->released = false;
-    }
-
-    // Process all new input state for the next frame.
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        process_event_(&event);
-    }
 }
 
 #endif // AENGN_IMPLEMENTATION

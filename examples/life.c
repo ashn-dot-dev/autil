@@ -219,6 +219,7 @@ runtick(void* ctx)
         time_accumulator -= TIMESTEP;
     }
     render();
+    aengn_end_frame();
 
     return quit;
 }
@@ -342,7 +343,6 @@ render(void)
 
         draw_sprite(spr_mouse, mousepos_x(), mousepos_y());
     }
-    draw_show();
 }
 
 static void
