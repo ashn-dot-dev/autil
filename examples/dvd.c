@@ -99,7 +99,7 @@ main(void)
         return EXIT_FAILURE;
     }
 
-    dvd = load_sprite("assets/dvd-logo-90x40.png");
+    dvd = load_sprite("dvd-assets/dvd-logo-90x40.png");
     if (dvd == NULL) {
         return EXIT_FAILURE;
     }
