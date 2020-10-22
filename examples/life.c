@@ -1,7 +1,7 @@
 #define AUTIL_IMPLEMENTATION
-#include "../../autil.h"
+#include "../autil.h"
 #define AENGN_IMPLEMENTATION
-#include "../../aengn.h"
+#include "../aengn.h"
 
 #define VERSION "0.2"
 
