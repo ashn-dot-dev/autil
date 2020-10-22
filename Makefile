@@ -4,6 +4,7 @@
 	all \
 	test \
 	examples \
+	examples-web \
 	clean \
 	format
 .SILENT: clean
