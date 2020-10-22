@@ -52,13 +52,14 @@ $ make examples                      # Release (c99)
 $ make examples CC=clang CFLAGS='$(GNU_DBG)'  # Debug   (gcc/clang)
 $ make examples CC=clang CFLAGS='$(GNU_REL)'  # Release (gcc/clang)
 
-$ (cd examples/<example-with-web-support> && make browser) # Release (emcc)
+$ make examples-web CFLAGS='$(GNU_DBG)'  # Debug   (emscripten)
+$ make examples-web CFLAGS='$(GNU_REL)'  # Release (emscripten)
 ```
 
 ### Running
 Native applications are run as you would expect with no real surprises.
-For applications that load assets relative to the working directory, you should
-run the application from within its example directory.
+For example applications that load assets relative to the working directory, you
+should run the application from within the `example/` directory.
 Note that some native applications built using `aengn.h` may provide additional
 command line options not seen when the binary is run by selecting it from within
 a file browser.
@@ -71,9 +72,8 @@ $ python3 -m http.server 8080
 ```
 and navigating to `http://localhost:8080/path/to/the/example.html` within your
 browser.
-
-Web applications build and bundled as a single `.bundle.html` file should work
-out of the box in major browsers if you open the `.bundle.html` page directly.
+Currently each web application and its assets are bundled into a single `.html`
+file to circumvent this issue.
 
 
 ## License

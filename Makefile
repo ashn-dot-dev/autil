@@ -24,10 +24,14 @@ GNU_DBG = $(GNU_BASE) -O0 -g
 GNU_REL = $(GNU_BASE) -Os -DNDEBUG
 SANITIZE = -fsanitize=address -fsanitize=leak -fsanitize=undefined
 
+EMFLAGS = \
+	--shell-file examples/emscripten-shell.html \
+	-s SINGLE_FILE=1 \
+	-s USE_SDL=2 \
+	-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'
+
 CC = c99
 CFLAGS = $(C99_REL)
-
-all: test examples
 
 TESTS = \
 	test/static.test \
@@ -49,12 +53,41 @@ TESTS = \
 	test/map_remove.test \
 	test/map_lookup.test \
 	test/map.example.test
+
+EXAMPLES = \
+	examples/dvd \
+	examples/life \
+	examples/shapes
+EXAMPLES_WEB = \
+	examples/dvd.html \
+	examples/life.html \
+	examples/shapes.html
+
+all: test examples examples-web
+
 test: $(TESTS)
 	(cd test/ && sh test-all.sh)
 
+examples: $(EXAMPLES)
+examples/dvd: examples/dvd.c
+	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+examples/life: examples/life.c
+	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+examples/shapes: examples/shapes.c
+	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+
+examples-web: $(EXAMPLES_WEB)
+examples/dvd.html: examples/dvd.c
+	emcc -o $@ $< $(CFLAGS) $(EMFLAGS) --embed-file examples/dvd-assets@assets/
+examples/life.html: examples/life.c
+	emcc -o $@ $< $(CFLAGS) $(EMFLAGS)
+examples/shapes.html: examples/shapes.c
+	emcc -o $@ $< $(CFLAGS) $(EMFLAGS)
+
 clean:
 	rm -f $(TESTS)
-	cd examples && $(MAKE) clean
+	rm -f $(EXAMPLES)
+	rm -f $(EXAMPLES_WEB)
 
 format:
 	clang-format -i \
