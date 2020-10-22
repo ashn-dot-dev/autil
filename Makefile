@@ -79,7 +79,8 @@ examples/shapes: examples/shapes.c
 
 examples-web: $(EXAMPLES_WEB)
 examples/dvd.html: examples/dvd.c
-	emcc -o $@ $< $(CFLAGS) $(EMFLAGS) --embed-file examples/dvd-assets@assets/
+	emcc -o $@ $< $(CFLAGS) $(EMFLAGS) \
+		--embed-file examples/dvd-assets@dvd-assets/
 examples/life.html: examples/life.c
 	emcc -o $@ $< $(CFLAGS) $(EMFLAGS)
 examples/shapes.html: examples/shapes.c
