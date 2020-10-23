@@ -419,7 +419,8 @@ is_punct(int c)
 AUTIL_API int
 is_space(int c)
 {
-    return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v';
+    return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t'
+        || c == '\v';
 }
 
 AUTIL_API int
