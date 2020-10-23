@@ -38,9 +38,10 @@ CHANGELOG
     Unreleased
     -------------------
     + Added macro FMT_COUNT.
-    + Added safe ctype functions is_alnum, is_alpha, is_blank, is_cntrl,
+    + Added safe ctype functions: is_alnum, is_alpha, is_blank, is_cntrl,
       is_digit, is_graph, is_lower, is_print, is_punct, is_space, is_upper,
       is_xdigit, to_lower, and to_upper.
+    + Added function vec_elemsize.
 
     v0.2.0 - 2020-09-16
     -------------------
@@ -220,6 +221,9 @@ vec_count(struct vec const* self);
 // The number of elements allocated in the vec.
 AUTIL_API size_t
 vec_capacity(struct vec const* self);
+// The sizeof of elements in the vec.
+AUTIL_API size_t
+vec_elemsize(struct vec const* self);
 
 // Update the minimum capacity of the vec.
 // The count of the vec remains unchanged.
@@ -632,6 +636,14 @@ vec_capacity(struct vec const* self)
     assert(self != NULL);
 
     return self->capacity;
+}
+
+AUTIL_API size_t
+vec_elemsize(struct vec const* self)
+{
+    assert(self != NULL);
+
+    return self->elemsize;
 }
 
 AUTIL_API void
