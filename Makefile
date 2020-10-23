@@ -49,6 +49,8 @@ TESTS = \
 	test/is_space.test \
 	test/is_upper.test \
 	test/is_xdigit.test \
+	test/to_lower.test \
+	test/to_upper.test \
 	test/infof.test \
 	test/errorf.test \
 	test/fatalf.test \
