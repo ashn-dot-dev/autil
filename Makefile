@@ -37,6 +37,18 @@ CFLAGS = $(C99_REL)
 TESTS = \
 	test/static.test \
 	test/custom-allocator.test \
+	test/is_alnum.test \
+	test/is_alpha.test \
+	test/is_blank.test \
+	test/is_cntrl.test \
+	test/is_digit.test \
+	test/is_graph.test \
+	test/is_lower.test \
+	test/is_print.test \
+	test/is_punct.test \
+	test/is_space.test \
+	test/is_upper.test \
+	test/is_xdigit.test \
 	test/infof.test \
 	test/errorf.test \
 	test/fatalf.test \

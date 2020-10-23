@@ -35,6 +35,13 @@ USAGE
 
 
 CHANGELOG
+    Unreleased
+    -------------------
+    + Added macro FMT_COUNT.
+    + Added safe ctype functions is_alnum, is_alpha, is_blank, is_cntrl,
+      is_digit, is_graph, is_lower, is_print, is_punct, is_space, is_upper,
+      is_xdigit, to_lower, and to_upper.
+
     v0.2.0 - 2020-09-16
     -------------------
     + Added function infof.
@@ -115,6 +122,30 @@ int_vpcmp(void const* lhs, void const* rhs); // int
 #define ARRAY_COUNT(array_) (sizeof(array_) / sizeof((array_)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
 #define CSTR_COUNT(cstr_) (ARRAY_COUNT(cstr_) - 1)
+
+// Number of characters in a formatted string.
+#define FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
+
+// Alternatives to the C99 character handling functions in ctype.h.
+// These functions always use the "C" locale and will not trigger undefined
+// behavior when passed a value not representable by an unsigned char.
+// clang-format off
+AUTIL_API int is_alnum(int c);
+AUTIL_API int is_alpha(int c);
+AUTIL_API int is_blank(int c);
+AUTIL_API int is_cntrl(int c);
+AUTIL_API int is_digit(int c);
+AUTIL_API int is_graph(int c);
+AUTIL_API int is_lower(int c);
+AUTIL_API int is_print(int c);
+AUTIL_API int is_punct(int c);
+AUTIL_API int is_space(int c);
+AUTIL_API int is_upper(int c);
+AUTIL_API int is_xdigit(int c);
+//
+AUTIL_API int to_lower(int c);
+AUTIL_API int to_upper(int c);
+// clang-format on
 
 // Write a formatted error message to stderr.
 // A newline is automatically appended to the end of the formatted message.
@@ -297,7 +328,6 @@ map_remove(struct map* self, void const* key, void* oldkey, void* oldval);
 #endif // AUTIL_FREE
 
 #include <assert.h>
-#include <ctype.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -330,6 +360,96 @@ int_vpcmp(void const* lhs, void const* rhs)
         return +1;
     }
     return 0;
+}
+
+AUTIL_API int
+is_alnum(int c)
+{
+    return is_alpha(c) || is_digit(c);
+}
+
+AUTIL_API int
+is_alpha(int c)
+{
+    return is_upper(c) || is_lower(c);
+}
+
+AUTIL_API int
+is_blank(int c)
+{
+    return c == ' ' || c == '\t';
+}
+
+AUTIL_API int
+is_cntrl(int c)
+{
+    return (unsigned)c < 0x20 || c == 0x7f;
+}
+
+AUTIL_API int
+is_digit(int c)
+{
+    return (unsigned)c - '0' < 10;
+}
+
+AUTIL_API int
+is_graph(int c)
+{
+    return is_print(c) && c != ' ';
+}
+
+AUTIL_API int
+is_lower(int c)
+{
+    return (unsigned)c - 'a' < 26;
+}
+
+AUTIL_API int
+is_print(int c)
+{
+    return 0x20 <= (unsigned)c && (unsigned)c <= 0x7e;
+}
+
+AUTIL_API int
+is_punct(int c)
+{
+    return is_graph(c) && !is_alnum(c);
+}
+
+AUTIL_API int
+is_space(int c)
+{
+    return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v';
+}
+
+AUTIL_API int
+is_upper(int c)
+{
+    return (unsigned)c - 'A' < 26;
+}
+
+AUTIL_API int
+is_xdigit(int c)
+{
+    return is_digit(c) || (unsigned)c - 'a' < 6 || (unsigned)c - 'A' < 6;
+}
+
+AUTIL_API int
+to_lower(int c)
+{
+    if (is_upper(c)) {
+        return c | 0x20;
+    }
+    return c;
+}
+
+AUTIL_API int
+to_upper(int c)
+{
+    if (is_lower(c)) {
+        return c & 0x5f;
+    }
+    return c;
 }
 
 AUTIL_API void
