@@ -4,6 +4,8 @@ packages:
   - dash
   - gcc
   - tcc
+  - libsdl2-dev
+  - libsdl2-image-dev
 sources:
   - https://git.sr.ht/~ashn/autil
 tasks:
@@ -22,6 +24,12 @@ tasks:
   - test-tcc: |
       cd autil
       make clean test CC=tcc
+  - examples-clang: |
+      cd autil
+      make clean examples CC=clang CFLAGS='$(GNU_REL)'
+  - examples-gcc: |
+      cd autil
+      make clean examples CC=gcc CFLAGS='$(GNU_REL)'
 triggers:
   - action: email
     condition: failure
