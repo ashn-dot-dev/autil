@@ -128,8 +128,8 @@ int_vpcmp(void const* lhs, void const* rhs); // int
 #define FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
 // Alternatives to the C99 character handling functions in ctype.h.
-// These functions always use the "C" locale and will not trigger undefined
-// behavior when passed a value not representable by an unsigned char.
+// These functions always use the "C" locale and will not result in undefined
+// behavior if passed a value not representable by an unsigned char.
 // clang-format off
 AUTIL_API int is_alnum(int c);
 AUTIL_API int is_alpha(int c);
