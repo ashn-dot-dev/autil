@@ -1,0 +1,15 @@
+image: freebsd/latest
+packages:
+sources:
+  - https://git.sr.ht/~ashn/autil
+tasks:
+  - test-clang-debug: |
+      cd autil
+      make clean test CC=clang CFLAGS='$(GNU_DBG) $(SANITIZE)'
+  - test-clang-release: |
+      cd autil
+      make clean test CC=clang CFLAGS='$(GNU_REL)'
+triggers:
+  - action: email
+    condition: failure
+    to: "<me@ashn.dev>"
