@@ -5,10 +5,10 @@
 
 #define VERSION "0.2"
 
-static struct rgba const black = {0x00, 0x00, 0x00, 0xff};
-static struct rgba const white = {0xff, 0xff, 0xff, 0xff};
-static struct rgba const iconc = {0xaa, 0xaa, 0xaa, 0x77};
-static struct rgba const red = {0xff, 0x00, 0x00, 0xff};
+static struct aengn_rgba const black = {0x00, 0x00, 0x00, 0xff};
+static struct aengn_rgba const white = {0xff, 0xff, 0xff, 0xff};
+static struct aengn_rgba const iconc = {0xaa, 0xaa, 0xaa, 0x77};
+static struct aengn_rgba const red = {0xff, 0x00, 0x00, 0xff};
 
 #define CELLS_W 64
 #define CELLS_H 48
@@ -40,11 +40,11 @@ static bool step = false;
 // Hide cursor and UI icons (play and pause) if true.
 static bool hide = false;
 
-static struct sprite* spr_cells = NULL;
-static struct sprite* spr_mouse = NULL;
-static struct sprite* spr_icon_play = NULL;
-static struct sprite* spr_icon_pause = NULL;
-static struct sprite* spr_icon_speed = NULL;
+static struct aengn_sprite* spr_cells = NULL;
+static struct aengn_sprite* spr_mouse = NULL;
+static struct aengn_sprite* spr_icon_play = NULL;
+static struct aengn_sprite* spr_icon_pause = NULL;
+static struct aengn_sprite* spr_icon_speed = NULL;
 
 static void
 usage(void);
@@ -139,45 +139,46 @@ argparse(int argc, char** argv)
 static int
 main_init(void)
 {
-    spr_cells = sprite_new(screen_w() + OFFSET, screen_h() + OFFSET);
+    spr_cells =
+        aengn_sprite_new(aengn_screen_w() + OFFSET, aengn_screen_h() + OFFSET);
     if (spr_cells == NULL) {
         goto error;
     }
 
-    spr_mouse = sprite_new(1, 1);
+    spr_mouse = aengn_sprite_new(1, 1);
     if (spr_mouse == NULL) {
         goto error;
     }
-    sprite_set_pixel(spr_mouse, 0, 0, &red);
+    aengn_sprite_set_pixel(spr_mouse, 0, 0, &red);
 
     static int const PLAY_PAUSE_W = 3;
     static int const PLAY_PAUSE_H = 3;
 
-    spr_icon_play = sprite_new(PLAY_PAUSE_W, PLAY_PAUSE_H);
+    spr_icon_play = aengn_sprite_new(PLAY_PAUSE_W, PLAY_PAUSE_H);
     if (spr_icon_play == NULL) {
         goto error;
     }
-    sprite_set_pixel(spr_icon_play, 0, 0, &iconc);
-    sprite_set_pixel(spr_icon_play, 0, 1, &iconc);
-    sprite_set_pixel(spr_icon_play, 0, 2, &iconc);
-    sprite_set_pixel(spr_icon_play, 1, 0, &iconc);
-    sprite_set_pixel(spr_icon_play, 1, 1, &iconc);
-    sprite_set_pixel(spr_icon_play, 1, 2, &iconc);
-    sprite_set_pixel(spr_icon_play, 2, 1, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 0, 0, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 0, 1, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 0, 2, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 1, 0, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 1, 1, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 1, 2, &iconc);
+    aengn_sprite_set_pixel(spr_icon_play, 2, 1, &iconc);
 
-    spr_icon_pause = sprite_new(PLAY_PAUSE_W, PLAY_PAUSE_H);
+    spr_icon_pause = aengn_sprite_new(PLAY_PAUSE_W, PLAY_PAUSE_H);
     if (spr_icon_pause == NULL) {
         goto error;
     }
-    sprite_set_pixel(spr_icon_pause, 0, 0, &iconc);
-    sprite_set_pixel(spr_icon_pause, 0, 1, &iconc);
-    sprite_set_pixel(spr_icon_pause, 0, 2, &iconc);
-    sprite_set_pixel(spr_icon_pause, 2, 0, &iconc);
-    sprite_set_pixel(spr_icon_pause, 2, 1, &iconc);
-    sprite_set_pixel(spr_icon_pause, 2, 2, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 0, 0, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 0, 1, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 0, 2, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 2, 0, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 2, 1, &iconc);
+    aengn_sprite_set_pixel(spr_icon_pause, 2, 2, &iconc);
 
-    spr_icon_speed = sprite_new(1, 1);
-    sprite_set_pixel(spr_icon_speed, 0, 0, &iconc);
+    spr_icon_speed = aengn_sprite_new(1, 1);
+    aengn_sprite_set_pixel(spr_icon_speed, 0, 0, &iconc);
 
     return 0;
 
@@ -191,7 +192,7 @@ main_fini(void)
 {
 #define SPRITE_DEL_IF_NOT_NULL(spr_)                                           \
     if (spr_ != NULL) {                                                        \
-        sprite_del(spr_);                                                      \
+        aengn_sprite_del(spr_);                                                \
     }
     SPRITE_DEL_IF_NOT_NULL(spr_cells);
     SPRITE_DEL_IF_NOT_NULL(spr_mouse);
@@ -230,59 +231,59 @@ hinput(void)
     int quit = 0;
 
     // Escape => Quit.
-    if (virtkey_state(SDLK_ESCAPE)->released) {
+    if (aengn_virtkey_state(SDLK_ESCAPE)->released) {
         quit = 1;
     }
 
     // Left mouse button => Turn cell under mouse alive.
-    if (mousebutton_state(MOUSEBUTTON_LEFT)->down) {
-        cells[mousepos_x() + OFFSET][mousepos_y() + OFFSET] = 1;
+    if (aengn_mousebutton_state(AENGN_MOUSEBUTTON_LEFT)->down) {
+        cells[aengn_mousepos_x() + OFFSET][aengn_mousepos_y() + OFFSET] = 1;
     }
     // Middle mouse button => Turn cell under mouse dead.
     // Right mouse button => Turn cell under mouse dead.
     else if (
-        mousebutton_state(MOUSEBUTTON_MIDDLE)->down
-        || mousebutton_state(MOUSEBUTTON_RIGHT)->down) {
-        cells[mousepos_x() + OFFSET][mousepos_y() + OFFSET] = 0;
+        aengn_mousebutton_state(AENGN_MOUSEBUTTON_MIDDLE)->down
+        || aengn_mousebutton_state(AENGN_MOUSEBUTTON_RIGHT)->down) {
+        cells[aengn_mousepos_x() + OFFSET][aengn_mousepos_y() + OFFSET] = 0;
     }
 
     // R or RETURN => Start / stop simulation.
-    if (scankey_state(SDL_SCANCODE_RETURN)->pressed
-        || virtkey_state(SDLK_r)->pressed) {
+    if (aengn_scankey_state(SDL_SCANCODE_RETURN)->pressed
+        || aengn_virtkey_state(SDLK_r)->pressed) {
         run = !run;
         step = false;
     }
 
     // S or SPACE => Advance one generation.
-    if (scankey_state(SDL_SCANCODE_SPACE)->pressed
-        || virtkey_state(SDLK_s)->pressed) {
+    if (aengn_scankey_state(SDL_SCANCODE_SPACE)->pressed
+        || aengn_virtkey_state(SDLK_s)->pressed) {
         run = false;
         step = true;
     }
 
     // C => Turn all cells on the board dead.
-    if (virtkey_state(SDLK_c)->pressed) {
+    if (aengn_virtkey_state(SDLK_c)->pressed) {
         run = false;
         memset(cells, 0x00, sizeof(cells));
     }
 
     // H => Hide / show cursor & UI icons.
-    if (virtkey_state(SDLK_h)->pressed) {
+    if (aengn_virtkey_state(SDLK_h)->pressed) {
         hide = !hide;
     }
 
     // 1 => Set simulation speed to slow.
-    if (virtkey_state(SDLK_1)->pressed) {
+    if (aengn_virtkey_state(SDLK_1)->pressed) {
         upg = UPG_1;
         updates_remaining = upg;
     }
     // 2 => Set simulation speed to medium.
-    else if (virtkey_state(SDLK_2)->pressed) {
+    else if (aengn_virtkey_state(SDLK_2)->pressed) {
         upg = UPG_2;
         updates_remaining = upg;
     }
     // 3 => Set simulation speed to fast.
-    else if (virtkey_state(SDLK_3)->pressed) {
+    else if (aengn_virtkey_state(SDLK_3)->pressed) {
         upg = UPG_3;
         updates_remaining = upg;
     }
@@ -298,8 +299,8 @@ update(void)
     // or not, so it should be updated every frame.
     for (int x = OFFSET; x < CELLS_W + OFFSET; ++x) {
         for (int y = OFFSET; y < CELLS_H + OFFSET; ++y) {
-            struct rgba const* color = cells[x][y] != 0 ? &white : &black;
-            sprite_set_pixel(spr_cells, x, y, color);
+            struct aengn_rgba const* color = cells[x][y] != 0 ? &white : &black;
+            aengn_sprite_set_pixel(spr_cells, x, y, color);
         }
     }
 
@@ -319,29 +320,30 @@ update(void)
 static void
 render(void)
 {
-    draw_clear(NULL);
-    draw_sprite(spr_cells, -OFFSET, -OFFSET);
+    aengn_draw_clear(NULL);
+    aengn_draw_sprite(spr_cells, -OFFSET, -OFFSET);
     if (!hide) {
         static int const ICON_X = 1;
         static int const ICON_Y = 1;
 
         int const playing = run || step;
-        draw_sprite(playing ? spr_icon_play : spr_icon_pause, ICON_X, ICON_Y);
+        aengn_draw_sprite(
+            playing ? spr_icon_play : spr_icon_pause, ICON_X, ICON_Y);
 
-        assert(sprite_h(spr_icon_play) == sprite_h(spr_icon_pause));
+        assert(aengn_sprite_h(spr_icon_play) == aengn_sprite_h(spr_icon_pause));
 #define MAYBE_DRAW_SPEED_ICON(num_)                                            \
     if (upg <= UPG_##num_) {                                                   \
-        draw_sprite(                                                           \
+        aengn_draw_sprite(                                                     \
             spr_icon_speed,                                                    \
-            ICON_X + (num_ - 1) * sprite_w(spr_icon_speed) + (num_ - 1),       \
-            screen_h() - sprite_h(spr_icon_speed) - 1);                        \
+            ICON_X + (num_ - 1) * aengn_sprite_w(spr_icon_speed) + (num_ - 1), \
+            aengn_screen_h() - aengn_sprite_h(spr_icon_speed) - 1);            \
     }
         MAYBE_DRAW_SPEED_ICON(1); // Should always be drawn.
         MAYBE_DRAW_SPEED_ICON(2);
         MAYBE_DRAW_SPEED_ICON(3);
 #undef MAYBE_DRAW_SPEED_ICON
 
-        draw_sprite(spr_mouse, mousepos_x(), mousepos_y());
+        aengn_draw_sprite(spr_mouse, aengn_mousepos_x(), aengn_mousepos_y());
     }
 }
 

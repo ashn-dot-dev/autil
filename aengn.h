@@ -19,8 +19,8 @@ DEPENDENCIES
         -lm -lSDL2 -lSDL2_image
 
     Installation (Debian/Ubuntu):
-        $ apt-get -y install libsdl2-dev
-        $ apt-get -y install libsdl2-image-dev
+        $ apt-get install libsdl2-dev
+        $ apt-get install libsdl2-image-dev
 
 
 USAGE
@@ -41,7 +41,9 @@ USAGE
 CHANGELOG
     Unreleased
     -------------------
-    + Add rendering functions: draw_point, draw_line, and draw_rect.
+    + Namespace library with AENGN_ and aengn_.
+    + Add rendering functions: aengn_draw_point, aengn_draw_line, and
+      aengn_draw_rect.
     + Rename draw_show to aengn_end_frame.
 
     v0.2.0 - 2020-09-16
@@ -101,14 +103,14 @@ LICENSE
 // and SDL_BUTTON function-like macro to avoid the somewhat awkward use of
 // SDL_BUTTON(SDL_BUTTON_WHATEVER) bitmask returned by SDL_GetMouseState.
 // clang-format off
-#define MOUSEBUTTON_LEFT   ((int)0)
-#define MOUSEBUTTON_RIGHT  ((int)1)
-#define MOUSEBUTTON_MIDDLE ((int)2)
-#define MOUSEBUTTON_COUNT  ((size_t)3)
+#define AENGN_MOUSEBUTTON_LEFT   ((int)0)
+#define AENGN_MOUSEBUTTON_RIGHT  ((int)1)
+#define AENGN_MOUSEBUTTON_MIDDLE ((int)2)
+#define AENGN_MOUSEBUTTON_COUNT  ((size_t)3)
 // clang-format on
 
 // Returns non-zero if should quit.
-typedef int (*runtick_fn)(void* ctx);
+typedef int (*aengn_runtick_fn)(void* ctx);
 
 // Initialize the engine and create a window with screen_w and screen_h virtual
 // pixels each composed of pixel_scale by pixel_scale physical pixels.
@@ -122,30 +124,30 @@ aengn_fini(void);
 // Start the main application loop, calling the user-provided runtick function
 // once per tick of the main loop.
 AENGN_API void
-aengn_run(runtick_fn runtick, void* ctx);
+aengn_run(aengn_runtick_fn runtick, void* ctx);
 // Returns the number of seconds elapsed since the invocation of aengn_run.
 AENGN_API double
 aengn_now(void);
-// Present the results of draw_* calls onto the screen.
+// Present the results of aengn_draw_* calls onto the screen.
 // Calling this function conceptually "ends" the current frame.
 AENGN_API void
 aengn_end_frame(void);
 
 // Returns the width of the screen in virtual pixels.
 // The width of the display area in physical pixels can be calculated with:
-//      int const disp_w = screen_w() * pixel_scale();
+//      int const disp_w = aengn_screen_w() * aengn_pixel_scale();
 AENGN_API int
-screen_w(void);
+aengn_screen_w(void);
 // Returns the height of the screen in virtual pixels.
 // The height of the display area in physical pixels can be calculated with:
-//      int const disp_h = screen_h() * pixel_scale();
+//      int const disp_h = aengn_screen_h() * aengn_pixel_scale();
 AENGN_API int
-screen_h(void);
+aengn_screen_h(void);
 // Returns the number of physical pixels per virtual pixel on the display.
 AENGN_API int
-pixel_scale(void);
+aengn_pixel_scale(void);
 
-struct button_state
+struct aengn_button_state
 {
     // Button was pressed this frame.
     bool pressed;
@@ -157,27 +159,27 @@ struct button_state
     bool down;
 };
 // Returns the state of the provided SDL2 scancode (SDL_SCANCODE_*).
-AENGN_API struct button_state const*
-scankey_state(SDL_Scancode key);
+AENGN_API struct aengn_button_state const*
+aengn_scankey_state(SDL_Scancode key);
 // Returns the state of the provided SDL2 keycode (SDLK_*).
-AENGN_API struct button_state const*
-virtkey_state(SDL_Keycode key);
-// Returns the state of the provided mouse button (MOUSEBUTTON_*).
-AENGN_API struct button_state const*
-mousebutton_state(int button);
+AENGN_API struct aengn_button_state const*
+aengn_virtkey_state(SDL_Keycode key);
+// Returns the state of the provided mouse button (AENGN_MOUSEBUTTON_*).
+AENGN_API struct aengn_button_state const*
+aengn_mousebutton_state(int button);
 
-// Returns the mouse cursor position in the range [0, screen_w()-1].
+// Returns the mouse cursor position in the range [0, aengn_screen_w()-1].
 AENGN_API int
-mousepos_x(void);
-// Returns the mouse cursor position in the range [0, screen_h()-1].
+aengn_mousepos_x(void);
+// Returns the mouse cursor position in the range [0, aengn_screen_h()-1].
 AENGN_API int
-mousepos_y(void);
+aengn_mousepos_y(void);
 
 // Abstract two-dimensional bitmap.
-struct sprite;
+struct aengn_sprite;
 // Information for a 24-bit color depth value with 8-bit opacity (alpha) value
 // as represented by the RGBA color model.
-struct rgba
+struct aengn_rgba
 {
     uint8_t r;
     uint8_t g;
@@ -185,83 +187,85 @@ struct rgba
     uint8_t a;
 };
 
-// Produce a pointer of type struct rgba* whose contents holds the provided red,
-// blue, green, and alpha values.
+// Produce a pointer of type struct aengn_rgba* whose contents holds the
+// provided red, blue, green, and alpha values.
 // This pointer has automatic storage duration associated with the enclosing
 // block.
-#define RGBA_LOCAL_PTR(red_, green_, blue_, alpha_)                            \
-    (&(struct rgba){.r = red_, .g = green_, .b = blue_, .a = alpha_})
+#define AENGN_RGBA_LOCAL_PTR(red_, green_, blue_, alpha_)                      \
+    (&(struct aengn_rgba){.r = red_, .g = green_, .b = blue_, .a = alpha_})
 
 // Allocate and initialize a sprite with the provided width and height.
 // Returns NULL on error.
-AENGN_API struct sprite*
-sprite_new(int w, int h);
+AENGN_API struct aengn_sprite*
+aengn_sprite_new(int w, int h);
 // Deinitialize and free the sprite.
 AENGN_API void
-sprite_del(struct sprite* self);
+aengn_sprite_del(struct aengn_sprite* self);
 // Return the width of the sprite in virtual pixels.
 AENGN_API int
-sprite_w(struct sprite const* self);
+aengn_sprite_w(struct aengn_sprite const* self);
 // Return the height of the sprite in virtual pixels.
 AENGN_API int
-sprite_h(struct sprite const* self);
+aengn_sprite_h(struct aengn_sprite const* self);
 // Set the pixel at position (x, y) to the RGBA value in color.
 AENGN_API void
-sprite_set_pixel(struct sprite* self, int x, int y, struct rgba const* color);
+aengn_sprite_set_pixel(
+    struct aengn_sprite* self, int x, int y, struct aengn_rgba const* color);
 // Store the RGBA value for the pixel at position (x, y) in color.
 AENGN_API void
-sprite_get_pixel(struct sprite const* self, int x, int y, struct rgba* color);
+aengn_sprite_get_pixel(
+    struct aengn_sprite const* self, int x, int y, struct aengn_rgba* color);
 // Update the GPU memory associated underlying SDL_Texture from sprite memory.
-// This process is expensive, so calls to sprite_set_pixel will *not* update
-// GPU memory until this function is called.
-// This function is automatically called from within draw_sprite if the
+// This process is expensive, so calls to aengn_sprite_set_pixel will *not*
+// update GPU memory until this function is called.
+// This function is automatically called from within aengn_draw_sprite if the
 // underlying SDL_Texture has not been explicitly updated since the last call to
-// sprite_set_pixel.
+// aengn_sprite_set_pixel.
 // Returns a non-zero value on error.
 AENGN_API int
-sprite_update_texture(struct sprite* self);
+aengn_sprite_update_texture(struct aengn_sprite* self);
 
 // Load and create an SDL_Surface from a file with the provided path.
 // This suface must be explicitly deinitialized with SDL_FreeSurface.
 // Returns NULL on error.
 AENGN_API SDL_Surface*
-load_surface(char const* path);
+aengn_load_surface(char const* path);
 // Load and create an SDL_Texture from a file with the provided path.
 // This texture must be explicitly deinitialized with SDL_DestroyTexture.
 // Returns NULL on error.
 AENGN_API SDL_Texture*
-load_texture(char const* path);
+aengn_load_texture(char const* path);
 // Load and create a sprite from a file with the provided path.
-// This sprite must be explicitly deinitialized with sprite_del.
+// This sprite must be explicitly deinitialized with aengn_sprite_del.
 // Returns NULL on error.
-AENGN_API struct sprite*
-load_sprite(char const* path);
+AENGN_API struct aengn_sprite*
+aengn_load_sprite(char const* path);
 
 // Clear the screen using the provided RGBA value in color.
-// The call draw_clear(NULL) will clear the screen with an opaque black.
+// The call aengn_draw_clear(NULL) will clear the screen with an opaque black.
 AENGN_API void
-draw_clear(struct rgba const* color);
+aengn_draw_clear(struct aengn_rgba const* color);
 // Draw a point at (x, y).
 // Returns a non-zero value on error.
 AENGN_API int
-draw_point(int x, int y, struct rgba const* color);
+aengn_draw_point(int x, int y, struct aengn_rgba const* color);
 // Draw a line from (x1, y1) to (x2, y2).
 // Returns a non-zero value on error.
 AENGN_API int
-draw_line(int x1, int y1, int x2, int y2, struct rgba const* color);
+aengn_draw_line(int x1, int y1, int x2, int y2, struct aengn_rgba const* color);
 // Draw axis-aligned rectangle with one corner at (x1, y1) and the opposite
 // corner at (x2, y2).
 // Returns a non-zero value on error.
 AENGN_API int
-draw_rect(int x1, int y1, int x2, int y2, struct rgba const* color);
+aengn_draw_rect(int x1, int y1, int x2, int y2, struct aengn_rgba const* color);
 // Draw the provided SDL_Texture with top-left position at (x, y).
 // Returns a non-zero value on error.
 AENGN_API int
-draw_texture(SDL_Texture* tex, int x, int y);
+aengn_draw_texture(SDL_Texture* tex, int x, int y);
 // Draw the provided sprite with top-left position at (x, y).
 // Returns a non-zero value on error.
 AENGN_API int
-draw_sprite(struct sprite* sprite, int x, int y);
+aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y);
 
 #endif // AENGN_H_INCLUDED
 
@@ -280,11 +284,13 @@ static int g_screen_w = 0;
 static int g_screen_h = 0;
 static int g_pixel_scale = 0;
 
-static struct map* g_scankey_map = NULL; // SDL_Scancode => struct button_state
-static struct map* g_virtkey_map = NULL; // SDL_Keycode  => struct button_state
-// Array mapping AENGN-supported mouse buttons => struct button state.
-static struct button_state g_mousebutton_state[MOUSEBUTTON_COUNT];
-static struct button_state BUTTON_STATE_DEFAULT = {0};
+// SDL_Scancode => struct aengn_button_state
+static struct map* g_scankey_map = NULL;
+// SDL_Keycode  => struct aengn_button_state
+static struct map* g_virtkey_map = NULL;
+// Array mapping AENGN-supported mouse buttons => struct aengn_button_state.
+static struct aengn_button_state g_mousebutton_state[AENGN_MOUSEBUTTON_COUNT];
+static struct aengn_button_state BUTTON_STATE_DEFAULT = {0};
 
 static SDL_Window* g_window = NULL;
 static SDL_Renderer* g_renderer = NULL;
@@ -347,9 +353,13 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
     g_screen_h = screen_h;
     g_pixel_scale = pixel_scale;
     g_scankey_map = map_new(
-        sizeof(SDL_Scancode), sizeof(struct button_state), scankey_map_vpcmp);
+        sizeof(SDL_Scancode),
+        sizeof(struct aengn_button_state),
+        scankey_map_vpcmp);
     g_virtkey_map = map_new(
-        sizeof(SDL_Keycode), sizeof(struct button_state), virtkey_map_vpcmp);
+        sizeof(SDL_Keycode),
+        sizeof(struct aengn_button_state),
+        virtkey_map_vpcmp);
     memset(g_mousebutton_state, 0x00, sizeof(g_mousebutton_state));
 
     SDL_version ver;
@@ -427,8 +437,8 @@ aengn_fini(void)
 // With either function we need these adaptor variables to properly forward the
 // update and ctx parameters to the callback.
 // clang-format off
-static runtick_fn g_run__main_loop_body__update = NULL;
-static void*      g_run__main_loop_body__ctx    = NULL;
+static aengn_runtick_fn g_run__main_loop_body__update = NULL;
+static void*            g_run__main_loop_body__ctx    = NULL;
 // clang-format on
 // Compatible with em_callback_func (Emscripten v2.0.2+).
 static void
@@ -440,7 +450,7 @@ aengn_run__main_loop_body(void)
 }
 
 AENGN_API void
-aengn_run(runtick_fn update, void* ctx)
+aengn_run(aengn_runtick_fn update, void* ctx)
 {
     g_run__main_loop_body__update = update;
     g_run__main_loop_body__ctx = ctx;
@@ -452,7 +462,7 @@ aengn_run(runtick_fn update, void* ctx)
     g_fps_period_start = now;
     g_fps_period_count = 0;
 
-    draw_clear(NULL);
+    aengn_draw_clear(NULL);
     aengn_end_frame();
 #ifdef __EMSCRIPTEN__
     em_callback_func const main_loop_body = aengn_run__main_loop_body;
@@ -485,8 +495,8 @@ process_event_(SDL_Event const* event)
     // SDL_KeyboardEvent
     SDL_Scancode scankey = (SDL_Scancode)0xDEADBEEF;
     SDL_Keycode virtkey = (SDL_Keycode)0xDEADBEEF;
-    struct button_state* scanstate = NULL;
-    struct button_state* virtstate = NULL;
+    struct aengn_button_state* scanstate = NULL;
+    struct aengn_button_state* virtstate = NULL;
     if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
         scankey = event->key.keysym.scancode;
         virtkey = event->key.keysym.sym;
@@ -523,17 +533,17 @@ process_event_(SDL_Event const* event)
     }
 
     // SDL_MouseButtonEvent
-    struct button_state* mousebtnstate = NULL;
+    struct aengn_button_state* mousebtnstate = NULL;
     if (event->type == SDL_MOUSEBUTTONDOWN
         || event->type == SDL_MOUSEBUTTONUP) {
         if (event->button.button == SDL_BUTTON_LEFT) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_LEFT];
+            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_LEFT];
         }
         if (event->button.button == SDL_BUTTON_RIGHT) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_RIGHT];
+            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_RIGHT];
         }
         if (event->button.button == SDL_BUTTON_MIDDLE) {
-            mousebtnstate = &g_mousebutton_state[MOUSEBUTTON_MIDDLE];
+            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_MIDDLE];
         }
     }
     if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONDOWN) {
@@ -574,20 +584,20 @@ aengn_end_frame(void)
     // Clear previous frame's input state.
     struct vec const* const scankeys = map_vals(g_scankey_map);
     for (size_t i = 0; i < vec_count(scankeys); ++i) {
-        struct button_state* const sk = vec_get(scankeys, i);
+        struct aengn_button_state* const sk = vec_get(scankeys, i);
         assert(sk != NULL);
         sk->pressed = false;
         sk->released = false;
     }
     struct vec const* const virtkeys = map_vals(g_virtkey_map);
     for (size_t i = 0; i < vec_count(virtkeys); ++i) {
-        struct button_state* const vk = vec_get(virtkeys, i);
+        struct aengn_button_state* const vk = vec_get(virtkeys, i);
         assert(vk != NULL);
         vk->pressed = false;
         vk->released = false;
     }
-    for (size_t i = 0; i < MOUSEBUTTON_COUNT; ++i) {
-        struct button_state* const btn = &g_mousebutton_state[i];
+    for (size_t i = 0; i < AENGN_MOUSEBUTTON_COUNT; ++i) {
+        struct aengn_button_state* const btn = &g_mousebutton_state[i];
         btn->pressed = false;
         btn->released = false;
     }
@@ -600,46 +610,48 @@ aengn_end_frame(void)
 }
 
 AENGN_API int
-screen_w(void)
+aengn_screen_w(void)
 {
     return g_screen_w;
 }
 
 AENGN_API int
-screen_h(void)
+aengn_screen_h(void)
 {
     return g_screen_h;
 }
 
 AENGN_API int
-pixel_scale(void)
+aengn_pixel_scale(void)
 {
     return g_pixel_scale;
 }
 
-AENGN_API struct button_state const*
-scankey_state(SDL_Scancode key)
+AENGN_API struct aengn_button_state const*
+aengn_scankey_state(SDL_Scancode key)
 {
-    struct button_state const* const state = map_lookup(g_scankey_map, &key);
+    struct aengn_button_state const* const state =
+        map_lookup(g_scankey_map, &key);
     return state != NULL ? state : &BUTTON_STATE_DEFAULT;
 }
 
-AENGN_API struct button_state const*
-virtkey_state(SDL_Keycode key)
+AENGN_API struct aengn_button_state const*
+aengn_virtkey_state(SDL_Keycode key)
 {
-    struct button_state const* const state = map_lookup(g_virtkey_map, &key);
+    struct aengn_button_state const* const state =
+        map_lookup(g_virtkey_map, &key);
     return state != NULL ? state : &BUTTON_STATE_DEFAULT;
 }
 
-AENGN_API struct button_state const*
-mousebutton_state(int button)
+AENGN_API struct aengn_button_state const*
+aengn_mousebutton_state(int button)
 {
-    assert(0 <= button && button < (int)MOUSEBUTTON_COUNT);
+    assert(0 <= button && button < (int)AENGN_MOUSEBUTTON_COUNT);
     return &g_mousebutton_state[button];
 }
 
 AENGN_API int
-mousepos_x(void)
+aengn_mousepos_x(void)
 {
     int x;
     SDL_GetMouseState(&x, NULL);
@@ -647,14 +659,14 @@ mousepos_x(void)
 }
 
 AENGN_API int
-mousepos_y(void)
+aengn_mousepos_y(void)
 {
     int y;
     SDL_GetMouseState(NULL, &y);
     return y / g_pixel_scale;
 }
 
-struct sprite
+struct aengn_sprite
 {
     int w;
     int h;
@@ -663,18 +675,18 @@ struct sprite
     bool texture_needs_update;
 };
 
-AENGN_API struct sprite*
-sprite_new(int w, int h)
+AENGN_API struct aengn_sprite*
+aengn_sprite_new(int w, int h)
 {
     assert(w > 0);
     assert(h > 0);
 
-    struct sprite* self = NULL;
+    struct aengn_sprite* self = NULL;
     SDL_Surface* surface = NULL;
     SDL_Texture* texture = NULL;
     static int const DEPTH = 32;
 
-    self = xalloc(NULL, sizeof(struct sprite));
+    self = xalloc(NULL, sizeof(struct aengn_sprite));
 
     surface = SDL_CreateRGBSurfaceWithFormat(
         0, w, h, DEPTH, SDL_PIXELFORMAT_ARGB8888);
@@ -727,7 +739,7 @@ error:
 }
 
 AENGN_API void
-sprite_del(struct sprite* self)
+aengn_sprite_del(struct aengn_sprite* self)
 {
     assert(self != NULL);
 
@@ -738,7 +750,7 @@ sprite_del(struct sprite* self)
 }
 
 AENGN_API int
-sprite_w(struct sprite const* self)
+aengn_sprite_w(struct aengn_sprite const* self)
 {
     assert(self != NULL);
 
@@ -746,7 +758,7 @@ sprite_w(struct sprite const* self)
 }
 
 AENGN_API int
-sprite_h(struct sprite const* self)
+aengn_sprite_h(struct aengn_sprite const* self)
 {
     assert(self != NULL);
 
@@ -754,7 +766,7 @@ sprite_h(struct sprite const* self)
 }
 
 AENGN_API int
-sprite_update_texture(struct sprite* self)
+aengn_sprite_update_texture(struct aengn_sprite* self)
 {
     int const err = SDL_UpdateTexture(
         self->texture, NULL, self->surface->pixels, self->surface->pitch);
@@ -768,7 +780,7 @@ sprite_update_texture(struct sprite* self)
 }
 
 static Uint32*
-sprite_locate_pixel_(struct sprite const* sprite, int x, int y)
+sprite_locate_pixel_(struct aengn_sprite const* sprite, int x, int y)
 {
     assert(0 <= x && x < sprite->w);
     assert(0 <= y && y < sprite->h);
@@ -780,7 +792,8 @@ sprite_locate_pixel_(struct sprite const* sprite, int x, int y)
 }
 
 AENGN_API void
-sprite_set_pixel(struct sprite* self, int x, int y, struct rgba const* color)
+aengn_sprite_set_pixel(
+    struct aengn_sprite* self, int x, int y, struct aengn_rgba const* color)
 {
     assert(self != NULL);
     assert(color != NULL);
@@ -793,7 +806,8 @@ sprite_set_pixel(struct sprite* self, int x, int y, struct rgba const* color)
 }
 
 AENGN_API void
-sprite_get_pixel(struct sprite const* self, int x, int y, struct rgba* color)
+aengn_sprite_get_pixel(
+    struct aengn_sprite const* self, int x, int y, struct aengn_rgba* color)
 {
     assert(self != NULL);
     assert(color != NULL);
@@ -804,7 +818,7 @@ sprite_get_pixel(struct sprite const* self, int x, int y, struct rgba* color)
 }
 
 AENGN_API SDL_Surface*
-load_surface(char const* path)
+aengn_load_surface(char const* path)
 {
     SDL_Surface* const surface = IMG_Load(path);
     if (surface == NULL) {
@@ -815,11 +829,14 @@ load_surface(char const* path)
 }
 
 AENGN_API SDL_Texture*
-load_texture(char const* path)
+aengn_load_texture(char const* path)
 {
-    SDL_Surface* const surface = load_surface(path);
+    SDL_Surface* const surface = aengn_load_surface(path);
     if (surface == NULL) {
-        errorf("[%s(%s)][load_surface] Failed to load surface", __func__, path);
+        errorf(
+            "[%s(%s)][aengn_load_surface] Failed to load surface",
+            __func__,
+            path);
         return NULL;
     }
 
@@ -838,22 +855,26 @@ load_texture(char const* path)
     return texture;
 }
 
-AENGN_API struct sprite*
-load_sprite(char const* path)
+AENGN_API struct aengn_sprite*
+aengn_load_sprite(char const* path)
 {
     int err = 0;
     SDL_Surface* surface = NULL;
-    struct sprite* sprite = NULL;
+    struct aengn_sprite* sprite = NULL;
 
-    surface = load_surface(path);
+    surface = aengn_load_surface(path);
     if (surface == NULL) {
-        errorf("[%s(%s)][load_surface] Failed to load surface", __func__, path);
+        errorf(
+            "[%s(%s)][aengn_load_surface] Failed to load surface",
+            __func__,
+            path);
         goto error;
     }
 
-    sprite = sprite_new(surface->w, surface->h);
+    sprite = aengn_sprite_new(surface->w, surface->h);
     if (sprite == NULL) {
-        errorf("[%s(%s)][sprite_new] Failed create sprite", __func__, path);
+        errorf(
+            "[%s(%s)][aengn_sprite_new] Failed create sprite", __func__, path);
         goto error;
     }
 
@@ -863,7 +884,7 @@ load_sprite(char const* path)
         goto error;
     }
 
-    err = sprite_update_texture(sprite);
+    err = aengn_sprite_update_texture(sprite);
     if (err) {
         errorf(
             "[%s(%s)][sprite_update_texture] Failed to update texture",
@@ -879,13 +900,13 @@ error:
         SDL_FreeSurface(surface);
     }
     if (sprite != NULL) {
-        sprite_del(sprite);
+        aengn_sprite_del(sprite);
     }
     return NULL;
 }
 
 AENGN_API int
-draw_texture(SDL_Texture* tex, int x, int y)
+aengn_draw_texture(SDL_Texture* tex, int x, int y)
 {
     int w;
     int h;
@@ -902,25 +923,26 @@ draw_texture(SDL_Texture* tex, int x, int y)
 }
 
 AENGN_API int
-draw_sprite(struct sprite* sprite, int x, int y)
+aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y)
 {
     assert(sprite != NULL);
 
     if (sprite->texture_needs_update) {
-        sprite_update_texture(sprite);
+        aengn_sprite_update_texture(sprite);
     }
 
-    int const err = draw_texture(sprite->texture, x, y);
+    int const err = aengn_draw_texture(sprite->texture, x, y);
     if (err) {
-        errorf("[%s][draw_texture] Failed to draw sprite texture", __func__);
+        errorf(
+            "[%s][aengn_draw_texture] Failed to draw sprite texture", __func__);
     }
     return err;
 }
 
 AENGN_API void
-draw_clear(struct rgba const* color)
+aengn_draw_clear(struct aengn_rgba const* color)
 {
-    static struct rgba const black = {0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE};
+    static struct aengn_rgba const black = {0x00, 0x00, 0x00, SDL_ALPHA_OPAQUE};
     if (color == NULL) {
         color = &black;
     }
@@ -929,7 +951,7 @@ draw_clear(struct rgba const* color)
 }
 
 AENGN_API int
-draw_point(int x, int y, struct rgba const* color)
+aengn_draw_point(int x, int y, struct aengn_rgba const* color)
 {
     assert(color != NULL);
 
@@ -989,7 +1011,7 @@ line_pos_(int x1, int y1, int x2, int y2, struct vec* xpos, struct vec* ypos)
 }
 
 AENGN_API int
-draw_line(int x1, int y1, int x2, int y2, struct rgba const* color)
+aengn_draw_line(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
 {
     assert(color != NULL);
 
@@ -1001,13 +1023,13 @@ draw_line(int x1, int y1, int x2, int y2, struct rgba const* color)
     assert(vec_count(xpos) == vec_count(ypos));
     size_t const npoints = vec_count(xpos);
     for (size_t i = 0; i < npoints; ++i) {
-        err |= draw_point(
+        err |= aengn_draw_point(
             DEREF_PTR(int, vec_get(xpos, i)),
             DEREF_PTR(int, vec_get(ypos, i)),
             color);
     }
     if (err) {
-        errorf("[%s][draw_point] Failed to draw point(s)", __func__);
+        errorf("[%s][aengn_draw_point] Failed to draw point(s)", __func__);
     }
 
     vec_del(xpos);
@@ -1016,18 +1038,18 @@ draw_line(int x1, int y1, int x2, int y2, struct rgba const* color)
 }
 
 AENGN_API int
-draw_rect(int x1, int y1, int x2, int y2, struct rgba const* color)
+aengn_draw_rect(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
 {
     assert(color != NULL);
 
     int err = 0;
-    err |= draw_line(x1, y1, x2, y1, color);
-    err |= draw_line(x1, y2, x2, y2, color);
-    err |= draw_line(x1, y1, x1, y2, color);
-    err |= draw_line(x2, y1, x2, y2, color);
+    err |= aengn_draw_line(x1, y1, x2, y1, color);
+    err |= aengn_draw_line(x1, y2, x2, y2, color);
+    err |= aengn_draw_line(x1, y1, x1, y2, color);
+    err |= aengn_draw_line(x2, y1, x2, y2, color);
 
     if (err) {
-        errorf("[%s][draw_line] Failed to draw rect line(s)", __func__);
+        errorf("[%s][aengn_draw_line] Failed to draw rect line(s)", __func__);
     }
     return err;
 }
