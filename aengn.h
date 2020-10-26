@@ -16,7 +16,7 @@ DEPENDENCIES
     3. libSDL2_image
 
     Linker flags (gcc/clang):
-        -m -lSDL2 -lSDL2_image
+        -lm -lSDL2 -lSDL2_image
 
     Installation (Debian/Ubuntu):
         $ apt-get -y install libsdl2-dev
