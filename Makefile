@@ -85,11 +85,11 @@ test: $(TESTS)
 
 examples: $(EXAMPLES)
 examples/dvd: examples/dvd.c
-	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) -lm "$$(sdl2-config --libs)" -lSDL2_image
 examples/life: examples/life.c
-	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) -lm "$$(sdl2-config --libs)" -lSDL2_image
 examples/shapes: examples/shapes.c
-	$(CC) -o $@ $< $(CFLAGS) -lm -lSDL2 -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) -lm "$$(sdl2-config --libs)" -lSDL2_image
 
 examples-web: $(EXAMPLES_WEB)
 examples/dvd.html: examples/dvd.c
