@@ -25,14 +25,14 @@ GNU_DBG = $(GNU_BASE) -O0 -g
 GNU_REL = $(GNU_BASE) -Os -DNDEBUG
 SANITIZE = -fsanitize=address -fsanitize=leak -fsanitize=undefined
 
+CC = c99
+CFLAGS = $(C99_REL)
+
 EMFLAGS = \
 	--shell-file examples/emscripten-shell.html \
 	-s SINGLE_FILE=1 \
 	-s USE_SDL=2 \
 	-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'
-
-CC = c99
-CFLAGS = $(C99_REL)
 
 TESTS = \
 	test/static.test \
