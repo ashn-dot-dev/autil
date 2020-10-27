@@ -31,7 +31,7 @@ make_istest(char const* func_name)
 "}\n";
     // clang-format on
 
-    size_t const buf_size = FMT_COUNT(fmt, func_name) + 1;
+    size_t const buf_size = AUTIL_FMT_COUNT(fmt, func_name) + 1;
     char* const buf = xalloc(NULL, buf_size);
     sprintf(buf, fmt, func_name);
 
@@ -51,12 +51,12 @@ make_isexpected(char const* func_name, ctypefunc f)
     for (int i = 0; i < EASCII_RANGE; ++i) {
         buf[i] = f(i) ? '1' : '0';
     }
-    buf[ARRAY_COUNT(buf) - 1] = '\n';
+    buf[AUTIL_ARRAY_COUNT(buf) - 1] = '\n';
 
     size_t const path_count = strlen(func_name) + strlen(".expected") + 1;
     char* const path = xalloc(NULL, path_count);
     sprintf(path, "%s.expected", func_name);
-    file_write(path, buf, ARRAY_COUNT(buf));
+    file_write(path, buf, AUTIL_ARRAY_COUNT(buf));
 
     xalloc(path, XALLOC_FREE);
 }
@@ -88,7 +88,7 @@ make_totest(char const* func_name)
 "}\n";
     // clang-format on
 
-    size_t const buf_size = FMT_COUNT(fmt, func_name) + 1;
+    size_t const buf_size = AUTIL_FMT_COUNT(fmt, func_name) + 1;
     char* const buf = xalloc(NULL, buf_size);
     sprintf(buf, fmt, func_name);
 
@@ -108,12 +108,12 @@ make_toexpected(char const* func_name, ctypefunc f)
     for (int i = 0; i < EASCII_RANGE; ++i) {
         buf[i] = f(i);
     }
-    buf[ARRAY_COUNT(buf) - 1] = '\n';
+    buf[AUTIL_ARRAY_COUNT(buf) - 1] = '\n';
 
     size_t const path_count = strlen(func_name) + strlen(".expected") + 1;
     char* const path = xalloc(NULL, path_count);
     sprintf(path, "%s.expected", func_name);
-    file_write(path, buf, ARRAY_COUNT(buf));
+    file_write(path, buf, AUTIL_ARRAY_COUNT(buf));
 
     xalloc(path, XALLOC_FREE);
 }
@@ -128,21 +128,21 @@ make_tofiles(char const* func_name, ctypefunc f)
 int
 main(void)
 {
-    make_isfiles("is_alnum", isalnum);
-    make_isfiles("is_alpha", isalpha);
-    make_isfiles("is_blank", isblank);
-    make_isfiles("is_cntrl", iscntrl);
-    make_isfiles("is_digit", isdigit);
-    make_isfiles("is_graph", isgraph);
-    make_isfiles("is_lower", islower);
-    make_isfiles("is_print", isprint);
-    make_isfiles("is_punct", ispunct);
-    make_isfiles("is_space", isspace);
-    make_isfiles("is_upper", isupper);
-    make_isfiles("is_xdigit", isxdigit);
+    make_isfiles("autil_isalnum", isalnum);
+    make_isfiles("autil_isalpha", isalpha);
+    make_isfiles("autil_isblank", isblank);
+    make_isfiles("autil_iscntrl", iscntrl);
+    make_isfiles("autil_isdigit", isdigit);
+    make_isfiles("autil_isgraph", isgraph);
+    make_isfiles("autil_islower", islower);
+    make_isfiles("autil_isprint", isprint);
+    make_isfiles("autil_ispunct", ispunct);
+    make_isfiles("autil_isspace", isspace);
+    make_isfiles("autil_isupper", isupper);
+    make_isfiles("autil_isxdigit", isxdigit);
 
-    make_tofiles("to_lower", to_lower);
-    make_tofiles("to_upper", to_upper);
+    make_tofiles("autil_tolower", tolower);
+    make_tofiles("autil_toupper", toupper);
 
     return EXIT_SUCCESS;
 }

@@ -28,7 +28,7 @@ struct shape
     } p1, p2;
 };
 // List of all shapes to be drawn (in order) every frame.
-struct vec* shapes = NULL;
+struct autil_vec* shapes = NULL;
 
 // Currently selected shape.
 enum shape_kind selected = SHAPE_POINT;
@@ -47,11 +47,11 @@ main(void)
         return EXIT_FAILURE;
     }
     atexit(aengn_fini);
-    shapes = vec_new(sizeof(struct shape));
+    shapes = autil_vec_new(sizeof(struct shape));
 
     aengn_run(runtick, NULL);
 
-    vec_del(shapes);
+    autil_vec_del(shapes);
     return EXIT_SUCCESS;
 }
 
@@ -76,33 +76,33 @@ runtick(void* ctx)
                                 .p1 = tmp_shape_start,
                                 .p2 = (struct point){.x = aengn_mousepos_x(),
                                                      .y = aengn_mousepos_y()}};
-        vec_insert(shapes, vec_count(shapes), &s);
+        autil_vec_insert(shapes, autil_vec_count(shapes), &s);
     }
 
     // 1,2,3,... => Change the selected shape.
     if (aengn_virtkey_state(SDLK_1)->pressed) {
-        infof("Selected 'point'");
+        autil_infof("Selected 'point'");
         selected = SHAPE_POINT;
     }
     else if (aengn_virtkey_state(SDLK_2)->pressed) {
-        infof("Selected 'line'");
+        autil_infof("Selected 'line'");
         selected = SHAPE_LINE;
     }
     else if (aengn_virtkey_state(SDLK_3)->pressed) {
-        infof("Selected 'rect'");
+        autil_infof("Selected 'rect'");
         selected = SHAPE_RECT;
     }
 
     // C => Clear the screen by removing existing shapes.
     if (aengn_virtkey_state(SDLK_c)->released) {
-        vec_resize(shapes, 0);
+        autil_vec_resize(shapes, 0);
     }
 
     // Render all existing shapes as well as a preview of the selected shape if
     // the user is currently drawing one with the mouse.
     aengn_draw_clear(NULL);
-    for (size_t i = 0; i < vec_count(shapes); ++i) {
-        aengn_draw_shape(vec_get(shapes, i));
+    for (size_t i = 0; i < autil_vec_count(shapes); ++i) {
+        aengn_draw_shape(autil_vec_get(shapes, i));
     }
     if (aengn_mousebutton_state(AENGN_MOUSEBUTTON_LEFT)->down) {
         struct shape const s = {.kind = selected,
@@ -139,5 +139,5 @@ aengn_draw_shape(struct shape const* s)
         aengn_draw_rect(s->p1.x, s->p1.y, s->p2.x, s->p2.y, &RGBA_WHITE);
         return;
     }
-    fatalf("Unreachable!");
+    autil_fatalf("Unreachable!");
 }

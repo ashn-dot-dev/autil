@@ -125,7 +125,7 @@ argparse(int argc, char** argv)
         }
 
         if (strncmp(argv[i], "-", 1) == 0 || strncmp(argv[i], "--", 2) == 0) {
-            errorf("Unrecognized command line option '%s'", argv[i]);
+            autil_errorf("Unrecognized command line option '%s'", argv[i]);
             error = true;
             continue;
         }

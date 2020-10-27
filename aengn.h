@@ -285,9 +285,9 @@ static int g_screen_h = 0;
 static int g_pixel_scale = 0;
 
 // SDL_Scancode => struct aengn_button_state
-static struct map* g_scankey_map = NULL;
+static struct autil_map* g_scankey_map = NULL;
 // SDL_Keycode  => struct aengn_button_state
-static struct map* g_virtkey_map = NULL;
+static struct autil_map* g_virtkey_map = NULL;
 // Array mapping AENGN-supported mouse buttons => struct aengn_button_state.
 static struct aengn_button_state g_mousebutton_state[AENGN_MOUSEBUTTON_COUNT];
 static struct aengn_button_state BUTTON_STATE_DEFAULT = {0};
@@ -337,26 +337,28 @@ AENGN_API int
 aengn_init(int screen_w, int screen_h, int pixel_scale)
 {
     if (screen_w <= 0) {
-        errorf("[%s] Invalid screen width (%d pixels)", __func__, screen_w);
+        autil_errorf(
+            "[%s] Invalid screen width (%d pixels)", __func__, screen_w);
         goto error;
     }
     if (screen_h <= 0) {
-        errorf("[%s] Invalid screen height (%d pixels)", __func__, screen_h);
+        autil_errorf(
+            "[%s] Invalid screen height (%d pixels)", __func__, screen_h);
         goto error;
     }
     if (pixel_scale <= 0) {
-        errorf("[%s] Invalid pixel scale (%d)", __func__, pixel_scale);
+        autil_errorf("[%s] Invalid pixel scale (%d)", __func__, pixel_scale);
         goto error;
     }
 
     g_screen_w = screen_w;
     g_screen_h = screen_h;
     g_pixel_scale = pixel_scale;
-    g_scankey_map = map_new(
+    g_scankey_map = autil_map_new(
         sizeof(SDL_Scancode),
         sizeof(struct aengn_button_state),
         scankey_map_vpcmp);
-    g_virtkey_map = map_new(
+    g_virtkey_map = autil_map_new(
         sizeof(SDL_Keycode),
         sizeof(struct aengn_button_state),
         virtkey_map_vpcmp);
@@ -364,10 +366,10 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
 
     SDL_version ver;
     SDL_GetVersion(&ver);
-    infof("Using SDL version %d.%d.%d", ver.major, ver.minor, ver.patch);
+    autil_infof("Using SDL version %d.%d.%d", ver.major, ver.minor, ver.patch);
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        errorf("[%s][SDL_Init] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_Init] %s", __func__, SDL_GetError());
         goto error;
     }
 
@@ -379,14 +381,14 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
     g_window = SDL_CreateWindow(
         window_title, window_x, window_y, window_w, window_h, SDL_WINDOW_SHOWN);
     if (g_window == NULL) {
-        errorf("[%s][SDL_CreateWindow] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_CreateWindow] %s", __func__, SDL_GetError());
         goto error;
     }
 
     g_renderer = SDL_CreateRenderer(
         g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (g_renderer == NULL) {
-        errorf("[%s][SDL_CreateRenderer] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_CreateRenderer] %s", __func__, SDL_GetError());
         goto error;
     }
     SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
@@ -419,11 +421,11 @@ aengn_fini(void)
     g_pixel_scale = -1;
 
     if (g_scankey_map != NULL) {
-        map_del(g_scankey_map);
+        autil_map_del(g_scankey_map);
         g_scankey_map = NULL;
     }
     if (g_virtkey_map != NULL) {
-        map_del(g_virtkey_map);
+        autil_map_del(g_virtkey_map);
         g_virtkey_map = NULL;
     }
     memset(g_mousebutton_state, 0x00, sizeof(g_mousebutton_state)); // scrub
@@ -500,17 +502,17 @@ process_event_(SDL_Event const* event)
     if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
         scankey = event->key.keysym.scancode;
         virtkey = event->key.keysym.sym;
-        scanstate = map_lookup(g_scankey_map, &scankey);
-        virtstate = map_lookup(g_virtkey_map, &virtkey);
+        scanstate = autil_map_lookup(g_scankey_map, &scankey);
+        virtstate = autil_map_lookup(g_virtkey_map, &virtkey);
         if (scanstate == NULL) {
-            map_insert(
+            autil_map_insert(
                 g_scankey_map, &scankey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            scanstate = map_lookup(g_scankey_map, &scankey);
+            scanstate = autil_map_lookup(g_scankey_map, &scankey);
         }
         if (virtstate == NULL) {
-            map_insert(
+            autil_map_insert(
                 g_virtkey_map, &virtkey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            virtstate = map_lookup(g_virtkey_map, &virtkey);
+            virtstate = autil_map_lookup(g_virtkey_map, &virtkey);
         }
         assert(scanstate != NULL);
         assert(virtstate != NULL);
@@ -571,7 +573,7 @@ aengn_end_frame(void)
         double const sec = (double)fps_period_elapsed / (double)ONE_SECOND;
         double const fps = (double)g_fps_period_count / sec;
         char title[256] = {0};
-        snprintf(title, ARRAY_COUNT(title) - 1, "FPS: %0.2f", fps);
+        snprintf(title, AUTIL_ARRAY_COUNT(title) - 1, "FPS: %0.2f", fps);
         SDL_SetWindowTitle(g_window, title);
         g_fps_period_start = now;
         g_fps_period_count = 0;
@@ -582,16 +584,16 @@ aengn_end_frame(void)
     g_frame_start = now;
 
     // Clear previous frame's input state.
-    struct vec const* const scankeys = map_vals(g_scankey_map);
-    for (size_t i = 0; i < vec_count(scankeys); ++i) {
-        struct aengn_button_state* const sk = vec_get(scankeys, i);
+    struct autil_vec const* const scankeys = autil_map_vals(g_scankey_map);
+    for (size_t i = 0; i < autil_vec_count(scankeys); ++i) {
+        struct aengn_button_state* const sk = autil_vec_get(scankeys, i);
         assert(sk != NULL);
         sk->pressed = false;
         sk->released = false;
     }
-    struct vec const* const virtkeys = map_vals(g_virtkey_map);
-    for (size_t i = 0; i < vec_count(virtkeys); ++i) {
-        struct aengn_button_state* const vk = vec_get(virtkeys, i);
+    struct autil_vec const* const virtkeys = autil_map_vals(g_virtkey_map);
+    for (size_t i = 0; i < autil_vec_count(virtkeys); ++i) {
+        struct aengn_button_state* const vk = autil_vec_get(virtkeys, i);
         assert(vk != NULL);
         vk->pressed = false;
         vk->released = false;
@@ -631,7 +633,7 @@ AENGN_API struct aengn_button_state const*
 aengn_scankey_state(SDL_Scancode key)
 {
     struct aengn_button_state const* const state =
-        map_lookup(g_scankey_map, &key);
+        autil_map_lookup(g_scankey_map, &key);
     return state != NULL ? state : &BUTTON_STATE_DEFAULT;
 }
 
@@ -639,7 +641,7 @@ AENGN_API struct aengn_button_state const*
 aengn_virtkey_state(SDL_Keycode key)
 {
     struct aengn_button_state const* const state =
-        map_lookup(g_virtkey_map, &key);
+        autil_map_lookup(g_virtkey_map, &key);
     return state != NULL ? state : &BUTTON_STATE_DEFAULT;
 }
 
@@ -686,12 +688,12 @@ aengn_sprite_new(int w, int h)
     SDL_Texture* texture = NULL;
     static int const DEPTH = 32;
 
-    self = xalloc(NULL, sizeof(struct aengn_sprite));
+    self = autil_xalloc(NULL, sizeof(struct aengn_sprite));
 
     surface = SDL_CreateRGBSurfaceWithFormat(
         0, w, h, DEPTH, SDL_PIXELFORMAT_ARGB8888);
     if (surface == NULL) {
-        errorf(
+        autil_errorf(
             "[%s][SDL_CreateRGBSurfaceWithFormat] %s",
             __func__,
             SDL_GetError());
@@ -705,7 +707,7 @@ aengn_sprite_new(int w, int h)
         w,
         h);
     if (texture == NULL) {
-        errorf("[%s][SDL_CreateTexture] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_CreateTexture] %s", __func__, SDL_GetError());
         goto error;
     }
     // TODO: Using alpha blending on all sprites *may* lead to a performance
@@ -713,7 +715,8 @@ aengn_sprite_new(int w, int h)
     //       performance difference, and if so, maybe make the blend mode
     //       configurable.
     if (0 != SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND)) {
-        errorf("[%s][SDL_SetTextureBlendMode] %s", __func__, SDL_GetError());
+        autil_errorf(
+            "[%s][SDL_SetTextureBlendMode] %s", __func__, SDL_GetError());
         goto error;
     }
 
@@ -727,7 +730,7 @@ aengn_sprite_new(int w, int h)
 
 error:
     if (self != NULL) {
-        xalloc(self, XALLOC_FREE);
+        autil_xalloc(self, AUTIL_XALLOC_FREE);
     }
     if (surface != NULL) {
         SDL_FreeSurface(surface);
@@ -746,7 +749,7 @@ aengn_sprite_del(struct aengn_sprite* self)
     SDL_FreeSurface(self->surface);
     SDL_DestroyTexture(self->texture);
     memset(self, 0x00, sizeof(*self)); // scrub
-    xalloc(self, XALLOC_FREE);
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
 
 AENGN_API int
@@ -771,7 +774,7 @@ aengn_sprite_update_texture(struct aengn_sprite* self)
     int const err = SDL_UpdateTexture(
         self->texture, NULL, self->surface->pixels, self->surface->pitch);
     if (err) {
-        errorf("[%s][SDL_UpdateTexture] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_UpdateTexture] %s", __func__, SDL_GetError());
         return -1;
     }
 
@@ -822,7 +825,7 @@ aengn_load_surface(char const* path)
 {
     SDL_Surface* const surface = IMG_Load(path);
     if (surface == NULL) {
-        errorf("[%s(%s)][IMG_Load] %s", __func__, path, IMG_GetError());
+        autil_errorf("[%s(%s)][IMG_Load] %s", __func__, path, IMG_GetError());
         return NULL;
     }
     return surface;
@@ -833,7 +836,7 @@ aengn_load_texture(char const* path)
 {
     SDL_Surface* const surface = aengn_load_surface(path);
     if (surface == NULL) {
-        errorf(
+        autil_errorf(
             "[%s(%s)][aengn_load_surface] Failed to load surface",
             __func__,
             path);
@@ -844,7 +847,7 @@ aengn_load_texture(char const* path)
         SDL_CreateTextureFromSurface(g_renderer, surface);
     SDL_FreeSurface(surface);
     if (texture == NULL) {
-        errorf(
+        autil_errorf(
             "[%s(%s)][SDL_CreateTextureFromSurface] %s",
             __func__,
             path,
@@ -864,7 +867,7 @@ aengn_load_sprite(char const* path)
 
     surface = aengn_load_surface(path);
     if (surface == NULL) {
-        errorf(
+        autil_errorf(
             "[%s(%s)][aengn_load_surface] Failed to load surface",
             __func__,
             path);
@@ -873,20 +876,21 @@ aengn_load_sprite(char const* path)
 
     sprite = aengn_sprite_new(surface->w, surface->h);
     if (sprite == NULL) {
-        errorf(
+        autil_errorf(
             "[%s(%s)][aengn_sprite_new] Failed create sprite", __func__, path);
         goto error;
     }
 
     err = SDL_BlitSurface(surface, NULL, sprite->surface, NULL);
     if (err) {
-        errorf("[%s(%s)][SDL_BlitSurface] %s", __func__, path, SDL_GetError());
+        autil_errorf(
+            "[%s(%s)][SDL_BlitSurface] %s", __func__, path, SDL_GetError());
         goto error;
     }
 
     err = aengn_sprite_update_texture(sprite);
     if (err) {
-        errorf(
+        autil_errorf(
             "[%s(%s)][sprite_update_texture] Failed to update texture",
             __func__,
             path);
@@ -917,7 +921,7 @@ aengn_draw_texture(SDL_Texture* tex, int x, int y)
                     .h = h * g_pixel_scale};
     int const err = SDL_RenderCopy(g_renderer, tex, NULL, &dst);
     if (err) {
-        errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
     }
     return err;
 }
@@ -933,7 +937,7 @@ aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y)
 
     int const err = aengn_draw_texture(sprite->texture, x, y);
     if (err) {
-        errorf(
+        autil_errorf(
             "[%s][aengn_draw_texture] Failed to draw sprite texture", __func__);
     }
     return err;
@@ -962,7 +966,7 @@ aengn_draw_point(int x, int y, struct aengn_rgba const* color)
                            .h = g_pixel_scale};
     int const err = SDL_RenderFillRect(g_renderer, &rect);
     if (err) {
-        errorf("[%s][SDL_RenderFillRect] %s", __func__, SDL_GetError());
+        autil_errorf("[%s][SDL_RenderFillRect] %s", __func__, SDL_GetError());
     }
     return err;
 }
@@ -974,13 +978,19 @@ aengn_draw_point(int x, int y, struct aengn_rgba const* color)
 // Vecs xpos and ypos are caller-allocated and should be initialized to hold
 // elements of type int.
 static void
-line_pos_(int x1, int y1, int x2, int y2, struct vec* xpos, struct vec* ypos)
+line_pos_(
+    int x1,
+    int y1,
+    int x2,
+    int y2,
+    struct autil_vec* xpos,
+    struct autil_vec* ypos)
 {
     assert(xpos != NULL);
     assert(ypos != NULL);
 
-    vec_resize(xpos, 0);
-    vec_resize(ypos, 0);
+    autil_vec_resize(xpos, 0);
+    autil_vec_resize(ypos, 0);
 
     // The number of steps to take is exactly the diagonal distance between
     // (x1, y1) and (x2, y2).
@@ -1002,8 +1012,8 @@ line_pos_(int x1, int y1, int x2, int y2, struct vec* xpos, struct vec* ypos)
     for (int step = 0; step <= nsteps; ++step) {
         int const xround = (int)round(x);
         int const yround = (int)round(y);
-        vec_insert(xpos, vec_count(xpos), &xround);
-        vec_insert(ypos, vec_count(ypos), &yround);
+        autil_vec_insert(xpos, autil_vec_count(xpos), &xround);
+        autil_vec_insert(ypos, autil_vec_count(ypos), &yround);
 
         x += xstep;
         y += ystep;
@@ -1015,25 +1025,26 @@ aengn_draw_line(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
 {
     assert(color != NULL);
 
-    struct vec* const xpos = vec_new(sizeof(int));
-    struct vec* const ypos = vec_new(sizeof(int));
+    struct autil_vec* const xpos = autil_vec_new(sizeof(int));
+    struct autil_vec* const ypos = autil_vec_new(sizeof(int));
     line_pos_(x1, y1, x2, y2, xpos, ypos);
 
     int err = 0;
-    assert(vec_count(xpos) == vec_count(ypos));
-    size_t const npoints = vec_count(xpos);
+    assert(autil_vec_count(xpos) == autil_vec_count(ypos));
+    size_t const npoints = autil_vec_count(xpos);
     for (size_t i = 0; i < npoints; ++i) {
         err |= aengn_draw_point(
-            DEREF_PTR(int, vec_get(xpos, i)),
-            DEREF_PTR(int, vec_get(ypos, i)),
+            AUTIL_DEREF_PTR(int, autil_vec_get(xpos, i)),
+            AUTIL_DEREF_PTR(int, autil_vec_get(ypos, i)),
             color);
     }
     if (err) {
-        errorf("[%s][aengn_draw_point] Failed to draw point(s)", __func__);
+        autil_errorf(
+            "[%s][aengn_draw_point] Failed to draw point(s)", __func__);
     }
 
-    vec_del(xpos);
-    vec_del(ypos);
+    autil_vec_del(xpos);
+    autil_vec_del(ypos);
     return err;
 }
 
@@ -1049,7 +1060,8 @@ aengn_draw_rect(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
     err |= aengn_draw_line(x2, y1, x2, y2, color);
 
     if (err) {
-        errorf("[%s][aengn_draw_line] Failed to draw rect line(s)", __func__);
+        autil_errorf(
+            "[%s][aengn_draw_line] Failed to draw rect line(s)", __func__);
     }
     return err;
 }

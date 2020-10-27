@@ -12,7 +12,7 @@ custom_free(void* ptr);
 int
 main(void)
 {
-    xalloc(xalloc(NULL, 4096), XALLOC_FREE);
+    autil_xalloc(autil_xalloc(NULL, 4096), AUTIL_XALLOC_FREE);
     return EXIT_SUCCESS;
 }
 

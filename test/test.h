@@ -4,7 +4,7 @@
 #define EXPECT(condition)                                                      \
     do {                                                                       \
         if (!(condition))                                                      \
-            errorf(                                                            \
+            autil_errorf(                                                      \
                 "[%s:%d][%s] EXPECT FAILURE: %s",                              \
                 __FILE__,                                                      \
                 __LINE__,                                                      \
@@ -15,7 +15,7 @@
 #define ASSERT(condition)                                                      \
     do {                                                                       \
         if (!(condition))                                                      \
-            fatalf(                                                            \
+            autil_fatalf(                                                      \
                 "[%s:%d][%s] ASSERT FAILURE: %s",                              \
                 __FILE__,                                                      \
                 __LINE__,                                                      \
