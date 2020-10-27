@@ -37,37 +37,37 @@ EMFLAGS = \
 TESTS = \
 	test/static.test \
 	test/custom-allocator.test \
-	test/is_alnum.test \
-	test/is_alpha.test \
-	test/is_blank.test \
-	test/is_cntrl.test \
-	test/is_digit.test \
-	test/is_graph.test \
-	test/is_lower.test \
-	test/is_print.test \
-	test/is_punct.test \
-	test/is_space.test \
-	test/is_upper.test \
-	test/is_xdigit.test \
-	test/to_lower.test \
-	test/to_upper.test \
-	test/infof.test \
-	test/errorf.test \
-	test/fatalf.test \
-	test/xalloc.test \
-	test/xallocn.test \
-	test/file_read.test \
-	test/file_write.test \
-	test/vec_reserve.test \
-	test/vec_resize.test \
-	test/vec_insert.test \
-	test/vec_remove.test \
-	test/vec_set.test \
-	test/vec_get.test \
-	test/map_insert.test \
-	test/map_remove.test \
-	test/map_lookup.test \
-	test/map.example.test
+	test/autil_isalnum.test \
+	test/autil_isalpha.test \
+	test/autil_isblank.test \
+	test/autil_iscntrl.test \
+	test/autil_isdigit.test \
+	test/autil_isgraph.test \
+	test/autil_islower.test \
+	test/autil_isprint.test \
+	test/autil_ispunct.test \
+	test/autil_isspace.test \
+	test/autil_isupper.test \
+	test/autil_isxdigit.test \
+	test/autil_tolower.test \
+	test/autil_toupper.test \
+	test/autil_infof.test \
+	test/autil_errorf.test \
+	test/autil_fatalf.test \
+	test/autil_xalloc.test \
+	test/autil_xallocn.test \
+	test/autil_file_read.test \
+	test/autil_file_write.test \
+	test/autil_vec_reserve.test \
+	test/autil_vec_resize.test \
+	test/autil_vec_insert.test \
+	test/autil_vec_remove.test \
+	test/autil_vec_set.test \
+	test/autil_vec_get.test \
+	test/autil_map_insert.test \
+	test/autil_map_remove.test \
+	test/autil_map_lookup.test \
+	test/autil_map.example.test
 
 EXAMPLES = \
 	examples/dvd \
