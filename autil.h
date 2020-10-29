@@ -37,7 +37,7 @@ USAGE
 CHANGELOG
     Unreleased
     -------------------
-    + Namespace library with AUTIL_ and autil_
+    + Namespace library with AUTIL_ and autil_.
     + Added macro AUTIL_FMT_COUNT.
     + Added safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
       autil_iscntrl, autil_isdigit, autil_isgraph, autil_islower, autil_isprint,
