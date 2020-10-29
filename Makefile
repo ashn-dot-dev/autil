@@ -37,6 +37,7 @@ EMFLAGS = \
 TESTS = \
 	test/static.test \
 	test/custom-allocator.test \
+	test/autil_array_count.test \
 	test/autil_isalnum.test \
 	test/autil_isalpha.test \
 	test/autil_isblank.test \
