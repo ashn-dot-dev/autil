@@ -35,7 +35,7 @@ USAGE
 
 
 CHANGELOG
-    Unreleased
+    v0.3.0 - 2020-10-29
     -------------------
     + Namespace library with AUTIL_ and autil_.
     + Added macro AUTIL_FMT_COUNT.

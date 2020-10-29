@@ -39,7 +39,7 @@ USAGE
 
 
 CHANGELOG
-    Unreleased
+    v0.3.0 - 2020-10-29
     -------------------
     + Namespace library with AENGN_ and aengn_.
     + Add rendering functions: aengn_draw_point, aengn_draw_line, and
