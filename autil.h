@@ -115,7 +115,7 @@ AUTIL_API int autil_ispunct(int c);
 AUTIL_API int autil_isspace(int c);
 AUTIL_API int autil_isupper(int c);
 AUTIL_API int autil_isbdigit(int c); // Not in C99. Binary digit.
-AUTIL_API int autil_isbdigit(int c); // Not in C99. Octal digit.
+AUTIL_API int autil_isodigit(int c); // Not in C99. Octal digit.
 AUTIL_API int autil_isxdigit(int c);
 //
 AUTIL_API int autil_tolower(int c);
