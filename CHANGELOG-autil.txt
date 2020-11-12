@@ -5,9 +5,9 @@ Unreleased
 + Add macro AUTIL_BIT.
 + Add type autil_bigint and associated functions: autil_bigint_new,
   autil_bigint_new_cstr, autil_bigint_new_utf8,autil_bigint_del,
-  autil_bigint_cmp, autil_bigint_assign, autil_bigint_negate, autil_bigint_abs,
-  autil_bigint_add, autil_bigint_sub, autil_bigint_mul, autil_bigint_div,
-  and autil_bigint_to_cstr.
+  autil_bigint_cmp, autil_bigint_vpcmp, autil_bigint_assign,
+  autil_bigint_negate, autil_bigint_abs, autil_bigint_add, autil_bigint_sub,
+  autil_bigint_mul, autil_bigint_div, and autil_bigint_to_cstr.
 
 v0.3.0 - 2020-10-29
 -------------------

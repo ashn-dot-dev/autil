@@ -64,6 +64,7 @@ TESTS = \
 	test/autil_file_read.test \
 	test/autil_file_write.test \
 	test/autil_bigint_new_cstr.test \
+	test/autil_bigint_cmp.test \
 	test/autil_bigint_to_cstr.test \
 	test/autil_bigint_add.test \
 	test/autil_bigint_sub.test \
