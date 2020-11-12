@@ -653,6 +653,45 @@ autil_xallocn(void* ptr, size_t nmemb, size_t size)
     return autil_xalloc(ptr, sz);
 }
 
+AUTIL_API void
+autil_xalloc_prepend(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size)
+{
+    assert(pdata != NULL);
+    assert(psize != NULL);
+    assert(othr != NULL || othr_size == 0);
+    if (othr_size == 0) {
+        return;
+    }
+
+    size_t const new_size = *psize + othr_size;
+    void* const new_data = autil_xalloc(*pdata, new_size);
+    memmove((char*)new_data + othr_size, new_data, *psize);
+    memcpy(new_data, othr, othr_size);
+
+    *pdata = new_data;
+    *psize = new_size;
+}
+
+AUTIL_API void
+autil_xalloc_append(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size)
+{
+    assert(pdata != NULL);
+    assert(psize != NULL);
+    assert(othr != NULL || othr_size == 0);
+    if (othr_size == 0) {
+        return;
+    }
+
+    size_t const new_size = *psize + othr_size;
+    void* const new_data = autil_xalloc(*pdata, new_size);
+    memcpy((char*)new_data + *psize, othr, othr_size);
+
+    *pdata = new_data;
+    *psize = new_size;
+}
+
 AUTIL_API int
 autil_file_read(char const* path, void** buf, size_t* buf_size)
 {
@@ -716,45 +755,6 @@ autil_file_write(char const* path, void const* buf, size_t buf_size)
     }
 
     return 0;
-}
-
-AUTIL_API void
-autil_xalloc_prepend(
-    void** pdata, size_t* psize, void const* othr, size_t othr_size)
-{
-    assert(pdata != NULL);
-    assert(psize != NULL);
-    assert(othr != NULL || othr_size == 0);
-    if (othr_size == 0) {
-        return;
-    }
-
-    size_t const new_size = *psize + othr_size;
-    void* const new_data = autil_xalloc(*pdata, new_size);
-    memmove((char*)new_data + othr_size, new_data, *psize);
-    memcpy(new_data, othr, othr_size);
-
-    *pdata = new_data;
-    *psize = new_size;
-}
-
-AUTIL_API void
-autil_xalloc_append(
-    void** pdata, size_t* psize, void const* othr, size_t othr_size)
-{
-    assert(pdata != NULL);
-    assert(psize != NULL);
-    assert(othr != NULL || othr_size == 0);
-    if (othr_size == 0) {
-        return;
-    }
-
-    size_t const new_size = *psize + othr_size;
-    void* const new_data = autil_xalloc(*pdata, new_size);
-    memcpy((char*)new_data + *psize, othr, othr_size);
-
-    *pdata = new_data;
-    *psize = new_size;
 }
 
 // The internals of struct autil_bigint are designed such that initializing an
