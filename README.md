@@ -44,6 +44,11 @@ $ ./emsdk activate latest # Make the latest SDK active (do this once)
 $ source ./emsdk_env.sh   # Setup envrionment (source this every time)
 ```
 
+*NOTE*: Currently `aengn.h` and aengn example programs are known to compile on
+Debian stable using `CC=gcc` or `CC=clang`, but fail to compile with
+`CC=musl-gcc` and `CC=tcc`.
+
+
 ### Building
 ```sh
 $ make examples CFLAGS='$(C99_DBG)'  # Debug   (c99)
