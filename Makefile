@@ -59,6 +59,8 @@ TESTS = \
 	test/autil_fatalf.test \
 	test/autil_xalloc.test \
 	test/autil_xallocn.test \
+	test/autil_xalloc_prepend.test \
+	test/autil_xalloc_append.test \
 	test/autil_file_read.test \
 	test/autil_file_write.test \
 	test/autil_bigint_new_cstr.test \

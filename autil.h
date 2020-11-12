@@ -661,6 +661,7 @@ autil_xalloc_prepend(
     assert(psize != NULL);
     assert(othr != NULL || othr_size == 0);
     if (othr_size == 0) {
+        // [] + [A][B][C] => [A][B][C]
         return;
     }
 
@@ -681,6 +682,7 @@ autil_xalloc_append(
     assert(psize != NULL);
     assert(othr != NULL || othr_size == 0);
     if (othr_size == 0) {
+        // [A][B][C] + [] => [A][B][C]
         return;
     }
 
