@@ -2,7 +2,7 @@
 AUTIL - ASHN'S UTILITY LIBRARY
     Single header file containing functions and data structures for rapid
     application development in C99 (or later) with a focus on simplicity.
-    This library has no additional dependencies outside of libc.
+    This library has no dependencies outside of libc.
 
 
 USAGE
