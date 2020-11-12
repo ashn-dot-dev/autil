@@ -88,6 +88,7 @@ autil_int_vpcmp(void const* lhs, void const* rhs); // int
 //  int val = AUTIL_DEREF_PTR(int, ptr);
 #define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
+// Unsigned long mask with the n_-th bit set.
 #define AUTIL_BIT(n_) (1UL << (n_))
 
 // Number of elements in an array.

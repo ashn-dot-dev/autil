@@ -2,6 +2,7 @@ Unreleased
 -------------------
 + Add functions autil_isbdigit and autil_isodigit.
 + Add functions autil_xalloc_prepend, autil_xalloc_append.
++ Add macro AUTIL_BIT.
 + Add type autil_bigint and associated functions: autil_bigint_new,
   autil_bigint_new_cstr, autil_bigint_new_utf8,autil_bigint_del,
   autil_bigint_cmp, autil_bigint_assign, autil_bigint_negate, autil_bigint_abs,
