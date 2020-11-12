@@ -1,0 +1,24 @@
+test_autil_bigint_sub__0_sub_x
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 8, LIMBS: [0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12]
+test_autil_bigint_sub__x_sub_0
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 8, LIMBS: [0x34, 0x12, 0x34, 0x12, 0x34, 0x12, 0x34, 0x12]
+test_autil_bigint_sub__pos_sub_pos
+SIGN: '0', COUNT: 0, LIMBS: []
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 2, LIMBS: [0x32, 0x12]
+SIGN: '-', COUNT: 2, LIMBS: [0x32, 0x12]
+test_autil_bigint_sub__neg_sub_neg
+SIGN: '0', COUNT: 0, LIMBS: []
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 2, LIMBS: [0x32, 0x12]
+SIGN: '+', COUNT: 2, LIMBS: [0x32, 0x12]
+test_autil_bigint_sub__pos_sub_neg
+SIGN: '+', COUNT: 1, LIMBS: [0x02]
+test_autil_bigint_sub__neg_sub_pos
+SIGN: '-', COUNT: 1, LIMBS: [0x02]

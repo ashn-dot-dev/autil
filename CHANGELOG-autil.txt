@@ -1,0 +1,41 @@
+Unreleased
+-------------------
++ Add functions autil_isbdigit and autil_isodigit.
++ Add functions autil_xalloc_prepend, autil_xalloc_append.
++ Add type autil_bigint and associated functions: autil_bigint_new,
+  autil_bigint_new_cstr, autil_bigint_new_utf8,autil_bigint_del,
+  autil_bigint_cmp, autil_bigint_assign, autil_bigint_negate, autil_bigint_abs,
+  autil_bigint_add, autil_bigint_sub, autil_bigint_mul, autil_bigint_div,
+  and autil_bigint_to_cstr.
+
+v0.3.0 - 2020-10-29
+-------------------
++ Namespace library with AUTIL_ and autil_.
++ Added macro AUTIL_FMT_COUNT.
++ Added safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
+  autil_iscntrl, autil_isdigit, autil_isgraph, autil_islower, autil_isprint,
+  autil_ispunct, autil_isspace, autil_isupper, autil_isxdigit, autil_tolower,
+  and autil_toupper.
++ Added function autil_vec_elemsize.
+
+v0.2.0 - 2020-09-16
+-------------------
++ Added function infof.
++ Added macro ARRAY_COUNT.
++ Added macro CSTR_COUNT.
++ Fixed missing const qualifier for vec_get parameter self.
+
+v0.1.0 - 2020-07-30
+-------------------
++ Initial release.
++ Added type vpcmp_fn and functions str_vpcmp and int_vpcmp.
++ Added macros LOCAL_PTR and DEREF_PTR.
++ Added functions errorf and fatalf.
++ Added functions xalloc and xallocn and macro XALLOC_FREE.
++ Added functions file_read and file_write.
++ Added type vec and associated functions: vec_new, vec_del, vec_count,
+  vec_capacity, vec_reserve, vec_resize, vec_set, vec_get, vec_insert, and
+  vec_remove.
++ Added type map and associated functions: map_new, map_del, map_count,
+  map_keys, map_vals, map_lookup, map_insert, and map_remove.
+

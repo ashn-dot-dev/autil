@@ -1,0 +1,18 @@
+test_autil_bigint_mul__0_mul_x
+SIGN: '0', COUNT: 0, LIMBS: []
+SIGN: '0', COUNT: 0, LIMBS: []
+test_autil_bigint_mul__x_mul_0
+SIGN: '0', COUNT: 0, LIMBS: []
+SIGN: '0', COUNT: 0, LIMBS: []
+test_autil_bigint_mul__pos_mul_pos
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 4, LIMBS: [0x44, 0x01, 0xDC, 0xFF]
+test_autil_bigint_mul__neg_mul_neg
+SIGN: '+', COUNT: 1, LIMBS: [0x01]
+SIGN: '+', COUNT: 4, LIMBS: [0x44, 0x01, 0xDC, 0xFF]
+test_autil_bigint_mul__pos_mul_neg
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 4, LIMBS: [0x44, 0x01, 0xDC, 0xFF]
+test_autil_bigint_mul__neg_mul_pos
+SIGN: '-', COUNT: 1, LIMBS: [0x01]
+SIGN: '-', COUNT: 4, LIMBS: [0x44, 0x01, 0xDC, 0xFF]

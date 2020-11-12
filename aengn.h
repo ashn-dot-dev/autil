@@ -38,31 +38,6 @@ USAGE
         #include "aengn.h"
 
 
-CHANGELOG
-    v0.3.0 - 2020-10-29
-    -------------------
-    + Namespace library with AENGN_ and aengn_.
-    + Add rendering functions: aengn_draw_point, aengn_draw_line, and
-      aengn_draw_rect.
-    + Rename draw_show to aengn_end_frame.
-
-    v0.2.0 - 2020-09-16
-    -------------------
-    + Initial release.
-    + Added engine initialization, finalization, execution, timing, and other
-      misc. functions: aengn_init, aengn_fini, aengn_run, and aengn_now,
-      screen_w, screen_h, pixel_scale.
-    + Added input state retrieval functions: scankey_state, virtkey_state,
-      mousebutton_state, mousepos_x, mousepos_y, and associated macros.
-    + Added type sprite, type rgba, and associated functions / macros:
-      sprite_new, sprite_del, sprite_w, sprite_h, sprite_set_pixel,
-      sprite_get_pixel, sprite_update_texture, and RGBA_LOCAL_PTR.
-    + Added resource loading functions: load_surface, load_texture, and
-      load_sprite.
-    + Added rendering functions: draw_clear, draw_texture, draw_sprite, and
-      draw_show.
-
-
 LICENSE
     Copyright (c) 2020 ashn <me@ashn.dev>
 

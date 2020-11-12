@@ -34,39 +34,6 @@ USAGE
         #include "autil.h"
 
 
-CHANGELOG
-    v0.3.0 - 2020-10-29
-    -------------------
-    + Namespace library with AUTIL_ and autil_.
-    + Added macro AUTIL_FMT_COUNT.
-    + Added safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
-      autil_iscntrl, autil_isdigit, autil_isgraph, autil_islower, autil_isprint,
-      autil_ispunct, autil_isspace, autil_isupper, autil_isxdigit,
-      autil_tolower, and autil_toupper.
-    + Added function autil_vec_elemsize.
-
-    v0.2.0 - 2020-09-16
-    -------------------
-    + Added function infof.
-    + Added macro ARRAY_COUNT.
-    + Added macro CSTR_COUNT.
-    + Fixed missing const qualifier for vec_get parameter self.
-
-    v0.1.0 - 2020-07-30
-    -------------------
-    + Initial release.
-    + Added type vpcmp_fn and functions str_vpcmp and int_vpcmp.
-    + Added macros LOCAL_PTR and DEREF_PTR.
-    + Added functions errorf and fatalf.
-    + Added functions xalloc and xallocn and macro XALLOC_FREE.
-    + Added functions file_read and file_write.
-    + Added type vec and associated functions: vec_new, vec_del, vec_count,
-      vec_capacity, vec_reserve, vec_resize, vec_set, vec_get, vec_insert, and
-      vec_remove.
-    + Added type map and associated functions: map_new, map_del, map_count,
-      map_keys, map_vals, map_lookup, map_insert, and map_remove.
-
-
 LICENSE
     Copyright (c) 2020 ashn <me@ashn.dev>
 
@@ -121,15 +88,17 @@ autil_int_vpcmp(void const* lhs, void const* rhs); // int
 //  int val = AUTIL_DEREF_PTR(int, ptr);
 #define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
+#define AUTIL_BIT(n_) (1UL << (n_))
+
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array_) (sizeof(array_) / sizeof((array_)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
 #define AUTIL_CSTR_COUNT(cstr_) (AUTIL_ARRAY_COUNT(cstr_) - 1)
-
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
-// Alternatives to the C99 character handling functions in ctype.h.
+// Alternatives to the C99 character handling functions in ctype.h (plus some
+// personal extras).
 // These functions always use the "C" locale and will not result in undefined
 // behavior if passed a value not representable by an unsigned char.
 // clang-format off
@@ -144,13 +113,15 @@ AUTIL_API int autil_isprint(int c);
 AUTIL_API int autil_ispunct(int c);
 AUTIL_API int autil_isspace(int c);
 AUTIL_API int autil_isupper(int c);
+AUTIL_API int autil_isbdigit(int c); // Not in C99. Binary digit.
+AUTIL_API int autil_isbdigit(int c); // Not in C99. Octal digit.
 AUTIL_API int autil_isxdigit(int c);
 //
 AUTIL_API int autil_tolower(int c);
 AUTIL_API int autil_toupper(int c);
 // clang-format on
 
-// Write a formatted error message to stderr.
+// Write a formatted info message to stderr.
 // A newline is automatically appended to the end of the formatted message.
 AUTIL_API void
 autil_infof(char const* fmt, ...);
@@ -184,6 +155,19 @@ autil_xallocn(void* ptr, size_t nmemb, size_t size);
 //
 #define AUTIL_XALLOC_FREE ((size_t)0)
 
+// Prepend othr_size bytes from othr onto the autil_xalloc-allocated buffer of
+// size *psize pointed to by *pdata, updating the address of *pdata if
+// necessary.
+AUTIL_API void
+autil_xalloc_prepend(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size);
+// Append othr_size bytes from othr onto the autil_xalloc-allocated buffer of
+// size *psize pointed to by *pdata, updating the address of *pdata if
+// necessary.
+AUTIL_API void
+autil_xalloc_append(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size);
+
 // Read the full contents of the file specified by path.
 // Returns zero on success, in which case a pointer to the
 // autil_xalloc-allocated buffer and that buffer's size are stored in *buf and
@@ -197,6 +181,136 @@ autil_file_read(char const* path, void** buf, size_t* buf_size);
 // On failure, the contents of the file specified by path is undefined.
 AUTIL_API int
 autil_file_write(char const* path, void const* buf, size_t buf_size);
+
+////////////////////////////////////////////////////////////////////////////////
+//////// BIG INTEGER ///////////////////////////////////////////////////////////
+
+// Arbitrary precision integer.
+struct autil_bigint;
+
+extern struct autil_bigint const* const AUTIL_BIGINT_ZERO; // 0
+extern struct autil_bigint const* const AUTIL_BIGINT_POS_ONE; // +1
+extern struct autil_bigint const* const AUTIL_BIGINT_NEG_ONE; // -1
+
+// Allocate and initialize a bigint to the value zero.
+AUTIL_API struct autil_bigint*
+autil_bigint_new(void);
+// Allocate and initialize a bigint from the provided NUL-terminated cstring.
+// Returns NULL if the cstring could not be parsed.
+//
+// The cstring may begin with a plus (+) or minus (-) sign.
+// In the absence of a plus or minus sign the cstring will interpreted as a
+// non-negative number.
+//
+// The digits of the cstring may be prefixed with a radix identifier:
+// 0b (binary) or 0x (hexadecimal).
+// In the absence of a radix identifier, the digits of the cstring will decoded
+// with radix 10 (decimal).
+//
+// The cstring *must* not have any leading or trailing whitespace.
+AUTIL_API struct autil_bigint*
+autil_bigint_new_cstr(char const* cstr);
+// Allocate and initialize a bigint from the provided UTF-8 string.
+// Returns NULL if the UTF-8 string could not be parsed.
+// This function uses the same string-grammar as autil_bigint_new_cstr().
+AUTIL_API struct autil_bigint*
+autil_bigint_new_utf8(void const* utf8, size_t utf8_size);
+// Deinitialize and free the bigint.
+AUTIL_API void
+autil_bigint_del(struct autil_bigint* self);
+
+// Return an int less than, equal to, or greater than zero if lhs is
+// semantically less than, equal to, or greater than rhs, respectively.
+AUTIL_API int
+autil_bigint_cmp(
+    struct autil_bigint const* lhs, struct autil_bigint const* rhs);
+
+// self = othr
+AUTIL_API void
+autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr);
+
+// self = -1 * self
+AUTIL_API void
+autil_bigint_negate(struct autil_bigint* self);
+// self = abs(self)
+AUTIL_API void
+autil_bigint_abs(struct autil_bigint* self);
+// res = lhs + rhs
+AUTIL_API void
+autil_bigint_add(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs);
+// res = lhs - rhs
+AUTIL_API void
+autil_bigint_sub(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs);
+// res  = lhs * rhs
+AUTIL_API void
+autil_bigint_mul(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs);
+// res  = lhs / rhs
+// rem  = lhs % rhs
+// If res is NULL then the result will not be written to res.
+// If rem is NULL then the remainder will not be written to rem.
+//
+// This function matches the behavior of the / and % operators as defined by the
+// C99 standard, satisfying the expression:
+//      (lhs/rhs)*rhs + lhs%rhs == lhs
+// where:
+//      lhs/rhs == res
+//      lhs%rhs == rem
+AUTIL_API void
+autil_bigint_div(
+    struct autil_bigint* res,
+    struct autil_bigint* rem,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs);
+
+// Returns an autil_xalloc-allocated cstring representation of the provided
+// bigint using using specified by the format string.
+// If fmt is NULL then default formatting is used.
+//
+// Returns a NUL-terminated string on success.
+// Returns NULL if an invalid format string was provided.
+//
+// Format string grammar: "[flags][width][specifier]"
+// Note that the format directive character, %, is *NOT* used in the format
+// string grammar.
+//
+// Flags:
+//   #      Prefix the digits of the output string with "0b", "0x", or "0x" when
+//          used in conjunction with the "b", "x", or "X" specifiers,
+//          respectively. Note that "0x" is used for both the "x" and "X"
+//          specifiers.
+//   0      Left pad the output string up to the field width using zeros.
+//          Default behavior is to pad with spaces.
+//   +      Prefix the numeric representation of the output string with a plus
+//          or minus sign (+ or -), even for positive numbers.
+//          Default behavior is to only add the minus sign for negative numbers.
+//   -      Left justify the output string within the provided field width.
+//   space  Prefix the numeric representation of the output string with a space
+//          if no sign would be written otherwise.
+//
+// Width:
+//   Optional decimal digit string with nonzero first digit specifying the
+//   minimum length of the output string.
+//
+// Specifier:
+//   d      The provided bigint will be represented using signed decimal
+//          notation.
+//   b      The provided bigint will be represented using signed binary
+//          notation using sign magnitude representation.
+//   x      The provided bigint will be represented using signed hexadecimal
+//          notation with *lower case* alphanumeric digits.
+//   X      The provided bigint will be represented using signed hexadecimal
+//          notation with *UPPER CASE* alphanumeric digits.
+AUTIL_API char*
+autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -338,9 +452,9 @@ autil_map_remove(
 #endif // AUTIL_FREE
 
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -437,6 +551,18 @@ AUTIL_API int
 autil_isupper(int c)
 {
     return (unsigned)c - 'A' < 26;
+}
+
+AUTIL_API int
+autil_isbdigit(int c)
+{
+    return (unsigned)c - '0' < 2;
+}
+
+AUTIL_API int
+autil_isodigit(int c)
+{
+    return (unsigned)c - '0' < 8;
 }
 
 AUTIL_API int
@@ -589,6 +715,855 @@ autil_file_write(char const* path, void const* buf, size_t buf_size)
     }
 
     return 0;
+}
+
+AUTIL_API void
+autil_xalloc_prepend(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size)
+{
+    assert(pdata != NULL);
+    assert(psize != NULL);
+    assert(othr != NULL || othr_size == 0);
+    if (othr_size == 0) {
+        return;
+    }
+
+    size_t const new_size = *psize + othr_size;
+    void* const new_data = autil_xalloc(*pdata, new_size);
+    memmove((char*)new_data + othr_size, new_data, *psize);
+    memcpy(new_data, othr, othr_size);
+
+    *pdata = new_data;
+    *psize = new_size;
+}
+
+AUTIL_API void
+autil_xalloc_append(
+    void** pdata, size_t* psize, void const* othr, size_t othr_size)
+{
+    assert(pdata != NULL);
+    assert(psize != NULL);
+    assert(othr != NULL || othr_size == 0);
+    if (othr_size == 0) {
+        return;
+    }
+
+    size_t const new_size = *psize + othr_size;
+    void* const new_data = autil_xalloc(*pdata, new_size);
+    memcpy((char*)new_data + *psize, othr, othr_size);
+
+    *pdata = new_data;
+    *psize = new_size;
+}
+
+// The internals of struct autil_bigint are designed such that initializing an
+// autil_bigint with:
+//      struct autil_bigint foo = {0};
+// or
+//      struct autil_bigint foo;
+//      memset(&foo, 0x00, sizeof(foo));
+// will create a bigint equal to zero without requiring heap allocation.
+struct autil_bigint
+{
+    // -1 if the integer <  0
+    //  0 if the integer == 0
+    // +1 if the integer >  0
+    int sign;
+    // Magnitude of the integer.
+    // Little endian list of bytes.
+    // The integer zero will have limbs == NULL.
+    uint8_t* limbs;
+    // Number of limbs.
+    // The integer zero will have count == 0.
+    size_t count;
+};
+
+struct autil_bigint const* const AUTIL_BIGINT_ZERO =
+    &(struct autil_bigint){.sign = 0, .limbs = NULL, .count = 0u};
+struct autil_bigint const* const AUTIL_BIGINT_POS_ONE =
+    &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x01}, .count = 1u};
+struct autil_bigint const* const AUTIL_BIGINT_NEG_ONE =
+    &(struct autil_bigint){.sign = -1, .limbs = (uint8_t[]){0x01}, .count = 1u};
+
+static struct autil_bigint const* const AUTIL_BIGINT_DEC =
+    &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x0A}, .count = 1u};
+static struct autil_bigint const* const AUTIL_BIGINT_BIN =
+    &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x02}, .count = 1u};
+static struct autil_bigint const* const AUTIL_BIGINT_HEX =
+    &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x10}, .count = 1u};
+
+static void
+autil_bigint_init_(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    *self = *AUTIL_BIGINT_ZERO;
+}
+
+static void
+autil_bigint_fini_(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    autil_xalloc(self->limbs, AUTIL_XALLOC_FREE);
+    memset(self, 0x00, sizeof(*self)); // scrub
+}
+
+static void
+autil_bigint_normalize_(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    while ((self->count != 0) && (self->limbs[self->count - 1] == 0)) {
+        self->count -= 1;
+    }
+    if (self->count == 0) {
+        self->sign = 0;
+    }
+}
+
+// Shift left by nlimbs number of limbs.
+// Example:
+//  -0xFFEE shifted left by nlimbs=2 turns into -0xFFEE0000 with 8-bit limbs.
+static void
+autil_bigint_shiftl_(struct autil_bigint* self, size_t nlimbs)
+{
+    assert(self != NULL);
+    if (self->sign == 0) {
+        return;
+    }
+
+    self->count += nlimbs;
+    self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+    memmove((char*)self->limbs + nlimbs, self->limbs, self->count - nlimbs);
+    memset(self->limbs, 0x00, nlimbs);
+}
+
+AUTIL_API struct autil_bigint*
+autil_bigint_new_cstr(char const* cstr)
+{
+    assert(cstr != NULL);
+
+    return autil_bigint_new_utf8(cstr, strlen(cstr));
+}
+
+AUTIL_API struct autil_bigint*
+autil_bigint_new_utf8(void const* utf8, size_t utf8_size)
+{
+    assert(utf8 != NULL);
+    struct autil_bigint* self = NULL;
+    unsigned char const* const end = (unsigned char const*)utf8 + utf8_size;
+
+    // Default to decimal radix.
+    int radix = 10;
+    struct autil_bigint const* radix_bigint = AUTIL_BIGINT_DEC;
+    int (*radix_isdigit)(int c) = autil_isdigit;
+
+    // Begin iterating over the string from left to right.
+    unsigned char const* cur = utf8;
+    goto sign;
+
+sign:
+    if (cur == end) {
+        // No prefix, radix identifier, or digits.
+        goto error;
+    }
+    int sign = +1;
+    if (*cur == '+') {
+        sign = +1;
+        cur += 1;
+        goto radix;
+    }
+    if (*cur == '-') {
+        sign = -1;
+        cur += 1;
+        goto radix;
+    }
+
+radix:
+    if ((size_t)(end - cur) < AUTIL_CSTR_COUNT("0x")) {
+        // String is not long enough to have a radix identifier.
+        goto digits;
+    }
+    if (cur[0] != '0') {
+        goto digits;
+    }
+
+    if (cur[1] == 'b') {
+        radix = 2;
+        radix_bigint = AUTIL_BIGINT_BIN;
+        radix_isdigit = autil_isbdigit;
+        cur += 2;
+        goto digits;
+    }
+    if (cur[1] == 'x') {
+        radix = 16;
+        radix_bigint = AUTIL_BIGINT_HEX;
+        radix_isdigit = autil_isxdigit;
+        cur += 2;
+        goto digits;
+    }
+
+digits:
+    if (cur == end) {
+        // No digits.
+        goto error;
+    }
+    unsigned char const* const digits_start = cur;
+    while (cur != end) {
+        if (!radix_isdigit(*cur)) {
+            // Invalid digit.
+            goto error;
+        }
+        cur += 1;
+    }
+
+    self = autil_bigint_new();
+    cur = digits_start;
+    while (cur != end) {
+        errno = 0;
+        uint8_t const digit_value =
+            (uint8_t)strtol((char[]){(char)*cur, '\0'}, NULL, radix);
+        if (errno != 0) {
+            goto error;
+        }
+
+        struct autil_bigint const digit_bigint = {
+            .sign = +1, .limbs = (uint8_t[]){digit_value}, .count = 1u};
+        autil_bigint_mul(self, self, radix_bigint);
+        autil_bigint_add(self, self, &digit_bigint);
+
+        cur += 1;
+    }
+
+    self->sign = sign;
+    autil_bigint_normalize_(self);
+    return self;
+
+error:
+    if (self != NULL) {
+        autil_bigint_del(self);
+    }
+    return NULL;
+}
+
+AUTIL_API struct autil_bigint*
+autil_bigint_new(void)
+{
+    struct autil_bigint* const self =
+        autil_xalloc(NULL, sizeof(struct autil_bigint));
+    autil_bigint_init_(self);
+    return self;
+}
+
+AUTIL_API void
+autil_bigint_del(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    autil_bigint_fini_(self);
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
+}
+
+AUTIL_API int
+autil_bigint_cmp(struct autil_bigint const* lhs, struct autil_bigint const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    if (lhs->sign > rhs->sign) {
+        return +1;
+    }
+    if (lhs->sign < rhs->sign) {
+        return -1;
+    }
+
+    assert(lhs->sign == rhs->sign);
+    int const sign = lhs->sign;
+    if (lhs->count > rhs->count) {
+        return sign;
+    }
+    if (lhs->count < rhs->count) {
+        return -sign;
+    }
+
+    assert(lhs->count == rhs->count);
+    size_t const count = lhs->count;
+    for (size_t i = 0; i < count; ++i) {
+        size_t limb_idx = count - i - 1;
+        uint8_t const lhs_limb = lhs->limbs[limb_idx];
+        uint8_t const rhs_limb = rhs->limbs[limb_idx];
+
+        if (lhs_limb > rhs_limb) {
+            return sign;
+        }
+        if (lhs_limb < rhs_limb) {
+            return -sign;
+        }
+    }
+
+    return 0;
+}
+
+AUTIL_API void
+autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr)
+{
+    assert(self != NULL);
+    assert(othr != NULL);
+    if (self == othr) {
+        return;
+    }
+
+    self->sign = othr->sign;
+    self->limbs = autil_xallocn(self->limbs, othr->count, sizeof(*othr->limbs));
+    self->count = othr->count;
+    if (self->sign != 0) {
+        assert(self->limbs != NULL);
+        assert(othr->limbs != NULL);
+        memcpy(self->limbs, othr->limbs, othr->count * sizeof(*othr->limbs));
+    }
+}
+
+AUTIL_API void
+autil_bigint_negate(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    // +1 * -1 == -1
+    // -1 * -1 == +1
+    //  0 * -1 ==  0
+    self->sign *= -1;
+}
+
+AUTIL_API void
+autil_bigint_abs(struct autil_bigint* self)
+{
+    assert(self != NULL);
+
+    // +1 * +1 == +1
+    // -1 * -1 == +1
+    //  0 *  0 ==  0
+    self->sign = self->sign * self->sign;
+}
+
+AUTIL_API void
+autil_bigint_add(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    // 0 + rhs == rhs
+    if (lhs->sign == 0) {
+        autil_bigint_assign(res, rhs);
+        return;
+    }
+    // lhs + 0 == lhs
+    if (rhs->sign == 0) {
+        autil_bigint_assign(res, lhs);
+        return;
+    }
+    // (+lhs) + (-rhs) == (+lhs) - (+rhs)
+    if ((lhs->sign == +1) && (rhs->sign == -1)) {
+        struct autil_bigint* const RHS = autil_bigint_new();
+        autil_bigint_assign(RHS, rhs);
+        autil_bigint_negate(RHS);
+        autil_bigint_sub(res, lhs, RHS);
+        autil_bigint_del(RHS);
+        return;
+    }
+    // (-lhs) + (+rhs) == (+rhs) - (+lhs)
+    if ((lhs->sign == -1) && (rhs->sign == +1)) {
+        struct autil_bigint* const LHS = autil_bigint_new();
+        autil_bigint_assign(LHS, lhs);
+        autil_bigint_negate(LHS);
+        autil_bigint_sub(res, rhs, LHS);
+        autil_bigint_del(LHS);
+        return;
+    }
+
+    // (+lhs) + (+rhs) == +(lhs + rhs)
+    // (-lhs) + (-rhs) == -(lhs + rhs)
+    assert(lhs->sign == rhs->sign);
+    int const sign = lhs->sign;
+
+    struct autil_bigint RES = {0};
+    RES.sign = sign;
+    RES.count = 1 + (lhs->count > rhs->count ? lhs->count : rhs->count);
+    RES.limbs = autil_xallocn(RES.limbs, RES.count, sizeof(*RES.limbs));
+
+    unsigned carry = 0;
+    for (size_t i = 0; i < RES.count; ++i) {
+        unsigned const lhs_limb = i < lhs->count ? lhs->limbs[i] : 0; // upcast
+        unsigned const rhs_limb = i < rhs->count ? rhs->limbs[i] : 0; // upcast
+        unsigned const tot = lhs_limb + rhs_limb + carry;
+
+        RES.limbs[i] = (uint8_t)tot;
+        carry = tot > UINT8_MAX;
+    }
+    assert(carry == 0);
+
+    autil_bigint_normalize_(&RES);
+    autil_bigint_assign(res, &RES);
+    autil_bigint_fini_(&RES);
+}
+
+AUTIL_API void
+autil_bigint_sub(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    // 0 - rhs == -(rhs)
+    if (lhs->sign == 0) {
+        autil_bigint_assign(res, rhs);
+        autil_bigint_negate(res);
+        return;
+    }
+    // lhs - 0 == lhs
+    if (rhs->sign == 0) {
+        autil_bigint_assign(res, lhs);
+        return;
+    }
+    // (+lhs) - (-rhs) == (+lhs) + (+rhs)
+    if ((lhs->sign == +1) && (rhs->sign == -1)) {
+        struct autil_bigint* const RHS = autil_bigint_new();
+        autil_bigint_assign(RHS, rhs);
+        autil_bigint_negate(RHS);
+        autil_bigint_add(res, lhs, RHS);
+        autil_bigint_del(RHS);
+        return;
+    }
+    // (-lhs) - (+rhs) == (-lhs) + (-rhs)
+    if ((lhs->sign == -1) && (rhs->sign == +1)) {
+        struct autil_bigint* const RHS = autil_bigint_new();
+        autil_bigint_assign(RHS, rhs);
+        autil_bigint_negate(RHS);
+        autil_bigint_add(res, lhs, RHS);
+        autil_bigint_del(RHS);
+        return;
+    }
+
+    // (+lhs) - (+rhs) == +(lhs - rhs)
+    // (-lhs) - (-rhs) == -(lhs - rhs)
+    assert(lhs->sign == rhs->sign);
+    int const sign = lhs->sign;
+    // Note that the expression (lhs - rhs) will require flipping the sign of
+    // the result if the magnitude of lhs is greater than the magnitude of rhs:
+    // (+5) - (+3) == +2
+    // (+3) - (+5) == -2
+    // (-5) - (-3) == -2
+    // (-3) - (-5) == +2
+    int const cmp = autil_bigint_cmp(lhs, rhs);
+    int const neg = ((sign == +1) && (cmp < 0)) || ((sign == -1) && (cmp > 0));
+    if (neg) {
+        struct autil_bigint const* tmp = lhs;
+        lhs = rhs;
+        rhs = tmp;
+    }
+
+    struct autil_bigint RES = {0};
+    RES.sign = lhs->sign;
+    RES.count = lhs->count > rhs->count ? lhs->count : rhs->count;
+    RES.limbs = autil_xallocn(RES.limbs, RES.count, sizeof(*RES.limbs));
+
+    unsigned borrow = 0;
+    for (size_t i = 0; i < RES.count; ++i) {
+        unsigned const lhs_limb = i < lhs->count ? lhs->limbs[i] : 0; // upcast
+        unsigned const rhs_limb = i < rhs->count ? rhs->limbs[i] : 0; // upcast
+        unsigned const tot = (lhs_limb - rhs_limb) - borrow;
+
+        RES.limbs[i] = (uint8_t)tot;
+        borrow = tot > UINT8_MAX;
+    }
+    //assert(borrow == 0); // TODO: Check if this right?? Sometimes assertion error.
+
+    if (neg) {
+        autil_bigint_negate(&RES);
+    }
+    autil_bigint_normalize_(&RES);
+    autil_bigint_assign(res, &RES);
+    autil_bigint_fini_(&RES);
+}
+
+// res  = lhs * rhs
+AUTIL_API void
+autil_bigint_mul(
+    struct autil_bigint* res,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    // 0 * rhs == 0
+    if (lhs->sign == 0) {
+        autil_bigint_assign(res, AUTIL_BIGINT_ZERO);
+        return;
+    }
+    // lhs * 0 == 0
+    if (rhs->sign == 0) {
+        autil_bigint_assign(res, AUTIL_BIGINT_ZERO);
+        return;
+    }
+
+    int const sign = lhs->sign * rhs->sign;
+    assert(sign == +1 || sign == -1);
+    size_t const count = lhs->count + rhs->count;
+    assert(count > 0);
+
+    struct autil_bigint RES = {0};
+    // Multiplication using partial products.
+    // When multiplying the digit at lhs position i by the digit at rhs position
+    // j the resulting 2-digit partial product is added at positions i+j (low
+    // digit) and i+j+1 (high digit).
+    //
+    //  79 =>  79    79 =>   70     09     70     09
+    // *67    *60 + *07     *60 +  *60 +  *07 +  *07
+    // ---    ---------    -------------------------
+    //                     4200 + 0540 + 0490 + 0063
+    //                     ^^      ^^     ^^      ^^
+    //                     -------------------------
+    //                                          5293
+    for (size_t j = 0; j < rhs->count; ++j) {
+        for (size_t i = 0; i < lhs->count; ++i) {
+            uint16_t const prod = (uint16_t)(lhs->limbs[i] * rhs->limbs[j]);
+            uint8_t const prodl = (uint8_t)prod;
+            uint8_t const prodh = (uint8_t)(prod >> 8);
+
+            uint8_t* const limbs = autil_xallocn(NULL, count, sizeof(uint8_t));
+            memset(limbs, 0x00, count * sizeof(*limbs));
+
+            struct autil_bigint partial;
+            partial.sign = sign;
+            partial.count = count;
+            partial.limbs = limbs;
+            partial.limbs[i + j] = prodl;
+            partial.limbs[i + j + 1] = prodh;
+
+            autil_bigint_add(&RES, &RES, &partial);
+            autil_bigint_fini_(&partial);
+        }
+    }
+
+    autil_bigint_normalize_(&RES);
+    autil_bigint_assign(res, &RES);
+    autil_bigint_fini_(&RES);
+}
+
+AUTIL_API void
+autil_bigint_div(
+    struct autil_bigint* res,
+    struct autil_bigint* rem,
+    struct autil_bigint const* lhs,
+    struct autil_bigint const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    // 0 / rhs == 0
+    if (lhs->sign == 0) {
+        if (res != NULL) {
+            autil_bigint_assign(res, AUTIL_BIGINT_ZERO);
+        }
+        if (rem != NULL) {
+            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
+        }
+        return;
+    }
+    // lhs / 0 == undefined
+    if (rhs->sign == 0) {
+        autil_fatalf("[%s] Divide by zero", __func__);
+    }
+
+    struct autil_bigint RES = {0};
+    struct autil_bigint REM = {0}; // abs(rem)
+    struct autil_bigint RHS = {0}; // abs(rhs)
+    autil_bigint_assign(&REM, lhs);
+    autil_bigint_abs(&REM);
+    autil_bigint_assign(&RHS, rhs);
+    autil_bigint_abs(&RHS);
+
+    // Division using goes-into method.
+    // In practice the expression (-RHS*NUM) is calculated by repeated
+    // subtraction of RHS from TOP a total of NUM times where TOP is composed of
+    // as many most-significant digits of REM as required for one iteration of
+    // "goes into".
+    //
+    //               TOP=4      TOP=45    TOP=16
+    //               NUM=0      NUM=4     NUM=1
+    // RES        ->    0          04        041
+    //                  ___        ___       ___       ___
+    // RHS√REM    -> 11√456  => 11√456 => 11√016 => 11√005 => 41 w/rem 5
+    // -RHS*NUM ->   -0         -44        -11       11 > 5
+    //                  ---        ---       ---
+    //                  456        016       005
+    size_t ls_idx = REM.count - 1; // Index of the least-significant digit.
+    while (autil_bigint_cmp(&REM, &RHS) > 0) {
+        struct autil_bigint TOP = {0};
+        autil_bigint_assign(&TOP, &REM);
+        memset(TOP.limbs, 0x00, ls_idx);
+
+        struct autil_bigint BOT = {0};
+        autil_bigint_assign(&BOT, &RHS);
+        autil_bigint_shiftl_(&BOT, ls_idx);
+
+        // Magnitude (MAG).
+        // The expression (MAG * NUM) is the partial sum added to the result.
+        struct autil_bigint MAG = {0};
+        autil_bigint_assign(&MAG, AUTIL_BIGINT_POS_ONE);
+        autil_bigint_shiftl_(&MAG, ls_idx);
+
+        // While loop is executed NUM times.
+        while (autil_bigint_cmp(&TOP, &BOT) >= 0) {
+            autil_bigint_sub(&TOP, &TOP, &BOT);
+            autil_bigint_sub(&REM, &REM, &BOT);
+            autil_bigint_add(&RES, &RES, &MAG);
+        }
+        ls_idx -= 1;
+
+        autil_bigint_fini_(&TOP);
+        autil_bigint_fini_(&BOT);
+        autil_bigint_fini_(&MAG);
+    }
+
+    // printf("%2d %2d\n", +7 / +3, +7 % +3); // 2  1
+    // printf("%2d %2d\n", +7 / -3, +7 % -3); //-2  1
+    // printf("%2d %2d\n", -7 / +3, -7 % +3); //-2 -1
+    // printf("%2d %2d\n", -7 / -3, -7 % -3); // 2 -1
+    // ISO-IEC-9899-1999 Section 6.5.5 - Multiplicative operators:
+    // > When integers are divided, the result of the / operator is the
+    // > algebraic quotient with any fractional part discarded. If the quotient
+    // > a/b is representable, the expression (a/b)*b + a%b shall equal a.
+    RES.sign = lhs->sign * rhs->sign;
+    REM.sign = lhs->sign;
+
+    if (res != NULL) {
+        autil_bigint_normalize_(&RES);
+        autil_bigint_assign(res, &RES);
+    }
+    if (rem != NULL) {
+        autil_bigint_normalize_(&REM);
+        autil_bigint_assign(rem, &REM);
+    }
+    autil_bigint_fini_(&RES);
+    autil_bigint_fini_(&REM);
+    autil_bigint_fini_(&RHS);
+}
+
+// clang-format off
+#define AUTIL_BIGINT_FMT_FLAG_HASH_  ((unsigned)0)
+#define AUTIL_BIGINT_FMT_FLAG_ZERO_  ((unsigned)1)
+#define AUTIL_BIGINT_FMT_FLAG_PLUS_  ((unsigned)2)
+#define AUTIL_BIGINT_FMT_FLAG_MINUS_ ((unsigned)3)
+#define AUTIL_BIGINT_FMT_FLAG_SPACE_ ((unsigned)4)
+// clang-format on
+AUTIL_API char*
+autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt)
+{
+    assert(self != NULL);
+
+    // Parse format string.
+    unsigned flags = 0;
+    size_t width = 0;
+    char specifier = 'd';
+    if (fmt != NULL) {
+        // Flags
+        while (*fmt != '\0' && strchr("#0+- ", *fmt) != NULL) {
+            flags |= (unsigned)(*fmt == '#') << AUTIL_BIGINT_FMT_FLAG_HASH_;
+            flags |= (unsigned)(*fmt == '0') << AUTIL_BIGINT_FMT_FLAG_ZERO_;
+            flags |= (unsigned)(*fmt == '+') << AUTIL_BIGINT_FMT_FLAG_PLUS_;
+            flags |= (unsigned)(*fmt == '-') << AUTIL_BIGINT_FMT_FLAG_MINUS_;
+            flags |= (unsigned)(*fmt == ' ') << AUTIL_BIGINT_FMT_FLAG_SPACE_;
+            fmt += 1;
+        }
+        // Width
+        char* fmt_ =
+            (char*)fmt; // Needed due to broken const behavior of strtol.
+        if (autil_isdigit(*fmt)) {
+            width = (size_t)strtol(fmt, &fmt_, 10);
+        }
+        fmt = fmt_;
+        // Specifier
+        char const* whichspec = strchr("dbxX", *fmt);
+        if (*fmt == '\0' || whichspec == NULL) {
+            return NULL;
+        }
+        specifier = *whichspec;
+        fmt += 1;
+        // Invalid trailing digits.
+        if (*fmt != '\0') {
+            return NULL;
+        }
+        // Match clang/gcc behavior:
+        //      "flag '0' is ignored when flag '-' is present"
+        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
+            flags &= (unsigned)~AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_);
+        }
+    }
+
+    // Prefix.
+    void* prefix = NULL;
+    size_t prefix_size = 0;
+    if (self->sign == +1 && (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_PLUS_))) {
+        autil_xalloc_append(&prefix, &prefix_size, "+", 1);
+    }
+    if (self->sign == +1 && (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_SPACE_))) {
+        autil_xalloc_append(&prefix, &prefix_size, " ", 1);
+    }
+    if (self->sign == -1) {
+        autil_xalloc_append(&prefix, &prefix_size, "-", 1);
+    }
+    if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_HASH_)) {
+        if (specifier == 'b') {
+            autil_xalloc_append(&prefix, &prefix_size, "0b", 2);
+        }
+        if (specifier == 'x') {
+            autil_xalloc_append(&prefix, &prefix_size, "0x", 2);
+        }
+        if (specifier == 'X') {
+            autil_xalloc_append(&prefix, &prefix_size, "0x", 2);
+        }
+    }
+
+    // Digits.
+    void* digits = NULL;
+    size_t digits_size = 0;
+    char digit_buf[8u + AUTIL_CSTR_COUNT("\0")] = {0};
+    if (specifier == 'd') {
+        struct autil_bigint DEC = {0};
+        struct autil_bigint SELF = {0};
+        autil_bigint_assign(&SELF, self);
+        autil_bigint_abs(&SELF);
+        while (autil_bigint_cmp(&SELF, AUTIL_BIGINT_ZERO) != 0) {
+            autil_bigint_div(&SELF, &DEC, &SELF, AUTIL_BIGINT_DEC);
+            assert(DEC.count <= 1);
+            assert(DEC.limbs == NULL || DEC.limbs[0] < 10);
+            sprintf(digit_buf, "%d", DEC.limbs != NULL ? (int)DEC.limbs[0] : 0);
+            autil_xalloc_prepend(
+                &digits, &digits_size, digit_buf, strlen(digit_buf));
+        }
+        autil_bigint_fini_(&DEC);
+        autil_bigint_fini_(&SELF);
+    }
+    else if (specifier == 'b') {
+        for (size_t i = self->count - 1; i < self->count; --i) {
+            sprintf(
+                digit_buf,
+                "%c%c%c%c%c%c%c%c",
+                ((int)self->limbs[i] >> 7) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 6) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 5) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 4) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 3) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 2) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 1) & 0x01 ? '1' : '0',
+                ((int)self->limbs[i] >> 0) & 0x01 ? '1' : '0');
+            autil_xalloc_append(
+                &digits, &digits_size, digit_buf, strlen(digit_buf));
+        }
+    }
+    else if (specifier == 'x') {
+        for (size_t i = self->count - 1; i < self->count; --i) {
+            sprintf(digit_buf, "%02x", (int)self->limbs[i]);
+            autil_xalloc_append(
+                &digits, &digits_size, digit_buf, strlen(digit_buf));
+        }
+    }
+    else if (specifier == 'X') {
+        for (size_t i = self->count - 1; i < self->count; --i) {
+            sprintf(digit_buf, "%02X", (int)self->limbs[i]);
+            autil_xalloc_append(
+                &digits, &digits_size, digit_buf, strlen(digit_buf));
+        }
+    }
+    else {
+        autil_fatalf("Unreachable!");
+    }
+
+    if (digits_size != 0) {
+        // Remove leading zeros.
+        size_t z = 0;
+        while (z < digits_size && (((char*)digits)[z] == '0')) {
+            z += 1;
+        }
+        digits_size -= z;
+        memmove(digits, (char*)digits + z, digits_size);
+    }
+    else {
+        // The number zero contains one digit - zero.
+        autil_xalloc_append(&digits, &digits_size, "0", 1);
+    }
+
+    // Width.
+    void* widths = NULL;
+    size_t widths_size = 0;
+    if ((prefix_size + digits_size) < width) {
+        char pad = ' ';
+        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
+            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)));
+            pad = '0';
+        }
+        widths_size = width - (prefix_size + digits_size);
+        widths = autil_xalloc(widths, widths_size);
+        memset(widths, pad, widths_size);
+
+        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
+            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)));
+            autil_xalloc_prepend(&digits, &digits_size, widths, widths_size);
+        }
+        else if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
+            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)));
+            autil_xalloc_append(&digits, &digits_size, widths, widths_size);
+        }
+        else {
+            autil_xalloc_prepend(&prefix, &prefix_size, widths, widths_size);
+        }
+    }
+
+    void* cstr = NULL;
+    size_t cstr_size = 0;
+    autil_xalloc_append(&cstr, &cstr_size, prefix, prefix_size);
+    autil_xalloc_append(&cstr, &cstr_size, digits, digits_size);
+    autil_xalloc_append(&cstr, &cstr_size, "\0", 1);
+    autil_xalloc(prefix, AUTIL_XALLOC_FREE);
+    autil_xalloc(digits, AUTIL_XALLOC_FREE);
+    autil_xalloc(widths, AUTIL_XALLOC_FREE);
+    return cstr;
+}
+
+// This function is "technically" part of the public API, but it is not given a
+// prototype, and is intended for debugging purposes only.
+// Expect this function to be removed in future versions of this header.
+AUTIL_API void
+autil_bigint_dump(struct autil_bigint const* self)
+{
+    int sign = self->sign;
+    char signc = '0';
+    if (sign == +1) {
+        signc = '+';
+    }
+    if (sign == -1) {
+        signc = '-';
+    }
+
+    FILE* const fp = stdout;
+    fprintf(fp, "SIGN: '%c', COUNT: %zu, LIMBS: [", signc, self->count);
+    for (size_t i = 0; i < self->count; ++i) {
+        fprintf(fp, "0x%02X", (int)self->limbs[i]);
+        if (i != self->count - 1) {
+            fputs(", ", fp);
+        }
+    }
+    fputs("]\n", fp);
 }
 
 struct autil_vec
@@ -813,7 +1788,7 @@ autil_map_vals(struct autil_map const* self)
 // the index of key if inserted (I.E -1 means insert at 0 and -42 means insert
 // at 41).
 static long
-map_find_(struct autil_map const* self, void const* key)
+autil_map_find_(struct autil_map const* self, void const* key)
 {
     assert(self != NULL);
     assert(autil_map_count(self) <= LONG_MAX);
@@ -851,7 +1826,7 @@ autil_map_lookup(struct autil_map const* self, void const* key)
 {
     assert(self != NULL);
 
-    long const location = map_find_(self, key);
+    long const location = autil_map_find_(self, key);
     if (location < 0) {
         return NULL;
     }
@@ -869,7 +1844,7 @@ autil_map_insert(
 {
     assert(self != NULL);
 
-    long const location = map_find_(self, key);
+    long const location = autil_map_find_(self, key);
     if (location < 0) {
         size_t const idx = (size_t)(-1 * location) - 1;
         autil_vec_insert(self->keys, idx, key);
@@ -895,7 +1870,7 @@ autil_map_remove(
 {
     assert(self != NULL);
 
-    long const location = map_find_(self, key);
+    long const location = autil_map_find_(self, key);
     if (location < 0) {
         return 0;
     }
