@@ -30,8 +30,8 @@ SDL2 and its extension libraries are provided by most package managers, and can
 be installed on Debian-based distros with:
 
 ```sh
-$ apt-get -y install libsdl2-dev
-$ apt-get -y install libsdl2-image-dev
+$ apt-get install libsdl2-dev
+$ apt-get install libsdl2-image-dev
 ```
 
 The Emscripten toolchain can be downloaded and activated with:
