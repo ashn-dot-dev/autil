@@ -62,15 +62,6 @@ LICENSE
 
 #include <stddef.h>
 
-// Should return an int less than, equal to, or greater than zero if lhs is
-// semantically less than, equal to, or greater than rhs, respectively.
-typedef int (*autil_vpcmp_fn)(void const* lhs, void const* rhs);
-// Implementations of autil_vpcmp_fn for builtin types.
-AUTIL_API int
-autil_str_vpcmp(void const* lhs, void const* rhs); // char const*
-AUTIL_API int
-autil_int_vpcmp(void const* lhs, void const* rhs); // int
-
 // Produce a pointer of type TYPE* whose contents is the scalar rvalue val.
 // This pointer has automatic storage duration associated with the enclosing
 // block.
@@ -97,6 +88,15 @@ autil_int_vpcmp(void const* lhs, void const* rhs); // int
 #define AUTIL_CSTR_COUNT(cstr_) (AUTIL_ARRAY_COUNT(cstr_) - 1)
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
+
+// Should return an int less than, equal to, or greater than zero if lhs is
+// semantically less than, equal to, or greater than rhs, respectively.
+typedef int (*autil_vpcmp_fn)(void const* lhs, void const* rhs);
+// Implementations of autil_vpcmp_fn for builtin types.
+AUTIL_API int
+autil_str_vpcmp(void const* lhs, void const* rhs); // char const*
+AUTIL_API int
+autil_int_vpcmp(void const* lhs, void const* rhs); // int
 
 // Alternatives to the C99 character handling functions in ctype.h (plus some
 // personal extras).
@@ -446,13 +446,13 @@ autil_map_remove(
 #ifdef AUTIL_IMPLEMENTATION
 #undef AUTIL_IMPLEMENTATION
 
-#ifndef AUTIL_REALLOC
 // USE: AUTIL_REALLOC(ptr, size)
+#ifndef AUTIL_REALLOC
 #    define AUTIL_REALLOC realloc
 #endif // AUTIL_REALLOC
 
-#ifndef AUTIL_FREE
 // USE: AUTIL_FREE(ptr)
+#ifndef AUTIL_FREE
 #    define AUTIL_FREE free
 #endif // AUTIL_FREE
 
