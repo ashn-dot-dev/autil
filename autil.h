@@ -287,7 +287,7 @@ autil_bigint_div(
 // Note that the format directive character, %, is *NOT* used in the format
 // string grammar.
 //
-// Flags:
+// Flags (optional):
 //   #      Prefix the digits of the output string with "0b", "0x", or "0x" when
 //          used in conjunction with the "b", "x", or "X" specifiers,
 //          respectively. Note that "0x" is used for both the "x" and "X"
@@ -301,11 +301,11 @@ autil_bigint_div(
 //   space  Prefix the numeric representation of the output string with a space
 //          if no sign would be written otherwise.
 //
-// Width:
-//   Optional decimal digit string with nonzero first digit specifying the
-//   minimum length of the output string.
+// Width (optional):
+//   Decimal digit string with nonzero first digit specifying the minimum length
+//   of the output string.
 //
-// Specifier:
+// Specifier (required):
 //   d      The provided bigint will be represented using signed decimal
 //          notation.
 //   b      The provided bigint will be represented using signed binary
