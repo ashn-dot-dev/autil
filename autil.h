@@ -1317,10 +1317,10 @@ autil_bigint_div(
     //
     //               TOP=4      TOP=45    TOP=16
     //               NUM=0      NUM=4     NUM=1
-    // RES        ->    0          04        041
+    // RES        ->    0          04        041       041
     //                  ___        ___       ___       ___
     // RHS√REM    -> 11√456  => 11√456 => 11√016 => 11√005 => 41 w/rem 5
-    // -RHS*NUM ->   -0         -44        -11       11 > 5
+    // -RHS*NUM   ->   -0         -44        -11    RHS>REM
     //                  ---        ---       ---
     //                  456        016       005
     size_t ls_idx = REM.count - 1; // Index of the least-significant digit.
