@@ -62,6 +62,11 @@ LICENSE
 
 #include <stddef.h>
 
+struct autil_bigint;
+struct autil_string;
+struct autil_vec;
+struct autil_map;
+
 // Produce a pointer of type TYPE* whose contents is the scalar rvalue val.
 // This pointer has automatic storage duration associated with the enclosing
 // block.
@@ -185,9 +190,7 @@ autil_file_write(char const* path, void const* buf, size_t buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
-
 // Arbitrary precision integer.
-struct autil_bigint;
 
 extern struct autil_bigint const* const AUTIL_BIGINT_ZERO; // 0
 extern struct autil_bigint const* const AUTIL_BIGINT_POS_ONE; // +1
@@ -319,9 +322,7 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// STRING ////////////////////////////////////////////////////////////////
-
 // String with guaranteed NUL termination.
-struct autil_string;
 
 // Allocate and initialize a string from the provided NUL-terminated cstring.
 // If cstr is NULL then string will be initialized to the empty string.
@@ -351,14 +352,12 @@ autil_string_ref_const(struct autil_string const* self, size_t idx);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
-
 // General purpose generic resizeable array.
 // A vec conceptually consists of the following components:
 // (1) data - An array containing the elements of the vec.
 // (2) count - The number of elements in the vec.
 // (3) capacity - The total number of elements allocated in the data array.
 //     This value is always greater than or equal to the count of the vec.
-struct autil_vec;
 
 // Allocate and initialize a vec holding elements of size elemsize.
 AUTIL_API struct autil_vec*
@@ -428,10 +427,8 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// MAP ///////////////////////////////////////////////////////////////////
-
 // General purpose generic ordered map.
 // Maps keys of some key-type to values of some value-type.
-struct autil_map;
 
 // Allocate and initialize a map.
 // The map will hold keys of size keysize.
