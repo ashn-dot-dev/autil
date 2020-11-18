@@ -161,19 +161,6 @@ autil_xallocn(void* ptr, size_t nmemb, size_t size);
 //
 #define AUTIL_XALLOC_FREE ((size_t)0)
 
-// Prepend othr_size bytes from othr onto the autil_xalloc-allocated buffer of
-// size *psize pointed to by *pdata, updating the address of *pdata if
-// necessary.
-AUTIL_API void
-autil_xalloc_prepend(
-    void** pdata, size_t* psize, void const* othr, size_t othr_size);
-// Append othr_size bytes from othr onto the autil_xalloc-allocated buffer of
-// size *psize pointed to by *pdata, updating the address of *pdata if
-// necessary.
-AUTIL_API void
-autil_xalloc_append(
-    void** pdata, size_t* psize, void const* othr, size_t othr_size);
-
 // Read the full contents of the file specified by path.
 // Returns zero on success, in which case a pointer to the
 // autil_xalloc-allocated buffer and that buffer's size are stored in *buf and
@@ -701,7 +688,10 @@ autil_xallocn(void* ptr, size_t nmemb, size_t size)
     return autil_xalloc(ptr, sz);
 }
 
-AUTIL_API void
+// Prepend othr_size bytes from othr onto the autil_xalloc-allocated buffer of
+// size *psize pointed to by *pdata, updating the address of *pdata if
+// necessary.
+static void
 autil_xalloc_prepend(
     void** pdata, size_t* psize, void const* othr, size_t othr_size)
 {
@@ -722,7 +712,10 @@ autil_xalloc_prepend(
     *psize = new_size;
 }
 
-AUTIL_API void
+// Append othr_size bytes from othr onto the autil_xalloc-allocated buffer of
+// size *psize pointed to by *pdata, updating the address of *pdata if
+// necessary.
+static void
 autil_xalloc_append(
     void** pdata, size_t* psize, void const* othr, size_t othr_size)
 {
