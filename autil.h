@@ -342,6 +342,13 @@ autil_string_start(struct autil_string const* self);
 AUTIL_API size_t
 autil_string_count(struct autil_string const* self);
 
+// Return a pointer to the byte of the string at position idx.
+// Fatally exits after printing an error message if idx is out of bounds.
+AUTIL_API char*
+autil_string_ref(struct autil_string* self, size_t idx);
+AUTIL_API char const*
+autil_string_ref_const(struct autil_string const* self, size_t idx);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
 
@@ -384,14 +391,27 @@ autil_vec_reserve(struct autil_vec* self, size_t capacity);
 AUTIL_API void
 autil_vec_resize(struct autil_vec* self, size_t count);
 
-// Set the value of the vec at position idx to the value at data.
+// Set the value of the vec *at* position idx to the value *at* data.
 // Fatally exits after printing an error message if idx is out of bounds.
+//
+// Example:
+//  struct autil_vec* const v = autil_vec_new(sizeof(int));
+//  // some time later...
+//  int const foo = 0xdeadbeef;
+//  autil_vec_set(v, 42u, &val);
 AUTIL_API void
 autil_vec_set(struct autil_vec* self, size_t idx, void const* data);
-// Get a pointer to the value of the vec at position idx.
+// Get a pointer to the value of the vec *at* position idx.
 // Fatally exits after printing an error message if idx is out of bounds.
+//
+// Example:
+//  struct autil_vec* const v = autil_vec_new(sizeof(int));
+//  // some time later...
+//  int val = AUTIL_DEREF_PTR(int, autil_vec_get(v, 42u)
 AUTIL_API void*
-autil_vec_get(struct autil_vec const* self, size_t idx);
+autil_vec_get(struct autil_vec* self, size_t idx);
+AUTIL_API void const*
+autil_vec_get_const(struct autil_vec const* self, size_t idx);
 
 // Insert a copy of the value at data into the vec at position idx.
 // Elements with position greater than or equal to idx are moved back one place.
@@ -1668,6 +1688,28 @@ autil_string_count(struct autil_string const* self)
     return self->count;
 }
 
+AUTIL_API char*
+autil_string_ref(struct autil_string* self, size_t idx)
+{
+    assert(self != NULL);
+
+    if (idx >= self->count) {
+        autil_fatalf("[%s] Index out of bounds", __func__);
+    }
+    return &self->start[idx];
+}
+
+AUTIL_API char const*
+autil_string_ref_const(struct autil_string const* self, size_t idx)
+{
+    assert(self != NULL);
+
+    if (idx >= self->count) {
+        autil_fatalf("[%s] Index out of bounds", __func__);
+    }
+    return &self->start[idx];
+}
+
 struct autil_vec
 {
     void* data;
@@ -1767,14 +1809,24 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
 }
 
 AUTIL_API void*
-autil_vec_get(struct autil_vec const* self, size_t idx)
+autil_vec_get(struct autil_vec* self, size_t idx)
 {
     assert(self != NULL);
 
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
+    return ((char*)self->data) + (idx * self->elemsize);
+}
 
+AUTIL_API void const*
+autil_vec_get_const(struct autil_vec const* self, size_t idx)
+{
+    assert(self != NULL);
+
+    if (idx >= self->count) {
+        autil_fatalf("[%s] Index out of bounds", __func__);
+    }
     return ((char*)self->data) + (idx * self->elemsize);
 }
 
