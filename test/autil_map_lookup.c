@@ -22,8 +22,10 @@ main(void)
     ASSERT(0x05 == *(int*)autil_map_lookup(m, AUTIL_LOCAL_PTR(int, 43)));
 
     struct autil_map const* const ref = m;
-    ASSERT(AUTIL_DEREF_PTR(
-               int, autil_map_lookup_const(ref, AUTIL_LOCAL_PTR(int, 42))) == 0x01);
+    ASSERT(
+        AUTIL_DEREF_PTR(
+            int, autil_map_lookup_const(ref, AUTIL_LOCAL_PTR(int, 42)))
+        == 0x01);
 
     autil_map_del(m);
 }
