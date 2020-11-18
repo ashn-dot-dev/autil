@@ -318,6 +318,31 @@ AUTIL_API char*
 autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 
 ////////////////////////////////////////////////////////////////////////////////
+//////// STRING ////////////////////////////////////////////////////////////////
+
+// String with guaranteed NUL termination.
+struct autil_string;
+
+// Allocate and initialize a string from the provided NUL-terminated cstring.
+// If cstr is NULL then string will be initialized to the empty string.
+AUTIL_API struct autil_string*
+autil_string_new(char const* cstr);
+// Allocate and initialize a string from the provided byte slice.
+AUTIL_API struct autil_string*
+autil_string_new_slice(char const* start, size_t count);
+// Deinitialize and free the string.
+AUTIL_API void
+autil_string_del(struct autil_string* self);
+
+// Pointer to the start of the underlying char array of the string.
+// Returns a pointer to a NUL terminator when the count of the string is zero.
+AUTIL_API char const*
+autil_string_start(struct autil_string const* self);
+// The number of bytes in the string *NOT* including the NUL terminator.
+AUTIL_API size_t
+autil_string_count(struct autil_string const* self);
+
+////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
 
 // General purpose generic resizeable array.
@@ -1581,6 +1606,66 @@ autil_bigint_dump(struct autil_bigint const* self)
         }
     }
     fputs("]\n", fp);
+}
+
+struct autil_string
+{
+    char* start;
+    size_t count;
+};
+
+AUTIL_API struct autil_string*
+autil_string_new(char const* cstr)
+{
+    if (cstr == NULL) {
+        cstr = "";
+    }
+    return autil_string_new_slice(cstr, strlen(cstr));
+}
+
+AUTIL_API struct autil_string*
+autil_string_new_slice(char const* start, size_t count)
+{
+    assert(start != NULL || count == 0);
+
+    struct autil_string* const self =
+        autil_xalloc(NULL, sizeof(struct autil_string));
+
+    self->start = autil_xalloc(NULL, count + AUTIL_CSTR_COUNT("\0"));
+    self->count = count;
+
+    if (start != NULL) {
+        memcpy(self->start, start, count);
+    }
+    self->start[self->count] = '\0';
+
+    return self;
+}
+
+AUTIL_API void
+autil_string_del(struct autil_string* self)
+{
+    assert(self != NULL);
+
+    autil_xalloc(self->start, AUTIL_XALLOC_FREE);
+    memset(self, 0x00, sizeof(*self)); // scrub
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
+}
+
+AUTIL_API char const*
+autil_string_start(struct autil_string const* self)
+{
+    assert(self != NULL);
+
+    return self->start;
+}
+
+AUTIL_API size_t
+autil_string_count(struct autil_string const* self)
+{
+    assert(self != NULL);
+
+    return self->count;
 }
 
 struct autil_vec

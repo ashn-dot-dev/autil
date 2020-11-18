@@ -8,6 +8,9 @@ Unreleased
   autil_bigint_cmp, autil_bigint_vpcmp, autil_bigint_assign,
   autil_bigint_negate, autil_bigint_abs, autil_bigint_add, autil_bigint_sub,
   autil_bigint_mul, autil_bigint_div, and autil_bigint_to_cstr.
++ Add type autil_string and associated functions: autil_string_new,
+  autil_string_new_slice, autil_string_del, autil_string_start, and
+  autil_string_count.
 
 v0.3.0 - 2020-10-29
 -------------------
