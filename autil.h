@@ -368,8 +368,8 @@ autil_vec_del(struct autil_vec* self);
 
 // Pointer to the start of the underlying array of the vec.
 // May return NULL when the count of the vec is zero.
-AUTIL_API void*
-autil_vec_data(struct autil_vec const* self);
+AUTIL_API void const*
+autil_vec_start(struct autil_vec const* self);
 // The number of elements in the vec.
 AUTIL_API size_t
 autil_vec_count(struct autil_vec const* self);
@@ -1711,7 +1711,7 @@ autil_string_ref_const(struct autil_string const* self, size_t idx)
 
 struct autil_vec
 {
-    void* data;
+    void* start;
     size_t count;
     size_t capacity;
     size_t elemsize;
@@ -1721,7 +1721,7 @@ AUTIL_API struct autil_vec*
 autil_vec_new(size_t elemsize)
 {
     struct autil_vec* const self = autil_xalloc(NULL, sizeof(struct autil_vec));
-    self->data = NULL;
+    self->start = NULL;
     self->count = 0;
     self->capacity = 0;
     self->elemsize = elemsize;
@@ -1733,17 +1733,17 @@ autil_vec_del(struct autil_vec* self)
 {
     assert(self != NULL);
 
-    autil_xalloc(self->data, AUTIL_XALLOC_FREE);
+    autil_xalloc(self->start, AUTIL_XALLOC_FREE);
     memset(self, 0x00, sizeof(*self)); // scrub
     autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
 
-AUTIL_API void*
-autil_vec_data(struct autil_vec const* self)
+AUTIL_API void const*
+autil_vec_start(struct autil_vec const* self)
 {
     assert(self != NULL);
 
-    return self->data;
+    return self->start;
 }
 
 AUTIL_API size_t
@@ -1779,7 +1779,7 @@ autil_vec_reserve(struct autil_vec* self, size_t capacity)
         return;
     }
 
-    self->data = autil_xallocn(self->data, capacity, self->elemsize);
+    self->start = autil_xallocn(self->start, capacity, self->elemsize);
     self->capacity = capacity;
 }
 
@@ -1804,7 +1804,7 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
 
-    memmove(((char*)self->data) + (idx * self->elemsize), data, self->elemsize);
+    memmove(((char*)self->start) + (idx * self->elemsize), data, self->elemsize);
 }
 
 AUTIL_API void*
@@ -1815,7 +1815,7 @@ autil_vec_ref(struct autil_vec* self, size_t idx)
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
-    return ((char*)self->data) + (idx * self->elemsize);
+    return ((char*)self->start) + (idx * self->elemsize);
 }
 
 AUTIL_API void const*
@@ -1826,7 +1826,7 @@ autil_vec_ref_const(struct autil_vec const* self, size_t idx)
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
-    return ((char*)self->data) + (idx * self->elemsize);
+    return ((char*)self->start) + (idx * self->elemsize);
 }
 
 AUTIL_API void
@@ -1852,7 +1852,7 @@ autil_vec_insert(struct autil_vec* self, size_t idx, void const* data)
     // [A][B][ ][C][D][E]
     size_t const move_count = self->count - idx;
     size_t const move_size = move_count * self->elemsize;
-    void* const move_src = ((char*)self->data) + (idx * self->elemsize);
+    void* const move_src = ((char*)self->start) + (idx * self->elemsize);
     void* const move_dst = ((char*)move_src) + 1 * self->elemsize;
     memmove(move_dst, move_src, move_size);
     self->count += 1;
@@ -1878,7 +1878,7 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem)
     // [A][B][C][D][E][ ]
     size_t const move_count = (self->count - 1) - idx;
     size_t const move_size = move_count * self->elemsize;
-    void* const move_dst = ((char*)self->data) + (idx * self->elemsize);
+    void* const move_dst = ((char*)self->start) + (idx * self->elemsize);
     void* const move_src = ((char*)move_dst) + 1 * self->elemsize;
     memmove(move_dst, move_src, move_size);
     self->count -= 1;

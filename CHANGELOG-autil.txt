@@ -14,6 +14,7 @@ Unreleased
 + Add function autil_vec_ref_const and make autil_ref_get* const correct.
 + Add function autil_map_lookup_const and make autil_map_lookup* const correct.
 + Rename autil_vec_get to autil_vec_ref.
++ Rename autil_vec_data to autil_vec_start and make const correct.
 
 v0.3.0 - 2020-10-29
 -------------------
