@@ -15,10 +15,10 @@ main(void)
     autil_vec_insert(v, 2, &A);
 
     autil_vec_set(v, 0, &B);
-    ASSERT(*(int*)autil_vec_get(v, 0) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == B);
 
     autil_vec_set(v, 1, AUTIL_LOCAL_PTR(int, 42));
-    ASSERT(*(int*)autil_vec_get(v, 1) == 42);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == 42);
 
     struct
     {
@@ -26,7 +26,7 @@ main(void)
     } C;
     C.val = 5;
     autil_vec_set(v, 2, AUTIL_LOCAL_PTR(int, C.val + 1));
-    ASSERT(*(int*)autil_vec_get(v, 2) == 6);
+    ASSERT(*(int*)autil_vec_ref(v, 2) == 6);
 
     //  0  1  2  3
     // [B][B][B][!]

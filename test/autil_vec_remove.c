@@ -19,32 +19,32 @@ main(void)
     autil_vec_insert(v, 3, &D);
     autil_vec_insert(v, 4, &E);
     ASSERT(autil_vec_count(v) == 5);
-    ASSERT(*(int*)autil_vec_get(v, 0) == A);
-    ASSERT(*(int*)autil_vec_get(v, 1) == B);
-    ASSERT(*(int*)autil_vec_get(v, 2) == C);
-    ASSERT(*(int*)autil_vec_get(v, 3) == D);
-    ASSERT(*(int*)autil_vec_get(v, 4) == E);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == A);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 2) == C);
+    ASSERT(*(int*)autil_vec_ref(v, 3) == D);
+    ASSERT(*(int*)autil_vec_ref(v, 4) == E);
 
     // [A][B][C][D]
     autil_vec_remove(v, 4, NULL);
     ASSERT(autil_vec_count(v) == 4);
-    ASSERT(*(int*)autil_vec_get(v, 0) == A);
-    ASSERT(*(int*)autil_vec_get(v, 1) == B);
-    ASSERT(*(int*)autil_vec_get(v, 2) == C);
-    ASSERT(*(int*)autil_vec_get(v, 3) == D);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == A);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 2) == C);
+    ASSERT(*(int*)autil_vec_ref(v, 3) == D);
 
     // [A][B][D]
     autil_vec_remove(v, 2, NULL);
     ASSERT(autil_vec_count(v) == 3);
-    ASSERT(*(int*)autil_vec_get(v, 0) == A);
-    ASSERT(*(int*)autil_vec_get(v, 1) == B);
-    ASSERT(*(int*)autil_vec_get(v, 2) == D);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == A);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 2) == D);
 
     // [B][D]
     autil_vec_remove(v, 0, NULL);
     ASSERT(autil_vec_count(v) == 2);
-    ASSERT(*(int*)autil_vec_get(v, 0) == B);
-    ASSERT(*(int*)autil_vec_get(v, 1) == D);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == D);
 
     // [B][D][42]
     autil_vec_insert(v, 2, (int[]){42});

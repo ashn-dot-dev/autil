@@ -79,7 +79,7 @@ TESTS = \
 	test/autil_vec_insert.test \
 	test/autil_vec_remove.test \
 	test/autil_vec_set.test \
-	test/autil_vec_get.test \
+	test/autil_vec_ref.test \
 	test/autil_map_insert.test \
 	test/autil_map_remove.test \
 	test/autil_map_lookup.test \

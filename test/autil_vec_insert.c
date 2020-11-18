@@ -13,12 +13,12 @@ main(void)
     // [A]
     autil_vec_insert(v, 0, &A);
     ASSERT(autil_vec_count(v) == 1);
-    ASSERT(*(int*)autil_vec_get(v, 0) == A);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == A);
 
     // [A][B]
     autil_vec_insert(v, 1, &B);
     ASSERT(autil_vec_count(v) == 2);
-    ASSERT(*(int*)autil_vec_get(v, 1) == B);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == B);
 
     // [C][A][B]
     struct
@@ -28,7 +28,7 @@ main(void)
     C.val = 4;
     autil_vec_insert(v, 0, AUTIL_LOCAL_PTR(int, C.val + 1));
     ASSERT(autil_vec_count(v) == 3);
-    ASSERT(*(int*)autil_vec_get(v, 0) == 0x5);
+    ASSERT(*(int*)autil_vec_ref(v, 0) == 0x5);
 
     // [C][D][A][B]
     // clang-format off
@@ -42,7 +42,7 @@ main(void)
     );
     // clang-format on
     ASSERT(autil_vec_count(v) == 4);
-    ASSERT(*(int*)autil_vec_get(v, 1) == 0x7);
+    ASSERT(*(int*)autil_vec_ref(v, 1) == 0x7);
 
     //  0  1  2  3  4  5
     // [C][D][A][B][!][E]

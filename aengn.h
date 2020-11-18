@@ -565,7 +565,7 @@ aengn_end_frame(void)
     struct autil_vec const* const scankeys = autil_map_vals(g_scankey_map);
     for (size_t i = 0; i < autil_vec_count(scankeys); ++i) {
         struct aengn_button_state* const sk =
-            autil_vec_get((struct autil_vec*)scankeys, i);
+            autil_vec_ref((struct autil_vec*)scankeys, i);
         assert(sk != NULL);
         sk->pressed = false;
         sk->released = false;
@@ -573,7 +573,7 @@ aengn_end_frame(void)
     struct autil_vec const* const virtkeys = autil_map_vals(g_virtkey_map);
     for (size_t i = 0; i < autil_vec_count(virtkeys); ++i) {
         struct aengn_button_state* const vk =
-            autil_vec_get((struct autil_vec*)virtkeys, i);
+            autil_vec_ref((struct autil_vec*)virtkeys, i);
         assert(vk != NULL);
         vk->pressed = false;
         vk->released = false;
@@ -1014,8 +1014,8 @@ aengn_draw_line(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
     size_t const npoints = autil_vec_count(xpos);
     for (size_t i = 0; i < npoints; ++i) {
         err |= aengn_draw_point(
-            AUTIL_DEREF_PTR(int, autil_vec_get(xpos, i)),
-            AUTIL_DEREF_PTR(int, autil_vec_get(ypos, i)),
+            AUTIL_DEREF_PTR(int, autil_vec_ref(xpos, i)),
+            AUTIL_DEREF_PTR(int, autil_vec_ref(ypos, i)),
             color);
     }
     if (err) {

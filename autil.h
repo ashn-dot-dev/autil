@@ -407,11 +407,11 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data);
 // Example:
 //  struct autil_vec* const v = autil_vec_new(sizeof(int));
 //  // some time later...
-//  int val = AUTIL_DEREF_PTR(int, autil_vec_get(v, 42u)
+//  int val = AUTIL_DEREF_PTR(int, autil_vec_ref(v, 42u)
 AUTIL_API void*
-autil_vec_get(struct autil_vec* self, size_t idx);
+autil_vec_ref(struct autil_vec* self, size_t idx);
 AUTIL_API void const*
-autil_vec_get_const(struct autil_vec const* self, size_t idx);
+autil_vec_ref_const(struct autil_vec const* self, size_t idx);
 
 // Insert a copy of the value at data into the vec at position idx.
 // Elements with position greater than or equal to idx are moved back one place.
@@ -1811,7 +1811,7 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
 }
 
 AUTIL_API void*
-autil_vec_get(struct autil_vec* self, size_t idx)
+autil_vec_ref(struct autil_vec* self, size_t idx)
 {
     assert(self != NULL);
 
@@ -1822,7 +1822,7 @@ autil_vec_get(struct autil_vec* self, size_t idx)
 }
 
 AUTIL_API void const*
-autil_vec_get_const(struct autil_vec const* self, size_t idx)
+autil_vec_ref_const(struct autil_vec const* self, size_t idx)
 {
     assert(self != NULL);
 
@@ -1874,7 +1874,7 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem)
     }
 
     if (oldelem != NULL) {
-        memcpy(oldelem, autil_vec_get(self, idx), self->elemsize);
+        memcpy(oldelem, autil_vec_ref(self, idx), self->elemsize);
     }
 
     // [A][B][X][C][D][E]
@@ -1958,7 +1958,7 @@ autil_map_find_(struct autil_map const* self, void const* key)
     long mid;
     while (bot <= top) {
         mid = (bot + top) / 2;
-        void* const midkey = autil_vec_get(self->keys, (size_t)mid);
+        void* const midkey = autil_vec_ref(self->keys, (size_t)mid);
         int const cmp = self->keycmp(midkey, key);
         if (cmp == 0) {
             return mid;
@@ -1986,7 +1986,7 @@ autil_map_lookup(struct autil_map* self, void const* key)
     if (location < 0) {
         return NULL;
     }
-    return autil_vec_get(self->vals, (size_t)location);
+    return autil_vec_ref(self->vals, (size_t)location);
 }
 
 AUTIL_API void const*
@@ -1998,7 +1998,7 @@ autil_map_lookup_const(struct autil_map const* self, void const* key)
     if (location < 0) {
         return NULL;
     }
-    return autil_vec_get(self->vals, (size_t)location);
+    return autil_vec_ref(self->vals, (size_t)location);
 }
 
 AUTIL_API int
@@ -2021,10 +2021,10 @@ autil_map_insert(
 
     size_t const idx = (size_t)location;
     if (oldkey != NULL) {
-        memcpy(oldkey, autil_vec_get(self->keys, idx), self->keys->elemsize);
+        memcpy(oldkey, autil_vec_ref(self->keys, idx), self->keys->elemsize);
     }
     if (oldval != NULL) {
-        memcpy(oldval, autil_vec_get(self->vals, idx), self->vals->elemsize);
+        memcpy(oldval, autil_vec_ref(self->vals, idx), self->vals->elemsize);
     }
     autil_vec_set(self->keys, idx, key);
     autil_vec_set(self->vals, idx, val);

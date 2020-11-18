@@ -102,7 +102,7 @@ runtick(void* ctx)
     // the user is currently drawing one with the mouse.
     aengn_draw_clear(NULL);
     for (size_t i = 0; i < autil_vec_count(shapes); ++i) {
-        aengn_draw_shape(autil_vec_get(shapes, i));
+        aengn_draw_shape(autil_vec_ref(shapes, i));
     }
     if (aengn_mousebutton_state(AENGN_MOUSEBUTTON_LEFT)->down) {
         struct shape const s = {.kind = selected,
