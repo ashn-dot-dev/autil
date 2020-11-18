@@ -456,7 +456,9 @@ autil_map_vals(struct autil_map const* self);
 // Retrieve a pointer to the value associated with key.
 // Returns NULL if the map has no key-value pair associated with key.
 AUTIL_API void*
-autil_map_lookup(struct autil_map const* self, void const* key);
+autil_map_lookup(struct autil_map* self, void const* key);
+AUTIL_API void const*
+autil_map_lookup_const(struct autil_map const* self, void const* key);
 // Insert a copy of the key-value pair at key/val into the map.
 // If a key-value pair with key already exists in the map then the existing key
 // and value are replaced with the provided key and value.
@@ -1976,7 +1978,7 @@ autil_map_find_(struct autil_map const* self, void const* key)
 }
 
 AUTIL_API void*
-autil_map_lookup(struct autil_map const* self, void const* key)
+autil_map_lookup(struct autil_map* self, void const* key)
 {
     assert(self != NULL);
 
@@ -1984,7 +1986,18 @@ autil_map_lookup(struct autil_map const* self, void const* key)
     if (location < 0) {
         return NULL;
     }
+    return autil_vec_get(self->vals, (size_t)location);
+}
 
+AUTIL_API void const*
+autil_map_lookup_const(struct autil_map const* self, void const* key)
+{
+    assert(self != NULL);
+
+    long const location = autil_map_find_(self, key);
+    if (location < 0) {
+        return NULL;
+    }
     return autil_vec_get(self->vals, (size_t)location);
 }
 
