@@ -559,16 +559,21 @@ aengn_end_frame(void)
     g_frame_start = now;
 
     // Clear previous frame's input state.
+    // TODO: Remove const-casts that break const correctness. This isn't a big
+    //       deal right now since these are private global variables, but they
+    //       hint at a deeper rooted design problem.
     struct autil_vec const* const scankeys = autil_map_vals(g_scankey_map);
     for (size_t i = 0; i < autil_vec_count(scankeys); ++i) {
-        struct aengn_button_state* const sk = autil_vec_get(scankeys, i);
+        struct aengn_button_state* const sk =
+            autil_vec_get((struct autil_vec*)scankeys, i);
         assert(sk != NULL);
         sk->pressed = false;
         sk->released = false;
     }
     struct autil_vec const* const virtkeys = autil_map_vals(g_virtkey_map);
     for (size_t i = 0; i < autil_vec_count(virtkeys); ++i) {
-        struct aengn_button_state* const vk = autil_vec_get(virtkeys, i);
+        struct aengn_button_state* const vk =
+            autil_vec_get((struct autil_vec*)virtkeys, i);
         assert(vk != NULL);
         vk->pressed = false;
         vk->released = false;
