@@ -309,7 +309,7 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// STRING ////////////////////////////////////////////////////////////////
-// String with guaranteed NUL termination.
+// Byte string with guaranteed NUL termination.
 
 // Allocate and initialize a string from the provided NUL-terminated cstring.
 // If cstr is NULL then string will be initialized to the empty string.
