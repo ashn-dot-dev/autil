@@ -183,9 +183,10 @@ extern struct autil_bigint const* const AUTIL_BIGINT_ZERO; // 0
 extern struct autil_bigint const* const AUTIL_BIGINT_POS_ONE; // +1
 extern struct autil_bigint const* const AUTIL_BIGINT_NEG_ONE; // -1
 
-// Allocate and initialize a bigint to the value zero.
+// Allocate and initialize a bigint to the specified value.
+// The call autil_bigint_new(AUTIL_BIGINT_ZERO) will zero-initialize a bigint.
 AUTIL_API struct autil_bigint*
-autil_bigint_new(void);
+autil_bigint_new(struct autil_bigint const* othr);
 // Allocate and initialize a bigint from the provided NUL-terminated cstring.
 // Returns NULL if the cstring could not be parsed.
 //
@@ -315,9 +316,9 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 // If cstr is NULL then string will be initialized to the empty string.
 AUTIL_API struct autil_string*
 autil_string_new(char const* cstr);
-// Allocate and initialize a string from the provided byte slice.
+// Allocate and initialize a string from the first count bytes of start.
 AUTIL_API struct autil_string*
-autil_string_new_slice(char const* start, size_t count);
+autil_string_new_count(char const* start, size_t count);
 // Deinitialize and free the string.
 AUTIL_API void
 autil_string_del(struct autil_string* self);
@@ -843,14 +844,6 @@ static struct autil_bigint const* const AUTIL_BIGINT_HEX =
     &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x10}, .count = 1u};
 
 static void
-autil_bigint_init_(struct autil_bigint* self)
-{
-    assert(self != NULL);
-
-    *self = *AUTIL_BIGINT_ZERO;
-}
-
-static void
 autil_bigint_fini_(struct autil_bigint* self)
 {
     assert(self != NULL);
@@ -887,6 +880,16 @@ autil_bigint_shiftl_(struct autil_bigint* self, size_t nlimbs)
     self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
     memmove((char*)self->limbs + nlimbs, self->limbs, self->count - nlimbs);
     memset(self->limbs, 0x00, nlimbs);
+}
+
+AUTIL_API struct autil_bigint*
+autil_bigint_new(struct autil_bigint const* othr)
+{
+    struct autil_bigint* const self =
+        autil_xalloc(NULL, sizeof(struct autil_bigint));
+    *self = *AUTIL_BIGINT_ZERO;
+    autil_bigint_assign(self, othr);
+    return self;
 }
 
 AUTIL_API struct autil_bigint*
@@ -968,7 +971,7 @@ digits:
         cur += 1;
     }
 
-    self = autil_bigint_new();
+    self = autil_bigint_new(AUTIL_BIGINT_ZERO);
     cur = digits_start;
     while (cur != end) {
         errno = 0;
@@ -995,15 +998,6 @@ error:
         autil_bigint_del(self);
     }
     return NULL;
-}
-
-AUTIL_API struct autil_bigint*
-autil_bigint_new(void)
-{
-    struct autil_bigint* const self =
-        autil_xalloc(NULL, sizeof(struct autil_bigint));
-    autil_bigint_init_(self);
-    return self;
 }
 
 AUTIL_API void
@@ -1128,7 +1122,7 @@ autil_bigint_add(
     }
     // (+lhs) + (-rhs) == (+lhs) - (+rhs)
     if ((lhs->sign == +1) && (rhs->sign == -1)) {
-        struct autil_bigint* const RHS = autil_bigint_new();
+        struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
         autil_bigint_assign(RHS, rhs);
         autil_bigint_negate(RHS);
         autil_bigint_sub(res, lhs, RHS);
@@ -1137,7 +1131,7 @@ autil_bigint_add(
     }
     // (-lhs) + (+rhs) == (+rhs) - (+lhs)
     if ((lhs->sign == -1) && (rhs->sign == +1)) {
-        struct autil_bigint* const LHS = autil_bigint_new();
+        struct autil_bigint* const LHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
         autil_bigint_assign(LHS, lhs);
         autil_bigint_negate(LHS);
         autil_bigint_sub(res, rhs, LHS);
@@ -1194,7 +1188,7 @@ autil_bigint_sub(
     }
     // (+lhs) - (-rhs) == (+lhs) + (+rhs)
     if ((lhs->sign == +1) && (rhs->sign == -1)) {
-        struct autil_bigint* const RHS = autil_bigint_new();
+        struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
         autil_bigint_assign(RHS, rhs);
         autil_bigint_negate(RHS);
         autil_bigint_add(res, lhs, RHS);
@@ -1203,7 +1197,7 @@ autil_bigint_sub(
     }
     // (-lhs) - (+rhs) == (-lhs) + (-rhs)
     if ((lhs->sign == -1) && (rhs->sign == +1)) {
-        struct autil_bigint* const RHS = autil_bigint_new();
+        struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
         autil_bigint_assign(RHS, rhs);
         autil_bigint_negate(RHS);
         autil_bigint_add(res, lhs, RHS);
@@ -1639,11 +1633,11 @@ autil_string_new(char const* cstr)
     if (cstr == NULL) {
         cstr = "";
     }
-    return autil_string_new_slice(cstr, strlen(cstr));
+    return autil_string_new_count(cstr, strlen(cstr));
 }
 
 AUTIL_API struct autil_string*
-autil_string_new_slice(char const* start, size_t count)
+autil_string_new_count(char const* start, size_t count)
 {
     assert(start != NULL || count == 0);
 

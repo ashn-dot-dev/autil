@@ -15,17 +15,17 @@ test_autil_bigint_sub__0_sub_x(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_ZERO, AUTIL_BIGINT_POS_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_ZERO, AUTIL_BIGINT_NEG_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     RHS = autil_bigint_new_cstr("0x1234123412341234");
     autil_bigint_sub(RES, AUTIL_BIGINT_ZERO, RHS);
     autil_bigint_dump(RES);
@@ -38,17 +38,17 @@ test_autil_bigint_sub__x_sub_0(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_POS_ONE, AUTIL_BIGINT_ZERO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_NEG_ONE, AUTIL_BIGINT_ZERO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     LHS = autil_bigint_new_cstr("0x1234123412341234");
     autil_bigint_sub(RES, LHS, AUTIL_BIGINT_ZERO);
     autil_bigint_dump(RES);
@@ -61,27 +61,27 @@ test_autil_bigint_sub__pos_sub_pos(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_POS_ONE, AUTIL_BIGINT_POS_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, POS_TWO, AUTIL_BIGINT_POS_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_POS_ONE, POS_TWO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, POS_0x1234, POS_TWO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, POS_TWO, POS_0x1234);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
@@ -92,27 +92,27 @@ test_autil_bigint_sub__neg_sub_neg(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_NEG_ONE, AUTIL_BIGINT_NEG_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, NEG_TWO, AUTIL_BIGINT_NEG_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_NEG_ONE, NEG_TWO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, NEG_0x1234, NEG_TWO);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, NEG_TWO, NEG_0x1234);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
@@ -123,7 +123,7 @@ test_autil_bigint_sub__pos_sub_neg(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_POS_ONE, AUTIL_BIGINT_NEG_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);
@@ -134,7 +134,7 @@ test_autil_bigint_sub__neg_sub_pos(void)
 {
     puts(__func__);
 
-    RES = autil_bigint_new();
+    RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_sub(RES, AUTIL_BIGINT_NEG_ONE, AUTIL_BIGINT_POS_ONE);
     autil_bigint_dump(RES);
     autil_bigint_del(RES);

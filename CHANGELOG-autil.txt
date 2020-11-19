@@ -8,7 +8,7 @@ Unreleased
   autil_bigint_negate, autil_bigint_abs, autil_bigint_add, autil_bigint_sub,
   autil_bigint_mul, autil_bigint_div, and autil_bigint_to_cstr.
 + Add type autil_string and associated functions: autil_string_new,
-  autil_string_new_slice, autil_string_del, autil_string_start,
+  autil_string_new_count, autil_string_del, autil_string_start,
   autil_string_count, autil_string_resize, autil_string_ref,
   and autil_string_ref_const.
 + Add function autil_vec_ref_const and make autil_ref_get* const correct.
