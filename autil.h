@@ -330,6 +330,12 @@ autil_string_start(struct autil_string const* self);
 AUTIL_API size_t
 autil_string_count(struct autil_string const* self);
 
+// Update the count of the string.
+// If count is greater than the current count of the string then additional
+// elements are initialized with garbage data.
+AUTIL_API void
+autil_string_resize(struct autil_string* self, size_t count);
+
 // Return a pointer to the byte of the string at position idx.
 // Fatally exits after printing an error message if idx is out of bounds.
 AUTIL_API char*
@@ -1625,6 +1631,7 @@ struct autil_string
     char* start;
     size_t count;
 };
+#define AUTIL_STRING_SIZE_(count_) (count_ + AUTIL_CSTR_COUNT("\0"))
 
 AUTIL_API struct autil_string*
 autil_string_new(char const* cstr)
@@ -1643,7 +1650,7 @@ autil_string_new_slice(char const* start, size_t count)
     struct autil_string* const self =
         autil_xalloc(NULL, sizeof(struct autil_string));
 
-    self->start = autil_xalloc(NULL, count + AUTIL_CSTR_COUNT("\0"));
+    self->start = autil_xalloc(NULL, AUTIL_STRING_SIZE_(count));
     self->count = count;
 
     if (start != NULL) {
@@ -1678,6 +1685,21 @@ autil_string_count(struct autil_string const* self)
     assert(self != NULL);
 
     return self->count;
+}
+
+AUTIL_API void
+autil_string_resize(struct autil_string* self, size_t count)
+{
+    assert(self != NULL);
+
+    if (count > self->count) {
+        self->start = autil_xalloc(self->start, AUTIL_STRING_SIZE_(count));
+        char* const fill_start = self->start + AUTIL_STRING_SIZE_(self->count);
+        size_t const fill_count = count - self->count;
+        memset(fill_start, 0x00, fill_count); // Fill new space with NULs.
+    }
+    self->count = count;
+    self->start[self->count] = '\0';
 }
 
 AUTIL_API char*
@@ -1797,7 +1819,8 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
 
-    memmove(((char*)self->start) + (idx * self->elemsize), data, self->elemsize);
+    memmove(
+        ((char*)self->start) + (idx * self->elemsize), data, self->elemsize);
 }
 
 AUTIL_API void*
