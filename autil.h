@@ -312,13 +312,13 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
 //////// STRING ////////////////////////////////////////////////////////////////
 // Byte string with guaranteed NUL termination.
 
-// Allocate and initialize a string from the provided NUL-terminated cstring.
-// If cstr is NULL then string will be initialized to the empty string.
-AUTIL_API struct autil_string*
-autil_string_new(char const* cstr);
 // Allocate and initialize a string from the first count bytes of start.
 AUTIL_API struct autil_string*
 autil_string_new_count(char const* start, size_t count);
+// Allocate and initialize a string from the provided NUL-terminated cstring.
+// If cstr is NULL then string will be initialized to the empty string.
+AUTIL_API struct autil_string*
+autil_string_new_cstr(char const* cstr);
 // Deinitialize and free the string.
 AUTIL_API void
 autil_string_del(struct autil_string* self);
@@ -1635,15 +1635,6 @@ struct autil_string
 #define AUTIL_STRING_SIZE_(count_) (count_ + AUTIL_CSTR_COUNT("\0"))
 
 AUTIL_API struct autil_string*
-autil_string_new(char const* cstr)
-{
-    if (cstr == NULL) {
-        cstr = "";
-    }
-    return autil_string_new_count(cstr, strlen(cstr));
-}
-
-AUTIL_API struct autil_string*
 autil_string_new_count(char const* start, size_t count)
 {
     assert(start != NULL || count == 0);
@@ -1660,6 +1651,15 @@ autil_string_new_count(char const* start, size_t count)
     self->start[self->count] = '\0';
 
     return self;
+}
+
+AUTIL_API struct autil_string*
+autil_string_new_cstr(char const* cstr)
+{
+    if (cstr == NULL) {
+        cstr = "";
+    }
+    return autil_string_new_count(cstr, strlen(cstr));
 }
 
 AUTIL_API void

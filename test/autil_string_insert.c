@@ -5,7 +5,7 @@
 int
 main(void)
 {
-    struct autil_string* const s = autil_string_new("");
+    struct autil_string* const s = autil_string_new_cstr("");
 
     autil_string_insert(s, 0, "", 0);
     ASSERT(strcmp(autil_string_start(s), "") == 0);

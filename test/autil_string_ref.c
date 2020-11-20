@@ -5,7 +5,7 @@
 int
 main(void)
 {
-    struct autil_string* const s = autil_string_new("foobar");
+    struct autil_string* const s = autil_string_new_cstr("foobar");
 
     ASSERT(*autil_string_ref(s, 0) == 'f');
     ASSERT(*autil_string_ref(s, 1) == 'o');

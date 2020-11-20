@@ -5,7 +5,7 @@
 int
 main(void)
 {
-    struct autil_string* const s = autil_string_new("abc");
+    struct autil_string* const s = autil_string_new_cstr("abc");
     ASSERT(autil_string_count(s) == 3);
 
     autil_string_resize(s, 6);

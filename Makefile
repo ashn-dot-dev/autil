@@ -70,7 +70,7 @@ TESTS = \
 	test/autil_bigint_sub.test \
 	test/autil_bigint_mul.test \
 	test/autil_bigint_div.test \
-	test/autil_string_new.test \
+	test/autil_string_new_cstr.test \
 	test/autil_string_new_count.test \
 	test/autil_string_resize.test \
 	test/autil_string_ref.test \
