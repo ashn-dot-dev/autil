@@ -10,7 +10,7 @@ Unreleased
 + Add type autil_string and associated functions: autil_string_new,
   autil_string_new_count, autil_string_del, autil_string_start,
   autil_string_count, autil_string_resize, autil_string_ref,
-  and autil_string_ref_const.
+  autil_string_ref_const, and autil_string_insert.
 + Add function autil_vec_ref_const and make autil_ref_get* const correct.
 + Add function autil_map_lookup_const and make autil_map_lookup* const correct.
 + Rename autil_vec_get to autil_vec_ref.

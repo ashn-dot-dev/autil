@@ -344,6 +344,10 @@ autil_string_ref(struct autil_string* self, size_t idx);
 AUTIL_API char const*
 autil_string_ref_const(struct autil_string const* self, size_t idx);
 
+AUTIL_API void
+autil_string_insert(
+    struct autil_string* self, size_t idx, char const* start, size_t count);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
 // General purpose generic resizeable array.
@@ -1716,6 +1720,25 @@ autil_string_ref_const(struct autil_string const* self, size_t idx)
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
     return &self->start[idx];
+}
+
+AUTIL_API void
+autil_string_insert(
+    struct autil_string* self, size_t idx, char const* start, size_t count)
+{
+    assert(self != NULL);
+    assert(start != NULL || count == 0);
+    if (idx > self->count) {
+        autil_fatalf("[%s] Invalid index", __func__);
+    }
+
+    if (count == 0) {
+        return;
+    }
+    size_t const mov_count = self->count - idx;
+    autil_string_resize(self, self->count + count);
+    memmove(self->start + idx + count, self->start + idx, mov_count);
+    memmove(self->start + idx, start, count);
 }
 
 struct autil_vec

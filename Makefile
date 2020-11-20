@@ -75,6 +75,7 @@ TESTS = \
 	test/autil_string_resize.test \
 	test/autil_string_ref.test \
 	test/autil_string_ref_const.test \
+	test/autil_string_insert.test \
 	test/autil_vec_reserve.test \
 	test/autil_vec_resize.test \
 	test/autil_vec_insert.test \
