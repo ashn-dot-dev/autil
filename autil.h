@@ -347,6 +347,9 @@ autil_string_ref_const(struct autil_string const* self, size_t idx);
 AUTIL_API void
 autil_string_insert(
     struct autil_string* self, size_t idx, char const* start, size_t count);
+AUTIL_API void
+autil_string_remove(
+    struct autil_string* self, size_t idx, size_t count);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -1739,6 +1742,25 @@ autil_string_insert(
     autil_string_resize(self, self->count + count);
     memmove(self->start + idx + count, self->start + idx, mov_count);
     memmove(self->start + idx, start, count);
+}
+
+AUTIL_API void
+autil_string_remove(
+    struct autil_string* self, size_t idx, size_t count)
+{
+    assert(self != NULL);
+    if (idx >= self->count) {
+        autil_fatalf("[%s] Invalid index", __func__);
+    }
+    if (count > self->count) {
+        autil_fatalf("[%s] Invalid count", __func__);
+    }
+
+    if (count == 0) {
+        return;
+    }
+    memmove(self->start + idx, self->start + idx + count, self->count - count);
+    autil_string_resize(self, self->count - count);
 }
 
 struct autil_vec
