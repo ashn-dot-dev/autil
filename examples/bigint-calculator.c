@@ -51,7 +51,7 @@ main(int argc, char** argv)
         if (strcmp(arg, "/") == 0) {
             y = pop();
             x = pop();
-            autil_bigint_div(x, NULL, x, y);
+            autil_bigint_divrem(x, NULL, x, y);
             autil_bigint_del(y);
             push(x);
             continue;
@@ -59,7 +59,7 @@ main(int argc, char** argv)
         if (strcmp(arg, "%") == 0) {
             y = pop();
             x = pop();
-            autil_bigint_div(NULL, x, x, y);
+            autil_bigint_divrem(NULL, x, x, y);
             autil_bigint_del(y);
             push(x);
             continue;

@@ -261,7 +261,7 @@ autil_bigint_mul(
 //      lhs/rhs == res
 //      lhs%rhs == rem
 AUTIL_API void
-autil_bigint_div(
+autil_bigint_divrem(
     struct autil_bigint* res,
     struct autil_bigint* rem,
     struct autil_bigint const* lhs,
@@ -1327,7 +1327,7 @@ autil_bigint_mul(
 }
 
 AUTIL_API void
-autil_bigint_div(
+autil_bigint_divrem(
     struct autil_bigint* res,
     struct autil_bigint* rem,
     struct autil_bigint const* lhs,
@@ -1511,7 +1511,7 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt)
         autil_bigint_assign(&SELF, self);
         autil_bigint_abs(&SELF);
         while (autil_bigint_cmp(&SELF, AUTIL_BIGINT_ZERO) != 0) {
-            autil_bigint_div(&SELF, &DEC, &SELF, AUTIL_BIGINT_DEC);
+            autil_bigint_divrem(&SELF, &DEC, &SELF, AUTIL_BIGINT_DEC);
             assert(DEC.count <= 1);
             assert(DEC.limbs == NULL || DEC.limbs[0] < 10);
             sprintf(digit_buf, "%d", DEC.limbs != NULL ? (int)DEC.limbs[0] : 0);

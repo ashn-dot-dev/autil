@@ -36,21 +36,21 @@ test_autil_bigint_div__pos_div_pos(void)
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0xFFEE, AUTIL_BIGINT_POS_ONE);
+    autil_bigint_divrem(DIV, REM, POS_0xFFEE, AUTIL_BIGINT_POS_ONE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0xFFEE, POS_0x44);
+    autil_bigint_divrem(DIV, REM, POS_0xFFEE, POS_0x44);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0x44, POS_0xFFEE);
+    autil_bigint_divrem(DIV, REM, POS_0x44, POS_0xFFEE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
@@ -63,21 +63,21 @@ test_autil_bigint_div__neg_div_neg(void)
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0xFFEE, AUTIL_BIGINT_NEG_ONE);
+    autil_bigint_divrem(DIV, REM, NEG_0xFFEE, AUTIL_BIGINT_NEG_ONE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0xFFEE, NEG_0x44);
+    autil_bigint_divrem(DIV, REM, NEG_0xFFEE, NEG_0x44);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0x44, NEG_0xFFEE);
+    autil_bigint_divrem(DIV, REM, NEG_0x44, NEG_0xFFEE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
@@ -90,21 +90,21 @@ test_autil_bigint_div__pos_div_neg(void)
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0xFFEE, AUTIL_BIGINT_NEG_ONE);
+    autil_bigint_divrem(DIV, REM, POS_0xFFEE, AUTIL_BIGINT_NEG_ONE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0xFFEE, NEG_0x44);
+    autil_bigint_divrem(DIV, REM, POS_0xFFEE, NEG_0x44);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, POS_0x44, NEG_0xFFEE);
+    autil_bigint_divrem(DIV, REM, POS_0x44, NEG_0xFFEE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
@@ -117,21 +117,21 @@ test_autil_bigint_div__neg_div_pos(void)
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0xFFEE, AUTIL_BIGINT_POS_ONE);
+    autil_bigint_divrem(DIV, REM, NEG_0xFFEE, AUTIL_BIGINT_POS_ONE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0xFFEE, POS_0x44);
+    autil_bigint_divrem(DIV, REM, NEG_0xFFEE, POS_0x44);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
 
     DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
     REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
-    autil_bigint_div(DIV, REM, NEG_0x44, POS_0xFFEE);
+    autil_bigint_divrem(DIV, REM, NEG_0x44, POS_0xFFEE);
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
