@@ -89,6 +89,7 @@ TESTS = \
 	test/autil_map.example.test
 
 EXAMPLES = \
+	examples/bigint-calculator \
 	examples/dvd \
 	examples/life \
 	examples/shapes
@@ -103,6 +104,8 @@ test: $(TESTS)
 	(cd test/ && sh test-all.sh)
 
 examples: $(EXAMPLES)
+examples/bigint-calculator: examples/bigint-calculator.c
+	$(CC) -o $@ $< $(CFLAGS)
 examples/dvd: examples/dvd.c
 	$(CC) -o $@ $< $(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image
 examples/life: examples/life.c

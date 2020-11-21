@@ -8,6 +8,7 @@ emsdk/
 *.js
 *.wasm
 
+examples/bigint-calculator
 examples/dvd
 examples/life
 examples/shapes
