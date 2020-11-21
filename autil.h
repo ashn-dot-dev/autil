@@ -344,12 +344,18 @@ autil_string_ref(struct autil_string* self, size_t idx);
 AUTIL_API char const*
 autil_string_ref_const(struct autil_string const* self, size_t idx);
 
+// Insert count bytes of start into the string at position idx.
+// Bytes with position greater than idx are moved back count bytes.
+// Fatally exits after printing an error message if idx is out of bounds.
 AUTIL_API void
 autil_string_insert(
     struct autil_string* self, size_t idx, char const* start, size_t count);
+// Remove count bytes at position idx from the string.
+// Bytes with position greater than idx are moved forward count bytes.
+// Fatally exits after printing an error message if the slice to be removed
+// indexes out of bounds.
 AUTIL_API void
-autil_string_remove(
-    struct autil_string* self, size_t idx, size_t count);
+autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -1745,8 +1751,7 @@ autil_string_insert(
 }
 
 AUTIL_API void
-autil_string_remove(
-    struct autil_string* self, size_t idx, size_t count)
+autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 {
     assert(self != NULL);
     if (idx >= self->count) {
