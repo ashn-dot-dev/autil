@@ -60,7 +60,8 @@ LICENSE
 #    define AUTIL_API extern
 #endif
 
-#include <stddef.h>
+#include <stddef.h> /* size_t, NULL */
+#include <stdio.h> /* FILE */
 
 struct autil_bigint;
 struct autil_string;
@@ -174,6 +175,13 @@ autil_file_read(char const* path, void** buf, size_t* buf_size);
 // On failure, the contents of the file specified by path is undefined.
 AUTIL_API int
 autil_file_write(char const* path, void const* buf, size_t buf_size);
+
+// Read the full contents of input stream specified by stream.
+// Returns zero on success, in which case a pointer to the
+// autil_xalloc-allocated buffer and that buffer's size are stored in *buf and
+// *buf_size.
+AUTIL_API int
+autil_stream_read(FILE* stream, void** buf, size_t* buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
@@ -512,7 +520,6 @@ autil_map_remove(
 #include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -767,23 +774,10 @@ autil_file_read(char const* path, void** buf, size_t* buf_size)
         return -1;
     }
 
-    unsigned char* bf = NULL;
-    size_t sz = 0;
-
-    int c;
-    while ((c = fgetc(stream)) != EOF) {
-        bf = autil_xalloc(bf, sz + 1);
-        bf[sz++] = (unsigned char)c;
-    }
-    if (ferror(stream)) {
-        autil_xalloc(bf, AUTIL_XALLOC_FREE);
-        return -1;
-    }
-
+    int const err = autil_stream_read(stream, buf, buf_size);
     (void)fclose(stream);
-    *buf = bf;
-    *buf_size = sz;
-    return 0;
+
+    return err;
 }
 
 AUTIL_API int
@@ -817,6 +811,31 @@ autil_file_write(char const* path, void const* buf, size_t buf_size)
         return -1;
     }
 
+    return 0;
+}
+
+AUTIL_API int
+autil_stream_read(FILE* stream, void** buf, size_t* buf_size)
+{
+    assert(stream != NULL);
+    assert(buf != NULL);
+    assert(buf_size != NULL);
+
+    unsigned char* bf = NULL;
+    size_t sz = 0;
+
+    int c;
+    while ((c = fgetc(stream)) != EOF) {
+        bf = autil_xalloc(bf, sz + 1);
+        bf[sz++] = (unsigned char)c;
+    }
+    if (ferror(stream)) {
+        autil_xalloc(bf, AUTIL_XALLOC_FREE);
+        return -1;
+    }
+
+    *buf = bf;
+    *buf_size = sz;
     return 0;
 }
 

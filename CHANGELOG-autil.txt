@@ -1,6 +1,7 @@
 Unreleased
 -------------------
 + Add functions autil_isbdigit and autil_isodigit.
++ Add function autil_stream_read.
 + Add macro AUTIL_BIT.
 + Add type autil_bigint and associated functions: autil_bigint_new,
   autil_bigint_new_cstr, autil_bigint_new_utf8,autil_bigint_del,
