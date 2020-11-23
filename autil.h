@@ -163,9 +163,8 @@ autil_xallocn(void* ptr, size_t nmemb, size_t size);
 #define AUTIL_XALLOC_FREE ((size_t)0)
 
 // Read the full contents of the file specified by path.
-// Returns zero on success, in which case a pointer to the
-// autil_xalloc-allocated buffer and that buffer's size are stored in *buf and
-// *buf_size.
+// Memory for the read content is allocated with autil_xalloc.
+// Returns zero on success.
 AUTIL_API int
 autil_file_read(char const* path, void** buf, size_t* buf_size);
 
@@ -176,12 +175,20 @@ autil_file_read(char const* path, void** buf, size_t* buf_size);
 AUTIL_API int
 autil_file_write(char const* path, void const* buf, size_t buf_size);
 
-// Read the full contents of input stream specified by stream.
-// Returns zero on success, in which case a pointer to the
-// autil_xalloc-allocated buffer and that buffer's size are stored in *buf and
-// *buf_size.
+// Read the full contents of the input stream specified by stream.
+// Memory for the read content is allocated with autil_xalloc.
+// Returns zero on success.
 AUTIL_API int
 autil_stream_read(FILE* stream, void** buf, size_t* buf_size);
+
+// Read the contents of the input stream specified by stream until a newline or
+// end-of-file is encountered.
+// The line buffer will *not* have NUL termination.
+// The line buffer will contain the end-of-line newline (if present).
+// Memory for the read content is allocated with autil_xalloc.
+// Returns zero on success.
+AUTIL_API int
+autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
@@ -838,6 +845,35 @@ autil_stream_read(FILE* stream, void** buf, size_t* buf_size)
     *buf_size = sz;
     return 0;
 }
+
+AUTIL_API int
+autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
+{
+    assert(stream != NULL);
+    assert(buf != NULL);
+    assert(buf_size != NULL);
+
+    unsigned char* bf = NULL;
+    size_t sz = 0;
+
+    int c;
+    while ((c = fgetc(stream)) != EOF) {
+        bf = autil_xalloc(bf, sz + 1);
+        bf[sz++] = (unsigned char)c;
+        if (c == '\n') {
+            break;
+        }
+    }
+    if (ferror(stream)) {
+        autil_xalloc(bf, AUTIL_XALLOC_FREE);
+        return -1;
+    }
+
+    *buf = bf;
+    *buf_size = sz;
+    return 0;
+}
+
 
 // The internals of struct autil_bigint are designed such that initializing an
 // autil_bigint with:
