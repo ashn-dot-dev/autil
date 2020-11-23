@@ -29,6 +29,9 @@ text_file(void)
     printf("3: %.*s", (int)size, (char*)buf);
     autil_xalloc(buf, AUTIL_XALLOC_FREE);
 
+    err =  autil_stream_read_line(fp, &buf, &size);
+    ASSERT(err != 0);
+
     fclose(fp);
 }
 

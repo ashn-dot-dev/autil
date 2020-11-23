@@ -868,6 +868,9 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
         autil_xalloc(bf, AUTIL_XALLOC_FREE);
         return -1;
     }
+    if (feof(stream) && sz == 0) {
+        return -1;
+    }
 
     *buf = bf;
     *buf_size = sz;
