@@ -374,7 +374,7 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 
 // Trim leading and trailing whitespace from the string (treated as ASCII).
 AUTIL_API void
-autil_string_trim_ascii(struct autil_string* self);
+autil_string_trim(struct autil_string* self);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -1827,7 +1827,7 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 }
 
 AUTIL_API void
-autil_string_trim_ascii(struct autil_string* self)
+autil_string_trim(struct autil_string* self)
 {
     size_t n;
 
@@ -1842,7 +1842,7 @@ autil_string_trim_ascii(struct autil_string* self)
 
     // Trim trailing characters.
     n = self->count;
-    while (n > 0 && autil_isspace(self->start[n-1])) {
+    while (n > 0 && autil_isspace(self->start[n - 1])) {
         n -= 1;
     }
     autil_string_resize(self, n);
