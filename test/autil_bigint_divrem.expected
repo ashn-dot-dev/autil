@@ -5,6 +5,8 @@ DIV => SIGN: '+', COUNT: 2, LIMBS: [0xC3, 0x03]
 REM => SIGN: '+', COUNT: 1, LIMBS: [0x22]
 DIV => SIGN: '0', COUNT: 0, LIMBS: []
 REM => SIGN: '+', COUNT: 1, LIMBS: [0x44]
+DIV => SIGN: '+', COUNT: 1, LIMBS: [0x01]
+REM => SIGN: '0', COUNT: 0, LIMBS: []
 test_autil_bigint_div__neg_div_neg
 DIV => SIGN: '+', COUNT: 2, LIMBS: [0xEE, 0xFF]
 REM => SIGN: '0', COUNT: 0, LIMBS: []

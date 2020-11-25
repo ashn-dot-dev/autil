@@ -1440,7 +1440,7 @@ autil_bigint_divrem(
     //                  ---        ---       ---
     //                  456        016       005
     size_t ls_idx = REM.count - 1; // Index of the least-significant digit.
-    while (autil_bigint_cmp(&REM, &RHS) > 0) {
+    while (autil_bigint_cmp(&REM, &RHS) >= 0) {
         struct autil_bigint TOP = {0};
         autil_bigint_assign(&TOP, &REM);
         memset(TOP.limbs, 0x00, ls_idx);

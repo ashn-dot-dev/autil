@@ -54,6 +54,13 @@ test_autil_bigint_div__pos_div_pos(void)
     dump_divrem(DIV, REM);
     autil_bigint_del(DIV);
     autil_bigint_del(REM);
+
+    DIV = autil_bigint_new(AUTIL_BIGINT_ZERO);
+    REM = autil_bigint_new(AUTIL_BIGINT_ZERO);
+    autil_bigint_divrem(DIV, REM, AUTIL_BIGINT_DEC, AUTIL_BIGINT_DEC);
+    dump_divrem(DIV, REM);
+    autil_bigint_del(DIV);
+    autil_bigint_del(REM);
 }
 
 static void
