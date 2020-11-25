@@ -1826,7 +1826,7 @@ AUTIL_API void
 autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 {
     assert(self != NULL);
-    if ((idx + count) >= self->count) {
+    if ((idx + count) > self->count) {
         autil_fatalf("[%s] Invalid index,count %zu,%zu", __func__, idx, count);
     }
 
