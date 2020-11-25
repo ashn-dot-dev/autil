@@ -372,6 +372,10 @@ autil_string_insert(
 AUTIL_API void
 autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 
+// Trim leading and trailing whitespace from the string (treated as ASCII).
+AUTIL_API void
+autil_string_trim_ascii(struct autil_string* self);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
 // General purpose generic resizeable array.
@@ -876,7 +880,6 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
     *buf_size = sz;
     return 0;
 }
-
 
 // The internals of struct autil_bigint are designed such that initializing an
 // autil_bigint with:
@@ -1824,6 +1827,24 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count)
     }
     memmove(self->start + idx, self->start + idx + count, self->count - count);
     autil_string_resize(self, self->count - count);
+}
+
+AUTIL_API void
+autil_string_trim_ascii(struct autil_string* self)
+{
+    char const* cur = self->start;
+    while (autil_isspace(*cur)) {
+        cur += 1;
+    }
+    autil_string_remove(self, 0, (size_t)(cur - self->start));
+
+    char const* const last = self->start + (self->count - 1);
+    cur = last;
+    while (autil_isspace(*cur)) {
+        cur -= 1;
+    }
+    autil_string_remove(
+        self, (size_t)(cur - self->start), (size_t)(last - cur));
 }
 
 struct autil_vec
