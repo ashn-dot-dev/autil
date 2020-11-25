@@ -1799,7 +1799,7 @@ autil_string_insert(
     assert(self != NULL);
     assert(start != NULL || count == 0);
     if (idx > self->count) {
-        autil_fatalf("[%s] Invalid index", __func__);
+        autil_fatalf("[%s] Invalid index %zu", __func__, idx);
     }
 
     if (count == 0) {
@@ -1815,11 +1815,8 @@ AUTIL_API void
 autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 {
     assert(self != NULL);
-    if (idx >= self->count) {
-        autil_fatalf("[%s] Invalid index", __func__);
-    }
-    if (count > self->count) {
-        autil_fatalf("[%s] Invalid count", __func__);
+    if ((idx + count) >= self->count) {
+        autil_fatalf("[%s] Invalid index,count %zu,%zu", __func__, idx, count);
     }
 
     if (count == 0) {
@@ -1832,19 +1829,23 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 AUTIL_API void
 autil_string_trim_ascii(struct autil_string* self)
 {
-    char const* cur = self->start;
-    while (autil_isspace(*cur)) {
-        cur += 1;
-    }
-    autil_string_remove(self, 0, (size_t)(cur - self->start));
+    size_t n;
 
-    char const* const last = self->start + (self->count - 1);
-    cur = last;
-    while (autil_isspace(*cur)) {
-        cur -= 1;
+    // Trim leading characters.
+    n = 0;
+    while (n < self->count && autil_isspace(self->start[n])) {
+        n += 1;
     }
-    autil_string_remove(
-        self, (size_t)(cur - self->start), (size_t)(last - cur));
+    if (n != 0) {
+        autil_string_remove(self, 0, n);
+    }
+
+    // Trim trailing characters.
+    n = self->count;
+    while (n > 0 && autil_isspace(self->start[n-1])) {
+        n -= 1;
+    }
+    autil_string_resize(self, n);
 }
 
 struct autil_vec
@@ -1974,7 +1975,7 @@ autil_vec_insert(struct autil_vec* self, size_t idx, void const* data)
     assert(self != NULL);
 
     if (idx > self->count) {
-        autil_fatalf("[%s] Invalid index", __func__);
+        autil_fatalf("[%s] Invalid index %zu", __func__, idx);
     }
 
     // [A][B][C][D][E]
@@ -2006,7 +2007,7 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem)
 {
     assert(self != NULL);
     if (idx >= self->count) {
-        autil_fatalf("[%s] Invalid index", __func__);
+        autil_fatalf("[%s] Invalid index %zu", __func__, idx);
     }
 
     if (oldelem != NULL) {
