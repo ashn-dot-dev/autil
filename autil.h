@@ -223,6 +223,7 @@ autil_bigint_new_cstr(char const* cstr);
 AUTIL_API struct autil_bigint*
 autil_bigint_new_utf8(void const* utf8, size_t utf8_size);
 // Deinitialize and free the bigint.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_bigint_del(struct autil_bigint* self);
 
@@ -335,6 +336,7 @@ autil_string_new(char const* start, size_t count);
 AUTIL_API struct autil_string*
 autil_string_new_cstr(char const* cstr);
 // Deinitialize and free the string.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_string_del(struct autil_string* self);
 
@@ -394,6 +396,7 @@ autil_string_split(
 AUTIL_API struct autil_vec*
 autil_vec_new(size_t elemsize);
 // Deinitialize and free the vec.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_vec_del(struct autil_vec* self);
 
@@ -468,6 +471,7 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem);
 AUTIL_API struct autil_map*
 autil_map_new(size_t keysize, size_t valsize, autil_vpcmp_fn keycmp);
 // Deinitialize and free the map.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_map_del(struct autil_map* self);
 
@@ -1073,16 +1077,16 @@ digits:
     return self;
 
 error:
-    if (self != NULL) {
-        autil_bigint_del(self);
-    }
+    autil_bigint_del(self);
     return NULL;
 }
 
 AUTIL_API void
 autil_bigint_del(struct autil_bigint* self)
 {
-    assert(self != NULL);
+    if (self == NULL) {
+        return;
+    }
 
     autil_bigint_fini_(self);
     autil_xalloc(self, AUTIL_XALLOC_FREE);
@@ -1737,7 +1741,9 @@ autil_string_new_cstr(char const* cstr)
 AUTIL_API void
 autil_string_del(struct autil_string* self)
 {
-    assert(self != NULL);
+    if (self == NULL) {
+        return;
+    }
 
     autil_xalloc(self->start, AUTIL_XALLOC_FREE);
     memset(self, 0x00, sizeof(*self)); // scrub
@@ -1907,7 +1913,9 @@ autil_vec_new(size_t elemsize)
 AUTIL_API void
 autil_vec_del(struct autil_vec* self)
 {
-    assert(self != NULL);
+    if (self == NULL) {
+        return;
+    }
 
     autil_xalloc(self->start, AUTIL_XALLOC_FREE);
     memset(self, 0x00, sizeof(*self)); // scrub
@@ -2081,7 +2089,9 @@ autil_map_new(size_t keysize, size_t valsize, autil_vpcmp_fn keycmp)
 AUTIL_API void
 autil_map_del(struct autil_map* self)
 {
-    assert(self != NULL);
+    if (self == NULL) {
+        return;
+    }
 
     autil_vec_del(self->keys);
     autil_vec_del(self->vals);
