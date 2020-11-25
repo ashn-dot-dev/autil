@@ -376,6 +376,11 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 AUTIL_API void
 autil_string_trim(struct autil_string* self);
 
+AUTIL_API void
+autil_string_split(
+    struct autil_string const* self,
+    struct autil_vec /* struct autil_string* */* res);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
 // General purpose generic resizeable array.
@@ -1829,6 +1834,7 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count)
 AUTIL_API void
 autil_string_trim(struct autil_string* self)
 {
+    assert(self != NULL);
     size_t n;
 
     // Trim leading characters.
@@ -1846,6 +1852,37 @@ autil_string_trim(struct autil_string* self)
         n -= 1;
     }
     autil_string_resize(self, n);
+}
+
+AUTIL_API void
+autil_string_split(
+    struct autil_string const* self,
+    struct autil_vec /* struct autil_string* */* res)
+{
+    assert(self != NULL);
+    assert(res != NULL);
+    if (autil_vec_elemsize(res) != sizeof(struct autil_string*)) {
+        autil_fatalf(
+            "[%s] Invalid vec element size %zu", autil_vec_elemsize(res));
+    }
+
+    autil_vec_resize(res, 0);
+    size_t first = 0;
+    while (first < self->count) {
+        if (autil_isspace(self->start[first])) {
+            first += 1;
+            continue;
+        }
+
+        size_t end = first;
+        while (end < self->count && !autil_isspace(self->start[end])) {
+            end += 1;
+        }
+        struct autil_string* const s =
+            autil_string_new(self->start + first, end - first);
+        autil_vec_insert(res, autil_vec_count(res), &s);
+        first = end;
+    }
 }
 
 struct autil_vec

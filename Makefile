@@ -79,6 +79,7 @@ TESTS = \
 	test/autil_string_insert.test \
 	test/autil_string_remove.test \
 	test/autil_string_trim.test \
+	test/autil_string_split.test \
 	test/autil_vec_reserve.test \
 	test/autil_vec_resize.test \
 	test/autil_vec_insert.test \
