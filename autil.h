@@ -1,5 +1,5 @@
 /*
-AUTIL - ASHN'S UTILITY LIBRARY
+AUTIL - ASHN'S UTILITY LIBRARY - v0.4.0
     Single header file containing functions and data structures for rapid
     application development in C99 (or later) with a focus on simplicity.
     This library has no dependencies outside of libc.
