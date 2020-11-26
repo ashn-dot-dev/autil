@@ -378,6 +378,9 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 AUTIL_API void
 autil_string_trim(struct autil_string* self);
 
+// Split the string on all occurrences of whitespace.
+// Parameter res will be populated with the collection of resulting strings.
+// The individual strings of res should be deleted prior to the deletion of res.
 AUTIL_API void
 autil_string_split(
     struct autil_string const* self,
