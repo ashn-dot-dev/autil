@@ -190,16 +190,11 @@ error:
 static void
 main_fini(void)
 {
-#define SPRITE_DEL_IF_NOT_NULL(spr_)                                           \
-    if (spr_ != NULL) {                                                        \
-        aengn_sprite_del(spr_);                                                \
-    }
-    SPRITE_DEL_IF_NOT_NULL(spr_cells);
-    SPRITE_DEL_IF_NOT_NULL(spr_mouse);
-    SPRITE_DEL_IF_NOT_NULL(spr_icon_play);
-    SPRITE_DEL_IF_NOT_NULL(spr_icon_pause);
-    SPRITE_DEL_IF_NOT_NULL(spr_icon_speed);
-#undef SPRITE_DEL_IF_NOT_NULL
+    aengn_sprite_del(spr_cells);
+    aengn_sprite_del(spr_mouse);
+    aengn_sprite_del(spr_icon_play);
+    aengn_sprite_del(spr_icon_pause);
+    aengn_sprite_del(spr_icon_speed);
 }
 
 static int

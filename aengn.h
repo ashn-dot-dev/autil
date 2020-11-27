@@ -724,7 +724,9 @@ error:
 AENGN_API void
 aengn_sprite_del(struct aengn_sprite* self)
 {
-    assert(self != NULL);
+    if (self == NULL) {
+        return;
+    }
 
     SDL_FreeSurface(self->surface);
     SDL_DestroyTexture(self->texture);
@@ -883,9 +885,7 @@ error:
     if (surface != NULL) {
         SDL_FreeSurface(surface);
     }
-    if (sprite != NULL) {
-        aengn_sprite_del(sprite);
-    }
+    aengn_sprite_del(sprite);
     return NULL;
 }
 
