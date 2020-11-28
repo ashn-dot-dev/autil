@@ -115,6 +115,7 @@ test: $(TESTS)
 	(cd test/ && sh test-all.sh)
 
 perf: $(PERFS)
+	for p in $(PERFS); do $$p; done
 
 examples: $(EXAMPLES)
 examples/bigint-calculator: examples/bigint-calculator.c
