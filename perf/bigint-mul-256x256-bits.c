@@ -1,6 +1,6 @@
 #define AUTIL_IMPLEMENTATION
 #include "../autil.h"
-#include "perf.h"
+#include "perf-bigint-mul.h"
 
 #define LHS_CSTR \
     "0x" \
@@ -12,17 +12,6 @@
 int
 main(void)
 {
-    struct autil_bigint* const LHS = autil_bigint_new_cstr(LHS_CSTR);
-    struct autil_bigint* const RHS = autil_bigint_new_cstr(RHS_CSTR);
-    struct autil_bigint* const RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
-
-    clock_t const start = clock();
-    autil_bigint_mul(RES, LHS, RHS);
-    clock_t const end = clock();
-    printf("%s: %0.6f sec\n", __FILE__, elapsed_sec(start, end));
-
-    autil_bigint_del(LHS);
-    autil_bigint_del(RHS);
-    autil_bigint_del(RES);
+    measure_bigint_mul(__FILE__, LHS_CSTR, RHS_CSTR);
     return EXIT_SUCCESS;
 }
