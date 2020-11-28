@@ -3,6 +3,7 @@
 .PHONY: \
 	all \
 	test \
+	perf \
 	examples \
 	examples-web \
 	clean \
@@ -91,6 +92,13 @@ TESTS = \
 	test/autil_map_lookup.test \
 	test/autil_map.example.test
 
+PERFS = \
+	perf/bigint-mul-256x256-bits.perf \
+	perf/bigint-mul-512x512-bits.perf \
+	perf/bigint-mul-1024x1024-bits.perf \
+	perf/bigint-mul-2048x2048-bits.perf \
+	perf/bigint-mul-4096x4096-bits.perf
+
 EXAMPLES = \
 	examples/bigint-calculator \
 	examples/dvd \
@@ -101,10 +109,12 @@ EXAMPLES_WEB = \
 	examples/life.html \
 	examples/shapes.html
 
-all: test examples examples-web
+all: test perf examples examples-web
 
 test: $(TESTS)
 	(cd test/ && sh test-all.sh)
+
+perf: $(PERFS)
 
 examples: $(EXAMPLES)
 examples/bigint-calculator: examples/bigint-calculator.c
@@ -127,6 +137,7 @@ examples/shapes.html: examples/shapes.c
 
 clean:
 	rm -f $(TESTS)
+	rm -f $(PERFS)
 	rm -f $(EXAMPLES)
 	rm -f $(EXAMPLES_WEB)
 
@@ -138,6 +149,8 @@ format:
 		$$(find examples/ -type f -name '*.h') \
 		$$(find examples/ -type f -name '*.c')
 
-.SUFFIXES: .c .test
+.SUFFIXES: .c .test .perf
 .c.test:
+	$(CC) -o $@ $(CFLAGS) $<
+.c.perf:
 	$(CC) -o $@ $(CFLAGS) $<

@@ -1,4 +1,5 @@
 *.test
+*.perf
 *.out
 *.o
 *.a
