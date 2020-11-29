@@ -1363,8 +1363,8 @@ autil_bigint_mul(
     struct autil_bigint RES = {0};
     // Multiplication using partial products.
     // When multiplying the digit at lhs position i by the digit at rhs position
-    // j the resulting 2-digit partial product is added at positions i+j (low
-    // digit) and i+j+1 (high digit).
+    // j the resulting 2-digit partial product is added at positions i+j (i.e.
+    // low digit) and i+j+1 (i.e. high digit).
     //
     //  79 =>  79    79 =>   70     09     70     09
     // *67    *60 + *07     *60 +  *60 +  *07 +  *07
