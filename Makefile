@@ -97,7 +97,12 @@ PERFS = \
 	perf/bigint-mul-512x512-bits.perf \
 	perf/bigint-mul-1024x1024-bits.perf \
 	perf/bigint-mul-2048x2048-bits.perf \
-	perf/bigint-mul-4096x4096-bits.perf
+	perf/bigint-mul-4096x4096-bits.perf \
+	perf/bigint-divrem-256x128-bits.perf \
+	perf/bigint-divrem-512x256-bits.perf \
+	perf/bigint-divrem-1024x512-bits.perf \
+	perf/bigint-divrem-2048x1024-bits.perf \
+	perf/bigint-divrem-4096x2048-bits.perf
 
 EXAMPLES = \
 	examples/bigint-calculator \

@@ -23,4 +23,3 @@ measure_bigint_mul(char const* file, char const* lhs_cstr, char const* rhs_cstr)
 }
 
 #endif // PERF_BIGINT_MUL_H_INCLUDED
-
