@@ -102,7 +102,8 @@ PERFS = \
 	perf/bigint-divrem-512x256-bits.perf \
 	perf/bigint-divrem-1024x512-bits.perf \
 	perf/bigint-divrem-2048x1024-bits.perf \
-	perf/bigint-divrem-4096x2048-bits.perf
+	perf/bigint-divrem-4096x2048-bits.perf \
+	perf/bigint-divrem-4096x64-bits.perf
 
 EXAMPLES = \
 	examples/bigint-calculator \
