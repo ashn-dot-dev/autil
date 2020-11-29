@@ -18,3 +18,6 @@ SIGN: '+', COUNT: 8, LIMBS: [0x57, 0x13, 0x57, 0x13, 0x57, 0x13, 0x57, 0x13]
 test_autil_bigint_add__neg_add_pos
 SIGN: '0', COUNT: 0, LIMBS: []
 SIGN: '-', COUNT: 8, LIMBS: [0x57, 0x13, 0x57, 0x13, 0x57, 0x13, 0x57, 0x13]
+test_autil_bigint_add__misc
++0x1fffffffffffffffffffffffffffffffe
++0x51456f3b5fbd77dc4cc69f6c6e0d64466b3f3512ec6fb88694b1a30514c09b4a
