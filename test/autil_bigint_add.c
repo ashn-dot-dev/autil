@@ -149,11 +149,11 @@ test_autil_bigint_add__misc(void)
     autil_xalloc(CSTR, AUTIL_XALLOC_FREE);
 
     LHS = autil_bigint_new_cstr(
-            "+0x"
-            "c9fe78519191bc2978d99a79a3fcc5cc54fd2967b4b2684c1dcbbb6682b6aa53");
+        "+0x"
+        "c9fe78519191bc2978d99a79a3fcc5cc54fd2967b4b2684c1dcbbb6682b6aa53");
     RHS = autil_bigint_new_cstr(
-            "-0x"
-            "78b9091631d4444d2c12fb0d35ef6185e9bdf454c842afc5891a18616df60f09");
+        "-0x"
+        "78b9091631d4444d2c12fb0d35ef6185e9bdf454c842afc5891a18616df60f09");
     RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_add(RES, LHS, RHS);
     CSTR = autil_bigint_to_cstr(RES, "#+x");
