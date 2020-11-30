@@ -1323,7 +1323,7 @@ autil_bigint_sub(
         RES.limbs[i] = (uint8_t)tot;
         borrow = tot > UINT8_MAX;
     }
-    //assert(borrow == 0); // TODO: Check if this right?? Sometimes assertion error.
+    //assert(borrow == 0); // TODO: Check if this right??
 
     if (neg) {
         autil_bigint_negate(&RES);
