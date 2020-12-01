@@ -74,6 +74,7 @@ TESTS = \
 	test/autil_bigint_divrem.test \
 	test/autil_string_new.test \
 	test/autil_string_new_cstr.test \
+	test/autil_string_cmp.test \
 	test/autil_string_resize.test \
 	test/autil_string_ref.test \
 	test/autil_string_ref_const.test \

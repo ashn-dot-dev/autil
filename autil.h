@@ -232,7 +232,7 @@ autil_bigint_del(struct autil_bigint* self);
 AUTIL_API int
 autil_bigint_cmp(
     struct autil_bigint const* lhs, struct autil_bigint const* rhs);
-// Comparison function compatible with autil_bigint_vpcmp / qsort.
+// Comparison function compatible with autil_vpcmp_fn / qsort.
 AUTIL_API int
 autil_bigint_vpcmp(
     struct autil_bigint const* lhs, struct autil_bigint const* rhs);
@@ -347,6 +347,14 @@ autil_string_start(struct autil_string const* self);
 // The number of bytes in the string *NOT* including the NUL terminator.
 AUTIL_API size_t
 autil_string_count(struct autil_string const* self);
+
+// Return an int less than, equal to, or greater than zero if lhs is
+// semantically less than, equal to, or greater than rhs, respectively.
+AUTIL_API int
+autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs);
+// Comparison function compatible with autil_vpcmp_fn / qsort.
+AUTIL_API int
+autil_string_vpcmp(struct autil_string const* lhs, struct autil_string const* rhs);
 
 // Update the count of the string.
 // If count is greater than the current count of the string then additional
@@ -1776,6 +1784,32 @@ autil_string_count(struct autil_string const* self)
     assert(self != NULL);
 
     return self->count;
+}
+
+AUTIL_API int
+autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    size_t const n = lhs->count < rhs->count ? lhs->count : rhs->count;
+    int const cmp = memcmp(lhs->start, rhs->start, n);
+
+    if (cmp != 0 || lhs->count == rhs->count) {
+        return cmp;
+    }
+    // Lexicographic ordering denotes that the shorter string as less than the
+    // larger string.
+    return lhs->count < rhs->count ? -1 : +1;
+}
+
+AUTIL_API int
+autil_string_vpcmp(struct autil_string const* lhs, struct autil_string const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    return autil_string_cmp(lhs, rhs);
 }
 
 AUTIL_API void
