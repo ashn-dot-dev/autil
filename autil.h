@@ -61,7 +61,7 @@ LICENSE
 #endif
 
 #include <stddef.h> /* size_t, NULL */
-#include <stdio.h> /* FILE */
+#include <stdio.h> /* FILE* */
 
 struct autil_bigint;
 struct autil_string;
