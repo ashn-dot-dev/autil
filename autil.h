@@ -232,7 +232,7 @@ autil_bigint_del(struct autil_bigint* self);
 AUTIL_API int
 autil_bigint_cmp(
     struct autil_bigint const* lhs, struct autil_bigint const* rhs);
-// Comparision function compatible with autil_bigint_vpcmp / qsort.
+// Comparison function compatible with autil_bigint_vpcmp / qsort.
 AUTIL_API int
 autil_bigint_vpcmp(
     struct autil_bigint const* lhs, struct autil_bigint const* rhs);
