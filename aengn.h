@@ -130,7 +130,7 @@ struct aengn_button_state
     bool released;
     // Button is held this frame.
     // This value is set to true the same frame that pressed is set to true.
-    // This value is set to false the same frame that releases is set to true.
+    // This value is set to false the same frame that released is set to true.
     bool down;
 };
 // Returns the state of the provided SDL2 scancode (SDL_SCANCODE_*).
