@@ -67,8 +67,7 @@ void
 eval_line(char const* line, size_t line_size)
 {
     struct autil_string* const string = autil_string_new(line, line_size);
-    struct autil_vec* const tokens =
-        autil_vec_new(sizeof(struct autil_string*));
+    struct autil_vec* const tokens = autil_vec_of_string_new();
     struct autil_vec* const stack = autil_vec_new(sizeof(struct autil_bigint*));
 
     autil_string_trim(string);
@@ -87,11 +86,7 @@ eval_line(char const* line, size_t line_size)
     }
 
     autil_string_del(string);
-    for (size_t i = 0; i < autil_vec_count(tokens); ++i) {
-        autil_string_del(
-            AUTIL_DEREF_PTR(struct autil_string*, autil_vec_ref(tokens, i)));
-    }
-    autil_vec_del(tokens);
+    autil_vec_of_string_del(tokens);
     for (size_t i = 0; i < autil_vec_count(stack); ++i) {
         autil_bigint_del(
             AUTIL_DEREF_PTR(struct autil_bigint*, autil_vec_ref(stack, i)));

@@ -374,17 +374,26 @@ autil_string_insert(
 AUTIL_API void
 autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 
-// Trim leading and trailing whitespace from the string (treated as ASCII).
+// Trim leading and trailing whitespace from the string.
+// Bytes of the string are decoded using the "C" locale.
 AUTIL_API void
 autil_string_trim(struct autil_string* self);
 
 // Split the string on all occurrences of whitespace.
-// Parameter res will be populated with the collection of resulting strings.
-// The individual strings of res should be deleted prior to the deletion of res.
+// Bytes of the string are decoded using the "C" locale.
+// Parameter res will be populated with the collection of resulting strings
+// created with autil_string_new.
 AUTIL_API void
 autil_string_split(
     struct autil_string const* self,
     struct autil_vec /* struct autil_string* */* res);
+
+// Wrapper functions for an autil_vec of autil_string*.
+// Useful for initializing / deinitializing a vec passed to autil_string_split.
+AUTIL_API struct autil_vec /* struct autil_string* */*
+autil_vec_of_string_new(void);
+AUTIL_API void
+autil_vec_of_string_del(struct autil_vec /* struct autil_string* */* vec);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -1864,16 +1873,11 @@ autil_string_trim(struct autil_string* self)
 }
 
 AUTIL_API void
-autil_string_split(
-    struct autil_string const* self,
-    struct autil_vec /* struct autil_string* */* res)
+autil_string_split(struct autil_string const* self, struct autil_vec* res)
 {
     assert(self != NULL);
     assert(res != NULL);
-    if (autil_vec_elemsize(res) != sizeof(struct autil_string*)) {
-        autil_fatalf(
-            "[%s] Invalid vec element size %zu", autil_vec_elemsize(res));
-    }
+    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
 
     autil_vec_resize(res, 0);
     size_t first = 0;
@@ -1892,6 +1896,22 @@ autil_string_split(
         autil_vec_insert(res, autil_vec_count(res), &s);
         first = end;
     }
+}
+
+AUTIL_API struct autil_vec*
+autil_vec_of_string_new(void)
+{
+    return autil_vec_new(sizeof(struct autil_string*));
+}
+
+AUTIL_API void
+autil_vec_of_string_del(struct autil_vec* vec)
+{
+    for (size_t i = 0; i < autil_vec_count(vec); ++i) {
+        struct autil_string** const ref = autil_vec_ref(vec, i);
+        autil_string_del(*ref);
+    }
+    autil_vec_del(vec);
 }
 
 struct autil_vec
