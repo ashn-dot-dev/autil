@@ -232,10 +232,6 @@ autil_bigint_del(struct autil_bigint* self);
 AUTIL_API int
 autil_bigint_cmp(
     struct autil_bigint const* lhs, struct autil_bigint const* rhs);
-// Comparison function compatible with autil_vpcmp_fn / qsort.
-AUTIL_API int
-autil_bigint_vpcmp(
-    struct autil_bigint const* lhs, struct autil_bigint const* rhs);
 
 // self = othr
 AUTIL_API void
@@ -351,10 +347,8 @@ autil_string_count(struct autil_string const* self);
 // Return an int less than, equal to, or greater than zero if lhs is
 // semantically less than, equal to, or greater than rhs, respectively.
 AUTIL_API int
-autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs);
-// Comparison function compatible with autil_vpcmp_fn / qsort.
-AUTIL_API int
-autil_string_vpcmp(struct autil_string const* lhs, struct autil_string const* rhs);
+autil_string_cmp(
+    struct autil_string const* lhs, struct autil_string const* rhs);
 
 // Update the count of the string.
 // If count is greater than the current count of the string then additional
@@ -1152,16 +1146,6 @@ autil_bigint_cmp(struct autil_bigint const* lhs, struct autil_bigint const* rhs)
     return 0;
 }
 
-AUTIL_API int
-autil_bigint_vpcmp(
-    struct autil_bigint const* lhs, struct autil_bigint const* rhs)
-{
-    assert(lhs != NULL);
-    assert(rhs != NULL);
-
-    return autil_bigint_cmp(lhs, rhs);
-}
-
 AUTIL_API void
 autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr)
 {
@@ -1801,15 +1785,6 @@ autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs)
     // Lexicographic ordering denotes that the shorter string as less than the
     // larger string.
     return lhs->count < rhs->count ? -1 : +1;
-}
-
-AUTIL_API int
-autil_string_vpcmp(struct autil_string const* lhs, struct autil_string const* rhs)
-{
-    assert(lhs != NULL);
-    assert(rhs != NULL);
-
-    return autil_string_cmp(lhs, rhs);
 }
 
 AUTIL_API void

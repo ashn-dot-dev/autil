@@ -13,7 +13,6 @@ main(void)
     ASSERT(LHS != NULL);                                                       \
     ASSERT(RHS != NULL);                                                       \
     EXPECT(autil_bigint_cmp(LHS, RHS) op_ 0);                                  \
-    EXPECT(autil_bigint_vpcmp(LHS, RHS) op_ 0);                                \
     autil_bigint_del(LHS);                                                     \
     autil_bigint_del(RHS);
 
