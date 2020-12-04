@@ -2019,9 +2019,12 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds", __func__);
     }
+    if (self->elemsize == 0) {
+        return;
+    }
 
-    memmove(
-        ((char*)self->start) + (idx * self->elemsize), data, self->elemsize);
+    void* const ref = ((char*)self->start) + (idx * self->elemsize);
+    memmove(ref, data, self->elemsize);
 }
 
 AUTIL_API void*
@@ -2054,6 +2057,10 @@ autil_vec_insert(struct autil_vec* self, size_t idx, void const* data)
     if (idx > self->count) {
         autil_fatalf("[%s] Invalid index %zu", __func__, idx);
     }
+    if (self->elemsize == 0) {
+        self->count += 1;
+        return;
+    }
 
     // [A][B][C][D][E]
     // [A][B][C][D][E][ ]
@@ -2085,6 +2092,10 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem)
     assert(self != NULL);
     if (idx >= self->count) {
         autil_fatalf("[%s] Invalid index %zu", __func__, idx);
+    }
+    if (self->elemsize == 0) {
+        self->count -= 1;
+        return;
     }
 
     if (oldelem != NULL) {
