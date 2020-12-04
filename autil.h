@@ -1818,7 +1818,7 @@ autil_string_ref(struct autil_string* self, size_t idx)
     assert(self != NULL);
 
     if (idx >= self->count) {
-        autil_fatalf("[%s] Index out of bounds", __func__);
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
     return &self->start[idx];
 }
@@ -1829,7 +1829,7 @@ autil_string_ref_const(struct autil_string const* self, size_t idx)
     assert(self != NULL);
 
     if (idx >= self->count) {
-        autil_fatalf("[%s] Index out of bounds", __func__);
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
     return &self->start[idx];
 }
@@ -2027,7 +2027,7 @@ autil_vec_set(struct autil_vec* self, size_t idx, void const* data)
     assert(self != NULL);
 
     if (idx >= self->count) {
-        autil_fatalf("[%s] Index out of bounds", __func__);
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
     if (self->elemsize == 0) {
         return;
@@ -2043,7 +2043,7 @@ autil_vec_ref(struct autil_vec* self, size_t idx)
     assert(self != NULL);
 
     if (idx >= self->count) {
-        autil_fatalf("[%s] Index out of bounds", __func__);
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
     return ((char*)self->start) + (idx * self->elemsize);
 }
@@ -2054,7 +2054,7 @@ autil_vec_ref_const(struct autil_vec const* self, size_t idx)
     assert(self != NULL);
 
     if (idx >= self->count) {
-        autil_fatalf("[%s] Index out of bounds", __func__);
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
     return ((char*)self->start) + (idx * self->elemsize);
 }
