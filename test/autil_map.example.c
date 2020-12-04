@@ -32,4 +32,5 @@ main(void)
     printf("REMOVED: \"%s\", %d\n", oldkey, oldval); // REMOVED: "foo", 42
 
     autil_map_del(m);
+    return EXIT_SUCCESS;
 }

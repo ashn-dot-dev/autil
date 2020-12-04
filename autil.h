@@ -100,6 +100,8 @@ struct autil_map;
 typedef int (*autil_vpcmp_fn)(void const* lhs, void const* rhs);
 // Implementations of autil_vpcmp_fn for builtin types.
 AUTIL_API int
+autil_void_vpcmp(void const* lhs, void const* rhs); // void (zero-sized object)
+AUTIL_API int
 autil_str_vpcmp(void const* lhs, void const* rhs); // char const*
 AUTIL_API int
 autil_int_vpcmp(void const* lhs, void const* rhs); // int
@@ -556,6 +558,14 @@ autil_map_remove(
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+AUTIL_API int
+autil_void_vpcmp(void const* lhs, void const* rhs)
+{
+    (void)lhs;
+    (void)rhs;
+    return 0; // The void (i.e. zero-sized object) type acts as a unit type.
+}
 
 AUTIL_API int
 autil_str_vpcmp(void const* lhs, void const* rhs)
