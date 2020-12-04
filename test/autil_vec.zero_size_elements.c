@@ -23,5 +23,6 @@ main(void)
     ASSERT(autil_vec_count(v) == 0);
     ASSERT(some_int == 314);
 
+    autil_vec_del(v);
     return EXIT_SUCCESS;
 }
