@@ -1,3 +1,7 @@
+Unreleased
+-------------------
++ Add functions autil_string_split_on and autil_string_split_on_cstr.
+
 v0.4.0 - 2020-11-25
 -------------------
 + Add functions autil_isbdigit and autil_isodigit.

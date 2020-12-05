@@ -3,4 +3,5 @@
 " A" => "A"
 "A " => "A"
 "A B" => "A" "B"
+"A B	C  D " => "A" "B" "C" "D"
 "A B text	C" => "A" "B" "text" "C"

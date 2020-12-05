@@ -384,12 +384,29 @@ AUTIL_API void
 autil_string_trim(struct autil_string* self);
 
 // Split the string on all occurrences of whitespace.
+// Empty strings are removed from the result.
 // Bytes of the string are decoded using the "C" locale.
-// Parameter res will be populated with the collection of resulting strings
-// created with autil_string_new.
+// Parameter res will be populated with the collection of resulting strings.
+// Example:
+//      "A B\tC  D " ===split===> "A" "B" "C"
 AUTIL_API void
 autil_string_split(
     struct autil_string const* self,
+    struct autil_vec /* struct autil_string* */* res);
+// Split the string on all occurrences of the provided separator.
+// Empty strings are *NOT* rmoved from the result.
+// Parameter res will be populated with the collection of resulting strings.
+//      "ABCBB" ===split on "B"===> "A" "C" "" ""
+AUTIL_API void
+autil_string_split_on(
+    struct autil_string const* self,
+    char const* separator,
+    size_t separator_size,
+    struct autil_vec /* struct autil_string* */* res);
+AUTIL_API void
+autil_string_split_on_cstr(
+    struct autil_string const* self,
+    char const* separator,
     struct autil_vec /* struct autil_string* */* res);
 
 // Wrapper functions for an autil_vec of autil_string*.
@@ -1891,6 +1908,7 @@ autil_string_trim(struct autil_string* self)
     autil_string_resize(self, n);
 }
 
+// Should be equivalent to str.split(sep=None) from Python3.
 AUTIL_API void
 autil_string_split(struct autil_string const* self, struct autil_vec* res)
 {
@@ -1899,6 +1917,7 @@ autil_string_split(struct autil_string const* self, struct autil_vec* res)
     assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
 
     autil_vec_resize(res, 0);
+
     size_t first = 0;
     while (first < self->count) {
         if (autil_isspace(self->start[first])) {
@@ -1915,6 +1934,57 @@ autil_string_split(struct autil_string const* self, struct autil_vec* res)
         autil_vec_insert(res, autil_vec_count(res), &s);
         first = end;
     }
+}
+
+AUTIL_API void
+autil_string_split_on(
+    struct autil_string const* self,
+    char const* separator,
+    size_t separator_size,
+    struct autil_vec* res)
+{
+    assert(self != NULL);
+    assert(res != NULL);
+    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
+
+    autil_vec_resize(res, 0);
+    if (separator_size == 0) {
+        struct autil_string* const s =
+            autil_string_new(self->start, self->count);
+        autil_vec_insert(res, autil_vec_count(res), &s);
+        return;
+    }
+
+    char const* const end_of_string = self->start + self->count;
+    char const* beg = self->start;
+    char const* end = beg;
+    while ((size_t)(end_of_string - end) >= separator_size) {
+        if (memcmp(end, separator, separator_size) != 0) {
+            end += 1;
+            continue;
+        }
+        struct autil_string* const s =
+            autil_string_new(beg, (size_t)(end - beg));
+        autil_vec_insert(res, autil_vec_count(res), &s);
+        beg = end + separator_size;
+        end = beg;
+    }
+    struct autil_string* const s =
+        autil_string_new(beg, (size_t)(end_of_string - beg));
+    autil_vec_insert(res, autil_vec_count(res), &s);
+}
+
+AUTIL_API void
+autil_string_split_on_cstr(
+    struct autil_string const* self,
+    char const* separator,
+    struct autil_vec* res)
+{
+    assert(self != NULL);
+    assert(res != NULL);
+    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
+
+    autil_string_split_on(self, separator, strlen(separator), res);
 }
 
 AUTIL_API struct autil_vec*
