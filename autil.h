@@ -411,10 +411,10 @@ autil_string_split_on_cstr(
 
 // Wrapper functions for an autil_vec of autil_string*.
 // Useful for initializing / deinitializing a vec passed to autil_string_split.
-AUTIL_API struct autil_vec /* struct autil_string* */*
+AUTIL_API struct autil_vec /*<struct autil_string*>*/*
 autil_vec_of_string_new(void);
 AUTIL_API void
-autil_vec_of_string_del(struct autil_vec /* struct autil_string* */* vec);
+autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
