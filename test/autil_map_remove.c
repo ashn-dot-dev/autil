@@ -6,7 +6,7 @@ int
 main(void)
 {
     struct autil_map* const m = autil_map_new(
-        sizeof(char const*), sizeof(char const*), autil_str_vpcmp);
+        sizeof(char const*), sizeof(char const*), autil_cstr_vpcmp);
     char const* oldkey = NULL;
     char const* oldval = 0;
     int existed = 0;

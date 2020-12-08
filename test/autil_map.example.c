@@ -5,7 +5,7 @@ int
 main(void)
 {
     struct autil_map* const m =
-        autil_map_new(sizeof(char const*), sizeof(int), autil_str_vpcmp);
+        autil_map_new(sizeof(char const*), sizeof(int), autil_cstr_vpcmp);
     char const* const keyfoo = "foo";
     char const* const keybar = "bar";
     char const* oldkey;

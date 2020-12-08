@@ -102,7 +102,7 @@ typedef int (*autil_vpcmp_fn)(void const* lhs, void const* rhs);
 AUTIL_API int
 autil_void_vpcmp(void const* lhs, void const* rhs); // void (zero-sized object)
 AUTIL_API int
-autil_str_vpcmp(void const* lhs, void const* rhs); // char const*
+autil_cstr_vpcmp(void const* lhs, void const* rhs); // char const*
 AUTIL_API int
 autil_int_vpcmp(void const* lhs, void const* rhs); // int
 
@@ -585,7 +585,7 @@ autil_void_vpcmp(void const* lhs, void const* rhs)
 }
 
 AUTIL_API int
-autil_str_vpcmp(void const* lhs, void const* rhs)
+autil_cstr_vpcmp(void const* lhs, void const* rhs)
 {
     assert(lhs != NULL);
     assert(rhs != NULL);

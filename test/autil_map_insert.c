@@ -6,7 +6,7 @@ int
 main(void)
 {
     struct autil_map* const m =
-        autil_map_new(sizeof(char const*), sizeof(int), autil_str_vpcmp);
+        autil_map_new(sizeof(char const*), sizeof(int), autil_cstr_vpcmp);
     int const A = 0x1;
     int const B = 0x3;
     int const C = 0x5;
