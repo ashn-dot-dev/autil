@@ -1,6 +1,9 @@
 Unreleased
 -------------------
 + Add functions autil_string_split_on and autil_string_split_on_cstr.
++ Add autil_arr functions and macros: AUTIL_ARR_FINI, AUTIL_ARR_COUNT,
+  AUTIL_ARR_CAPACITY, AUTIL_ARR_RESERVE, AUTIL_ARR_RESIZE, AUTIL_ARR_PUSH,
+  and AUTIL_ARR_POP.
 + Rename autil_str_vpcmp to autil_cstr_vpcmp.
 
 v0.4.0 - 2020-11-25
