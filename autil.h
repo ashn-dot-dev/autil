@@ -95,6 +95,26 @@ struct autil_map;
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
+// C99 compatible _Alignof operator.
+// Produces an integer constant expression.
+#define AUTIL_ALIGNOF(type_) offsetof(struct{char _; type_ ty;}, ty)
+// C99 compatible max_align_t.
+// clang-format off
+typedef union
+{
+    _Bool       bool_;
+    char        char_;
+    short       short_;
+    int         int_;
+    long        long_;
+    float       float_;
+    double      double_;
+    long double long_double_;
+    void*       void_ptr_;
+    void        (*fn_ptr_)();
+} autil_max_align_t_;
+// clang-format on
+
 // Should return an int less than, equal to, or greater than zero if lhs is
 // semantically less than, equal to, or greater than rhs, respectively.
 typedef int (*autil_vpcmp_fn)(void const* lhs, void const* rhs);
@@ -468,7 +488,7 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 // Internal utilities that must be visible to other header/source files that
 // wish to use the AUTIL_ARR_* API. Do not use these directly!
 // clang-format off
-struct autil__arr_header_{size_t cnt_; size_t cap_;};
+struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_t_ _[];};
 enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
 #define AUTIL__ARR_PHEADER_MUTBL_(arr_)                                        \
     ((struct autil__arr_header_      *)                                        \
@@ -651,25 +671,6 @@ autil_map_remove(
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-// clang-format off
-union autil_primitive_
-{
-    _Bool       bool_;
-    char        char_;
-    short       short_;
-    int         int_;
-    long        long_;
-    float       float_;
-    double      double_;
-    long double long_double_;
-    void*       void_ptr_;
-    void        (*fn_ptr_)();
-};
-
-#define AUTIL_ALIGNOF(type_) offsetof(struct{char _; type_ ty;}, ty)
-typedef union autil_primitive_ autil_max_align_t_;
-// clang-format on
 
 AUTIL_API int
 autil_void_vpcmp(void const* lhs, void const* rhs)
