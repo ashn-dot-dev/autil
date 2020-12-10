@@ -2148,9 +2148,8 @@ autil__arr_grw_(size_t elemsize, void* arr)
 {
     assert(elemsize != 0);
 
-    size_t const cnt = AUTIL_ARR_COUNT(arr);
     size_t const cap = AUTIL_ARR_CAPACITY(arr);
-    assert(cnt == cap);
+    assert(AUTIL_ARR_COUNT(arr) == cap);
 
     static size_t const GROWTH_FACTOR = 2;
     static size_t const DEFAULT_CAPACITY = 8;
