@@ -458,6 +458,7 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 // void AUTIL_ARR_FINI(TYPE* arr)
 // ------------------------------------------------------------
 // Free resources associated with the arr.
+// Macro parameter arr is evaluated multiple times.
 #define AUTIL_ARR_FINI(arr)                                                    \
     ((void)((arr) != NULL ? AUTIL__ARR_FREE_NON_NULL_HEADER(arr) : NULL))
 
@@ -519,12 +520,9 @@ enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
          : (arr_))
 #define AUTIL__ARR_APPEND_VAL_(arr_, val_)                                     \
     ((arr_)[AUTIL__ARR_PHEADER_MUTBL_(arr_)->cnt_++] = (val_))
-AUTIL_API void*
-autil__arr_rsv_(size_t elemsize, void* arr, size_t cap);
-AUTIL_API void*
-autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt);
-AUTIL_API void*
-autil__arr_grw_(size_t elemsize, void* arr);
+AUTIL_API void* autil__arr_rsv_(size_t elemsize, void* arr, size_t cap);
+AUTIL_API void* autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt);
+AUTIL_API void* autil__arr_grw_(size_t elemsize, void* arr);
 // clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
