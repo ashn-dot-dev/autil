@@ -455,54 +455,54 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 //////// ARR ///////////////////////////////////////////////////////////////////
 // General purpose generic stretchy buffer.
 
-// void AUTIL_ARR_FINI(TYPE* arr)
+// void autil_arr_fini(TYPE* arr)
 // ------------------------------------------------------------
 // Free resources associated with the arr.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_FINI(arr)                                                    \
+#define autil_arr_fini(arr)                                                    \
     ((void)((arr) != NULL ? AUTIL__ARR_FREE_NON_NULL_HEADER(arr) : NULL))
 
-// size_t AUTIL_ARR_COUNT(TYPE* arr)
+// size_t autil_arr_count(TYPE* arr)
 // ------------------------------------------------------------
 // The number of elements in the arr.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_COUNT(arr)                                                   \
+#define autil_arr_count(arr)                                                   \
     ((size_t)((arr) != NULL ? AUTIL__ARR_PHEADER_CONST_(arr)->cnt_ : (size_t)0))
-// size_t AUTIL_ARR_CAPACITY(TYPE* arr)
+// size_t autil_arr_capacity(TYPE* arr)
 // ------------------------------------------------------------
 // The number of elements the allocated in the arr.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_CAPACITY(arr)                                                \
+#define autil_arr_capacity(arr)                                                \
     ((size_t)((arr) != NULL ? AUTIL__ARR_PHEADER_CONST_(arr)->cap_ : (size_t)0))
 
-// void AUTIL_ARR_RESERVE(TYPE* arr, size_t n)
+// void autil_arr_reserve(TYPE* arr, size_t n)
 // ------------------------------------------------------------
 // Update the minimum capacity of the arr to n elements.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_RESERVE(arr, n)                                              \
+#define autil_arr_reserve(arr, n)                                              \
     ((void)((arr) = autil__arr_rsv_(sizeof(*(arr)), arr, n)))
-// void AUTIL_ARR_RESIZE(TYPE* arr, size_t n)
+// void autil_arr_resize(TYPE* arr, size_t n)
 // ------------------------------------------------------------
 // Update the count of the arr to n elements.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_RESIZE(arr, n)                                               \
+#define autil_arr_resize(arr, n)                                               \
     ((void)((arr) = autil__arr_rsz_(sizeof(*(arr)), arr, n)))
 
-// void AUTIL_ARR_PUSH(TYPE* arr, TYPE val)
+// void autil_arr_push(TYPE* arr, TYPE val)
 // ------------------------------------------------------------
 // Append val as the last element of arr.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_PUSH(arr, val)                                               \
+#define autil_arr_push(arr, val)                                               \
     ((void)(AUTIL__ARR_MAYBE_GROW_(arr), AUTIL__ARR_APPEND_VAL_(arr, val)))
-// TYPE AUTIL_ARR_POP(TYPE* arr)
+// TYPE autil_arr_pop(TYPE* arr)
 // ------------------------------------------------------------
 // Remove and return the last element of arr.
 // This macro does *not* perform bounds checking.
 // Macro parameter arr is evaluated multiple times.
-#define AUTIL_ARR_POP(arr) ((arr)[--AUTIL__ARR_PHEADER_MUTBL_(arr)->cnt_])
+#define autil_arr_pop(arr) ((arr)[--AUTIL__ARR_PHEADER_MUTBL_(arr)->cnt_])
 
 // Internal utilities that must be visible to other header/source files that
-// wish to use the AUTIL_ARR_* API. Do not use these directly!
+// wish to use the autil_arr_* API. Do not use these directly!
 // clang-format off
 struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_type _[];};
 enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
@@ -515,7 +515,7 @@ enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
 #define AUTIL__ARR_FREE_NON_NULL_HEADER(arr_)                                  \
     (autil_xalloc(AUTIL__ARR_PHEADER_MUTBL_(arr_), AUTIL_XALLOC_FREE))
 #define AUTIL__ARR_MAYBE_GROW_(arr_)                                           \
-    ((AUTIL_ARR_COUNT(arr_) == AUTIL_ARR_CAPACITY(arr_))                       \
+    ((autil_arr_count(arr_) == autil_arr_capacity(arr_))                       \
          ? (arr_) = autil__arr_grw_(sizeof(*(arr_)), arr_)                     \
          : (arr_))
 #define AUTIL__ARR_APPEND_VAL_(arr_, val_)                                     \
@@ -2124,7 +2124,7 @@ autil__arr_rsv_(size_t elemsize, void* arr, size_t cap)
 {
     assert(elemsize != 0);
 
-    if (cap <= AUTIL_ARR_CAPACITY(arr)) {
+    if (cap <= autil_arr_capacity(arr)) {
         return arr;
     }
 
@@ -2144,11 +2144,11 @@ autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt)
     assert(elemsize != 0);
 
     if (cnt == 0) {
-        AUTIL_ARR_FINI(arr);
+        autil_arr_fini(arr);
         return NULL;
     }
 
-    if (cnt > AUTIL_ARR_CAPACITY(arr)) {
+    if (cnt > autil_arr_capacity(arr)) {
         arr = autil__arr_rsv_(elemsize, arr, cnt);
     }
     assert(arr != NULL);
@@ -2162,8 +2162,8 @@ autil__arr_grw_(size_t elemsize, void* arr)
 {
     assert(elemsize != 0);
 
-    size_t const cap = AUTIL_ARR_CAPACITY(arr);
-    assert(AUTIL_ARR_COUNT(arr) == cap);
+    size_t const cap = autil_arr_capacity(arr);
+    assert(autil_arr_count(arr) == cap);
 
     static size_t const GROWTH_FACTOR = 2;
     static size_t const DEFAULT_CAPACITY = 8;
