@@ -95,9 +95,12 @@ struct autil_map;
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
+// clang-format off
 // C99 compatible _Alignof operator.
 // Produces an integer constant expression.
 #define AUTIL_ALIGNOF(type_) offsetof(struct{char _; type_ ty;}, ty)
+// clang-format on
+
 // C99 compatible max_align_t.
 // clang-format off
 typedef union
@@ -112,7 +115,19 @@ typedef union
     long double long_double_;
     void*       void_ptr_;
     void        (*fn_ptr_)();
-} autil_max_align_t_;
+} autil_max_align_type;
+// clang-format on
+
+// C99 compatible(ish) _Static_assert.
+// Macro parameter what should be a valid identifier describing the assertion.
+// Flips the order of arguments from C11's _Static_assert so that assertions
+// read as if they were a sentence.
+// Example:
+//      // Assert that we are compiling on a 64-bit machine.
+//      AUTIL_STATIC_ASSERT(pointers_are_eight_bytes, sizeof(void*) == 8);
+// clang-format off
+#define AUTIL_STATIC_ASSERT(what, expr)                                        \
+    enum {STATIC_ASSERT__ ## what = 1/!!(expr)}//;
 // clang-format on
 
 // Should return an int less than, equal to, or greater than zero if lhs is
@@ -488,7 +503,7 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 // Internal utilities that must be visible to other header/source files that
 // wish to use the AUTIL_ARR_* API. Do not use these directly!
 // clang-format off
-struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_t_ _[];};
+struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_type _[];};
 enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
 #define AUTIL__ARR_PHEADER_MUTBL_(arr_)                                        \
     ((struct autil__arr_header_      *)                                        \
@@ -671,6 +686,8 @@ autil_map_remove(
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+AUTIL_STATIC_ASSERT(CHAR_BIT_IS_8, CHAR_BIT == 8);
 
 AUTIL_API int
 autil_void_vpcmp(void const* lhs, void const* rhs)
@@ -2101,7 +2118,7 @@ autil_vec_of_string_del(struct autil_vec* vec)
 
 // clang-format off
 enum {AUTIL_STATIC_ASSERT_ARR_HEADER_OFFSET_IS_ALIGNED =
-    1/!!((AUTIL__ARR_HEADER_OFFSET % AUTIL_ALIGNOF(autil_max_align_t_)) == 0)};
+   1/!!((AUTIL__ARR_HEADER_OFFSET % AUTIL_ALIGNOF(autil_max_align_type)) == 0)};
 // clang-format on
 
 /* reserve */
