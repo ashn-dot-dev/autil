@@ -85,20 +85,20 @@ struct autil_map;
 //      int val = AUTIL_DEREF_PTR(int, ptr);
 #define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
-// Unsigned long mask with the n_-th bit set.
-#define AUTIL_BIT(n_) (1UL << (n_))
+// Unsigned long mask with the n-th bit set.
+#define AUTIL_BIT(n) (1UL << (n))
 
 // Number of elements in an array.
-#define AUTIL_ARRAY_COUNT(array_) (sizeof(array_) / sizeof((array_)[0]))
+#define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
-#define AUTIL_CSTR_COUNT(cstr_) (AUTIL_ARRAY_COUNT(cstr_) - 1)
+#define AUTIL_CSTR_COUNT(cstr) (AUTIL_ARRAY_COUNT(cstr) - 1)
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
-// clang-format off
 // C99 compatible _Alignof operator.
 // Produces an integer constant expression.
-#define AUTIL_ALIGNOF(type_) offsetof(struct{char _; type_ ty;}, ty)
+// clang-format off
+#define AUTIL_ALIGNOF(type) offsetof(struct{char _; type ty;}, ty)
 // clang-format on
 
 // C99 compatible max_align_t.
