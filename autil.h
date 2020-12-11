@@ -73,16 +73,16 @@ struct autil_map;
 // block.
 //
 // Example:
-//  int* pint = AUTIL_LOCAL_PTR(int, 42);
-//  char const** pstr = AUTIL_LOCAL_PTR(char const*, "FOO");
-//  printf("%d %s\n", *pint, *pstr); // 42 FOO
+//      int* pint = AUTIL_LOCAL_PTR(int, 42);
+//      char const** pstr = AUTIL_LOCAL_PTR(char const*, "FOO");
+//      printf("%d %s\n", *pint, *pstr); // 42 FOO
 #define AUTIL_LOCAL_PTR(TYPE, /*val*/...) (&((TYPE){__VA_ARGS__}))
 
 // Dereference ptr as if it were of type TYPE*.
 //
 // Example:
-//  void* ptr = some_func();
-//  int val = AUTIL_DEREF_PTR(int, ptr);
+//      void* ptr = some_func();
+//      int val = AUTIL_DEREF_PTR(int, ptr);
 #define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
 // Unsigned long mask with the n_-th bit set.
@@ -572,19 +572,19 @@ autil_vec_resize(struct autil_vec* self, size_t count);
 // Fatally exits after printing an error message if idx is out of bounds.
 //
 // Example:
-//  struct autil_vec* const v = autil_vec_new(sizeof(int));
-//  // some time later...
-//  int const foo = 0xdeadbeef;
-//  autil_vec_set(v, 42u, &val);
+//      struct autil_vec* const v = autil_vec_new(sizeof(int));
+//      // some time later...
+//      int const foo = 0xdeadbeef;
+//      autil_vec_set(v, 42u, &val);
 AUTIL_API void
 autil_vec_set(struct autil_vec* self, size_t idx, void const* data);
 // Get a pointer to the value of the vec *at* position idx.
 // Fatally exits after printing an error message if idx is out of bounds.
 //
 // Example:
-//  struct autil_vec* const v = autil_vec_new(sizeof(int));
-//  // some time later...
-//  int val = AUTIL_DEREF_PTR(int, autil_vec_ref(v, 42u)
+//      struct autil_vec* const v = autil_vec_new(sizeof(int));
+//      // some time later...
+//      int val = AUTIL_DEREF_PTR(int, autil_vec_ref(v, 42u)
 AUTIL_API void*
 autil_vec_ref(struct autil_vec* self, size_t idx);
 AUTIL_API void const*
@@ -1104,7 +1104,7 @@ autil_bigint_normalize_(struct autil_bigint* self)
 
 // Shift left by nlimbs number of limbs.
 // Example:
-//  -0xFFEE shifted left by nlimbs=2 turns into -0xFFEE0000 with 8-bit limbs.
+//      -0xFFEE shifted left by nlimbs=2 becomes -0xFFEE0000 with 8-bit limbs.
 static void
 autil_bigint_shiftl_(struct autil_bigint* self, size_t nlimbs)
 {
