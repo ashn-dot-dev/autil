@@ -2116,10 +2116,9 @@ autil_vec_of_string_del(struct autil_vec* vec)
     autil_vec_del(vec);
 }
 
-// clang-format off
-enum {AUTIL_STATIC_ASSERT_ARR_HEADER_OFFSET_IS_ALIGNED =
-   1/!!((AUTIL__ARR_HEADER_OFFSET % AUTIL_ALIGNOF(autil_max_align_type)) == 0)};
-// clang-format on
+AUTIL_STATIC_ASSERT(
+    ARR_HEADER_OFFSET_IS_ALIGNED,
+    AUTIL__ARR_HEADER_OFFSET % AUTIL_ALIGNOF(autil_max_align_type) == 0);
 
 /* reserve */
 AUTIL_API void*
