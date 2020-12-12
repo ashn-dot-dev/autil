@@ -30,37 +30,37 @@ main(void)
     struct autil_vec* const split = autil_vec_new(sizeof(struct autil_string*));
 
     string = autil_string_new_cstr("");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr(" ");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr(" A");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A ");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A B");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A B\tC  D ");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A B text\tC");
-    autil_string_split(string, split);
+    autil_string_split_to_vec(string, split);
     dump(string, split);
     cleanup(string, split);
 

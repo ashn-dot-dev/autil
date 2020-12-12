@@ -425,7 +425,7 @@ autil_string_trim(struct autil_string* self);
 // Example:
 //      "A B\tC  D " ===split===> "A" "B" "C"
 AUTIL_API void
-autil_string_split(
+autil_string_split_to_vec(
     struct autil_string const* self,
     struct autil_vec /* struct autil_string* */* res);
 // Split the string on all occurrences of the provided separator.
@@ -445,7 +445,8 @@ autil_string_split_on_cstr(
     struct autil_vec /* struct autil_string* */* res);
 
 // Wrapper functions for an autil_vec of autil_string*.
-// Useful for initializing / deinitializing a vec passed to autil_string_split.
+// Useful for initializing and deinitializing a vec passed to
+// autil_string_split_* functions.
 AUTIL_API struct autil_vec /*<struct autil_string*>*/*
 autil_vec_of_string_new(void);
 AUTIL_API void
@@ -2058,7 +2059,8 @@ autil_string_trim(struct autil_string* self)
 
 // Should be equivalent to str.split(sep=None) from Python3.
 AUTIL_API void
-autil_string_split(struct autil_string const* self, struct autil_vec* res)
+autil_string_split_to_vec(
+        struct autil_string const* self, struct autil_vec* res)
 {
     assert(self != NULL);
     assert(res != NULL);
