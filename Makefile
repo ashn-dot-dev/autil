@@ -147,8 +147,8 @@ examples/shapes.html: examples/shapes.c
 	emcc -o $@ $< $(CFLAGS) $(EMFLAGS)
 
 clean:
-	rm -f $(TESTS)
-	rm -f $(PERFS)
+	rm -f test/*.test
+	rm -f perf/*.perf
 	rm -f $(EXAMPLES)
 	rm -f $(EXAMPLES_WEB)
 
