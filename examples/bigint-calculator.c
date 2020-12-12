@@ -71,7 +71,7 @@ eval_line(char const* line, size_t line_size)
     struct autil_vec* const stack = autil_vec_new(sizeof(struct autil_bigint*));
 
     autil_string_trim(string);
-    autil_string_split(string, tokens);
+    autil_string_split_to_vec(string, tokens);
 
     int err = 0;
     for (size_t i = 0; i < autil_vec_count(tokens); ++i) {
