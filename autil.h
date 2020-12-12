@@ -433,13 +433,13 @@ autil_string_split_to_vec(
 // Parameter res will be populated with the collection of resulting strings.
 //      "ABCBB" ===split on "B"===> "A" "C" "" ""
 AUTIL_API void
-autil_string_split_on(
+autil_string_split_to_vec_on(
     struct autil_string const* self,
     char const* separator,
     size_t separator_size,
     struct autil_vec /* struct autil_string* */* res);
 AUTIL_API void
-autil_string_split_on_cstr(
+autil_string_split_to_vec_on_cstr(
     struct autil_string const* self,
     char const* separator,
     struct autil_vec /* struct autil_string* */* res);
@@ -2087,7 +2087,7 @@ autil_string_split_to_vec(
 }
 
 AUTIL_API void
-autil_string_split_on(
+autil_string_split_to_vec_on(
     struct autil_string const* self,
     char const* separator,
     size_t separator_size,
@@ -2125,7 +2125,7 @@ autil_string_split_on(
 }
 
 AUTIL_API void
-autil_string_split_on_cstr(
+autil_string_split_to_vec_on_cstr(
     struct autil_string const* self,
     char const* separator,
     struct autil_vec* res)
@@ -2134,7 +2134,7 @@ autil_string_split_on_cstr(
     assert(res != NULL);
     assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
 
-    autil_string_split_on(self, separator, strlen(separator), res);
+    autil_string_split_to_vec_on(self, separator, strlen(separator), res);
 }
 
 AUTIL_API struct autil_vec*

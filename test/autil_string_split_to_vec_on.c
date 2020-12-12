@@ -30,42 +30,42 @@ main(void)
     struct autil_vec* const split = autil_vec_new(sizeof(struct autil_string*));
 
     string = autil_string_new_cstr("");
-    autil_string_split_on_cstr(string, "", split);
+    autil_string_split_to_vec_on_cstr(string, "", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A");
-    autil_string_split_on_cstr(string, "", split);
+    autil_string_split_to_vec_on_cstr(string, "", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A");
-    autil_string_split_on_cstr(string, "A", split);
+    autil_string_split_to_vec_on_cstr(string, "A", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("AA");
-    autil_string_split_on_cstr(string, "A", split);
+    autil_string_split_to_vec_on_cstr(string, "A", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("A A");
-    autil_string_split_on_cstr(string, " ", split);
+    autil_string_split_to_vec_on_cstr(string, " ", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("ABCBB");
-    autil_string_split_on_cstr(string, "B", split);
+    autil_string_split_to_vec_on_cstr(string, "B", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("ABC");
-    autil_string_split_on_cstr(string, "D", split);
+    autil_string_split_to_vec_on_cstr(string, "D", split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("ABC");
-    autil_string_split_on_cstr(string, "FOOBAR", split);
+    autil_string_split_to_vec_on_cstr(string, "FOOBAR", split);
     dump(string, split);
     cleanup(string, split);
 

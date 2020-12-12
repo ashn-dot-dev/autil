@@ -82,7 +82,7 @@ TESTS = \
 	test/autil_string_remove.test \
 	test/autil_string_trim.test \
 	test/autil_string_split_to_vec.test \
-	test/autil_string_split_on.test \
+	test/autil_string_split_to_vec_on.test \
 	test/autil_arr.example.test \
 	test/autil_vec_reserve.test \
 	test/autil_vec_resize.test \
