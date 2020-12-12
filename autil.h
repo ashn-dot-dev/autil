@@ -2060,7 +2060,7 @@ autil_string_trim(struct autil_string* self)
 // Should be equivalent to str.split(sep=None) from Python3.
 AUTIL_API void
 autil_string_split_to_vec(
-        struct autil_string const* self, struct autil_vec* res)
+    struct autil_string const* self, struct autil_vec* res)
 {
     assert(self != NULL);
     assert(res != NULL);
