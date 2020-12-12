@@ -453,7 +453,44 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// ARR ///////////////////////////////////////////////////////////////////
-// General purpose generic stretchy buffer.
+// General purpose typesafe dynamic array (a.k.a stretchy buffer).
+//
+// A stretchy buffer works by storing metadata about the number of allocated and
+// in-use elements in a header just before the address of the buffer's first
+// element. The ith element of a stretchy buffer may be accessed using the array
+// index operator, arr[i], and a strechy buffer containing elements of type T
+// may be passed to subroutines as if it were regular array-like pointer of type
+// T* or T const*. The address of a stretchy buffer may change when a resizing
+// operation is performed, similar to resizing operations done with realloc, so
+// the address of a strechy buffer should not be considered stable.
+//
+// +--------+--------+--------+--------+--
+// | HEADER | ARR[0] | ARR[1] | ARR[2] | ...
+// +--------+--------+--------+--------+--
+//          ^
+//          Pointer manipulated by the user / autil_arr_* macros.
+//
+// Example:
+//      // The declaration:
+//      //      TYPE* identifier = NULL;
+//      // creates an empty strechy buffer holding TYPE values.
+//      int* vals = NULL;
+//      printf("count == %zu\n", autil_arr_count(vals));  /* count == 0 */
+//
+//      for (int i = 0; i < 3; ++i) {
+//          autil_arr_push(vals, (i + 1) * 2);
+//      }
+//      printf("count == %zu\n", autil_arr_count(vals)); /* count == 3 */
+//      printf("vals[0] == %d\n", vals[0]); /* vals[0] == 2 */
+//      printf("vals[1] == %d\n", vals[1]); /* vals[1] == 4 */
+//      printf("vals[2] == %d\n", vals[2]); /* vals[2] == 6 */
+//
+//      printf("popped == %d\n", autil_arr_pop(vals)); /* popped == 6 */
+//      printf("count == %zu\n", autil_arr_count(vals)); /* count == 2 */
+//
+//      // Free memory allocated to the arr.
+//      // This is safe to call even if vals == NULL.
+//      autil_arr_fini(vals);
 
 // void autil_arr_fini(TYPE* arr)
 // ------------------------------------------------------------
