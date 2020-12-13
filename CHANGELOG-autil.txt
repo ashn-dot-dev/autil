@@ -2,10 +2,12 @@ unreleased
 -------------------
 + Add macros AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
-+ Add functions autil_string_split_on and autil_string_split_on_cstr.
++ Add functions autil_string_split_to_vec_on and
+  autil_string_split_to_vec_on_cstr.
 + Add autil_arr macros: autil_arr_fini, autil_arr_count, autil_arr_capacity,
   autil_arr_reserve, autil_arr_resize, autil_arr_push, and autil_arr_pop.
 + Rename autil_str_vpcmp to autil_cstr_vpcmp.
++ Rename autil_string_split to autil_string_split_to_vec.
 
 v0.4.0 - 2020-11-25
 -------------------
@@ -20,8 +22,8 @@ v0.4.0 - 2020-11-25
 + Add type autil_string and associated functions: autil_string_new,
   autil_string_new_cstr, autil_string_del, autil_string_start,
   autil_string_count, autil_string_resize, autil_string_ref,
-  autil_string_ref_const, autil_string_insert, and autil_string_remove,
-  autil_string_trim.
+  autil_string_ref_const, autil_string_insert, autil_string_remove,
+  autil_string_trim, and autil_string_split.
 + Add function autil_vec_ref_const and make autil_ref_get* const correct.
 + Add function autil_map_lookup_const and make autil_map_lookup* const correct.
 + Rename autil_vec_get to autil_vec_ref.
