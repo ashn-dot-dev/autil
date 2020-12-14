@@ -2,7 +2,7 @@ unreleased
 -------------------
 + Add macros AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
-+ Add function autil_memmove.
++ Add functions autil_memcmp and autil_memmove.
 + Add functions autil_string_split_to_vec_on and
   autil_string_split_to_vec_on_cstr.
 + Add autil_arr macros: autil_arr_fini, autil_arr_count, autil_arr_capacity,

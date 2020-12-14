@@ -168,6 +168,7 @@ AUTIL_API int autil_toupper(int c);
 // These functions do not result in undefined behavior when passed an invalid
 // pointer argument paired with a memory-size argument of zero.
 // clang-format off
+AUTIL_API int autil_memcmp(void const* s1, void const* s2, size_t n);
 AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
 // clang-format on
 
@@ -866,6 +867,18 @@ autil_toupper(int c)
         return c & 0x5f;
     }
     return c;
+}
+
+AUTIL_API int
+autil_memcmp(void const* s1, void const* s2, size_t n)
+{
+    assert(s1 != NULL || n == 0);
+    assert(s2 != NULL || n == 0);
+
+    if (n == 0) {
+        return 0;
+    }
+    return memcmp(s1, s2, n);
 }
 
 AUTIL_API void*
