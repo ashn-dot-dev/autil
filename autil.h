@@ -141,8 +141,7 @@ autil_cstr_vpcmp(void const* lhs, void const* rhs); // char const*
 AUTIL_API int
 autil_int_vpcmp(void const* lhs, void const* rhs); // int
 
-// Alternatives to the C99 character handling functions in ctype.h (plus some
-// personal extras).
+// Alternatives to the C99 character handling functions in ctype.h.
 // These functions always use the "C" locale and will not result in undefined
 // behavior if passed a value not representable by an unsigned char.
 // clang-format off
@@ -163,6 +162,13 @@ AUTIL_API int autil_isxdigit(int c);
 //
 AUTIL_API int autil_tolower(int c);
 AUTIL_API int autil_toupper(int c);
+// clang-format on
+
+// Alternatives to the C99 memory handling functions in string.h.
+// These functions do not result in undefined behavior when passed an invalid
+// pointer argument paired with a memory-size argument of zero.
+// clang-format off
+AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
 // clang-format on
 
 // Write a formatted info message to stderr.
@@ -860,6 +866,18 @@ autil_toupper(int c)
         return c & 0x5f;
     }
     return c;
+}
+
+AUTIL_API void*
+autil_memmove(void* dest, void const* src, size_t n)
+{
+    assert(dest != NULL || n == 0);
+    assert(src != NULL || n == 0);
+
+    if (n == 0) {
+        return dest;
+    }
+    return memmove(dest, src, n);
 }
 
 AUTIL_API void
