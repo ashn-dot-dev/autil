@@ -1,4 +1,4 @@
-unreleased
+v0.5.0 - 2020-12-13
 -------------------
 + Add macros AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
