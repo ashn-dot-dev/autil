@@ -110,6 +110,7 @@ typedef union
     short       short_;
     int         int_;
     long        long_;
+    long long   long_long_;
     float       float_;
     double      double_;
     long double long_double_;
