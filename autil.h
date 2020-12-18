@@ -249,6 +249,7 @@ struct autil_vstr
 // parameters. This pointer has automatic storage duration associated with the
 // enclosing block.
 #define AUTIL_VSTR_LOCAL_PTR(start, count) (&(struct autil_vstr){start, count})
+
 // Create a vstring literal from the provided cstring literal.
 // Example:
 //      struct autil_vstr const foo = AUTIL_VSTR_LITERAL("foo");
@@ -258,6 +259,7 @@ struct autil_vstr
 #define AUTIL_VSTR_LITERAL(cstr_literal)                                       \
     ((struct autil_vstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
 // clang-format on
+
 // Clang, TCC, and ICC allow initialization of objects with static storage
 // duration using compound literals (as a conforming extension permitted by
 // ISO-IEC-9899-1999 section 6.6.7), but GCC and MSVC do *not* allow such
