@@ -250,12 +250,21 @@ struct autil_vstr
 // enclosing block.
 #define AUTIL_VSTR_LOCAL_PTR(start, count) (&(struct autil_vstr){start, count})
 // Create a vstring literal from the provided cstring literal.
-// Note: GCC (when compiling with -pedantic) and MSVC do *not* allow the result
-//       of this macro expression to be used for the initialization of objects
-//       with static storage duration. Clang, tcc, and icc *do* appear to allow
-//       this behavior.
+// Example:
+//      struct autil_vstr const foo = AUTIL_VSTR_LITERAL("foo");
+//      struct autil_vstr bar = {0};
+//      bar = AUTIL_VSTR_LITERAL("bar");
 #define AUTIL_VSTR_LITERAL(cstr_literal)                                       \
     ((struct autil_vstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
+// Clang, TCC, and ICC allow initialization of objects with static storage
+// duration using compound literals (as a conforming extension permitted by
+// ISO-IEC-9899-1999 section 6.6.7), but GCC and MSVC do *not* allow such
+// behavior. This macro allows for a portable conforming initialization of vstr
+// objects with static storage duration.
+// Example:
+//      static struct autil_vstr const foo = AUTIL_VSTR_LITERAL_INIT("foo");
+#define AUTIL_VSTR_LITERAL_INIT(cstr_literal)                                  \
+    {cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)}
 
 // Return an int less than, equal to, or greater than zero if lhs is
 // lexicographically less than, equal to, or greater than rhs, respectively.

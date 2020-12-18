@@ -2,7 +2,7 @@
 #include "../autil.h"
 #include "test.h"
 
-static struct autil_vstr const static_vstr = {"foo", AUTIL_CSTR_COUNT("foo")};
+static struct autil_vstr const static_vstr = AUTIL_VSTR_LITERAL_INIT("foo");
 
 int
 main(void)
