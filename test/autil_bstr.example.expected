@@ -1,0 +1,3 @@
+static literal "foo": 3 bytes
+local literal "bar": 3 bytes
+"foobar": 6 bytes

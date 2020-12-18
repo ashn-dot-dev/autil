@@ -91,7 +91,7 @@ struct autil_map;
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
-#define AUTIL_CSTR_COUNT(cstr) (AUTIL_ARRAY_COUNT(cstr) - 1)
+#define AUTIL_CSTR_COUNT(cstr_literal) (AUTIL_ARRAY_COUNT(cstr_literal) - 1)
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
@@ -236,17 +236,44 @@ AUTIL_API int
 autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
+//////// BSTR //////////////////////////////////////////////////////////////////
+// Byte string slice.
+
+struct autil_bstr
+{
+    char const* start;
+    size_t count;
+};
+
+// Produce a pointer of type struct autil_bstr* constructed from the provided
+// parameters. This pointer has automatic storage duration associated with the
+// enclosing block.
+#define AUTIL_BSTR_LOCAL_PTR(start, count) (&(struct autil_bstr){start, count})
+// Create a bstring literal from the provided cstring literal.
+#define AUTIL_BSTR_LITERAL(cstr_literal)                                       \
+    ((struct autil_bstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
+
+// Return an int less than, equal to, or greater than zero if lhs is
+// lexicographically less than, equal to, or greater than rhs, respectively.
+AUTIL_API int
+autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs);
+// Comparison function satisfying autil_vpcmp_fn.
+// Parameters lhs and rhs must be of type struct autil_bstr const*.
+AUTIL_API int
+autil_bstr_vpcmp(void const* lhs, void const* rhs);
+
+////////////////////////////////////////////////////////////////////////////////
 //////// ARR ///////////////////////////////////////////////////////////////////
 // General purpose typesafe dynamic array (a.k.a stretchy buffer).
 //
 // A stretchy buffer works by storing metadata about the number of allocated and
 // in-use elements in a header just before the address of the buffer's first
 // element. The ith element of a stretchy buffer may be accessed using the array
-// index operator, arr[i], and a strechy buffer containing elements of type T
+// index operator, arr[i], and a stretchy buffer containing elements of type T
 // may be passed to subroutines as if it were regular array-like pointer of type
 // T* or T const*. The address of a stretchy buffer may change when a resizing
 // operation is performed, similar to resizing operations done with realloc, so
-// the address of a strechy buffer should not be considered stable.
+// the address of a stretchy buffer should not be considered stable.
 //
 // +--------+--------+--------+--------+--
 // | HEADER | ARR[0] | ARR[1] | ARR[2] | ...
@@ -501,7 +528,7 @@ AUTIL_API size_t
 autil_string_count(struct autil_string const* self);
 
 // Return an int less than, equal to, or greater than zero if lhs is
-// semantically less than, equal to, or greater than rhs, respectively.
+// lexicographically less than, equal to, or greater than rhs, respectively.
 AUTIL_API int
 autil_string_cmp(
     struct autil_string const* lhs, struct autil_string const* rhs);
@@ -1110,6 +1137,29 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
     *buf = bf;
     *buf_size = sz;
     return 0;
+}
+
+AUTIL_API int
+autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    size_t const n = lhs->count < rhs->count ? lhs->count : rhs->count;
+    int const cmp = memcmp(lhs->start, rhs->start, n);
+
+    if (cmp != 0 || lhs->count == rhs->count) {
+        return cmp;
+    }
+    return lhs->count < rhs->count ? -1 : +1;
+}
+
+AUTIL_API int
+autil_bstr_vpcmp(void const* lhs, void const* rhs)
+{
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+    return autil_bstr_cmp(lhs, rhs);
 }
 
 AUTIL_STATIC_ASSERT(
@@ -2047,8 +2097,6 @@ autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs)
     if (cmp != 0 || lhs->count == rhs->count) {
         return cmp;
     }
-    // Lexicographic ordering denotes that the shorter string as less than the
-    // larger string.
     return lhs->count < rhs->count ? -1 : +1;
 }
 

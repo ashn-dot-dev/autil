@@ -21,6 +21,18 @@ main(void)
     autil_string_del(rhs);
 
     lhs = autil_string_new_cstr("A");
+    rhs = autil_string_new_cstr("AA");
+    EXPECT(autil_string_cmp(lhs, rhs) < 0);
+    autil_string_del(lhs);
+    autil_string_del(rhs);
+
+    lhs = autil_string_new_cstr("AA");
+    rhs = autil_string_new_cstr("A");
+    EXPECT(autil_string_cmp(lhs, rhs) > 0);
+    autil_string_del(lhs);
+    autil_string_del(rhs);
+
+    lhs = autil_string_new_cstr("A");
     rhs = autil_string_new_cstr("B");
     EXPECT(autil_string_cmp(lhs, rhs) < 0);
     autil_string_del(lhs);
@@ -43,4 +55,6 @@ main(void)
     EXPECT(autil_string_cmp(lhs, rhs) < 0);
     autil_string_del(lhs);
     autil_string_del(rhs);
+
+    return EXIT_SUCCESS;
 }
