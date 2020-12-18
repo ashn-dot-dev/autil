@@ -159,6 +159,8 @@ format:
 		*.h \
 		$$(find test/ -type f -name '*.h') \
 		$$(find test/ -type f -name '*.c') \
+		$$(find perf/ -type f -name '*.h') \
+		$$(find perf/ -type f -name '*.c') \
 		$$(find examples/ -type f -name '*.h') \
 		$$(find examples/ -type f -name '*.c')
 

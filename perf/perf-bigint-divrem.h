@@ -4,7 +4,8 @@
 #include "perf.h"
 
 static void
-measure_bigint_divrem(char const* file, char const* lhs_cstr, char const* rhs_cstr)
+measure_bigint_divrem(
+    char const* file, char const* lhs_cstr, char const* rhs_cstr)
 {
     struct autil_bigint* const LHS = autil_bigint_new_cstr(lhs_cstr);
     struct autil_bigint* const RHS = autil_bigint_new_cstr(rhs_cstr);

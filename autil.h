@@ -254,8 +254,10 @@ struct autil_vstr
 //      struct autil_vstr const foo = AUTIL_VSTR_LITERAL("foo");
 //      struct autil_vstr bar = {0};
 //      bar = AUTIL_VSTR_LITERAL("bar");
+// clang-format off
 #define AUTIL_VSTR_LITERAL(cstr_literal)                                       \
     ((struct autil_vstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
+// clang-format on
 // Clang, TCC, and ICC allow initialization of objects with static storage
 // duration using compound literals (as a conforming extension permitted by
 // ISO-IEC-9899-1999 section 6.6.7), but GCC and MSVC do *not* allow such
@@ -263,8 +265,10 @@ struct autil_vstr
 // objects with static storage duration.
 // Example:
 //      static struct autil_vstr const foo = AUTIL_VSTR_LITERAL_INIT("foo");
+// clang-format off
 #define AUTIL_VSTR_LITERAL_INIT(cstr_literal)                                  \
     {cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)}
+// clang-format on
 
 // Return an int less than, equal to, or greater than zero if lhs is
 // lexicographically less than, equal to, or greater than rhs, respectively.
