@@ -1146,7 +1146,7 @@ autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs)
     assert(rhs != NULL);
 
     size_t const n = lhs->count < rhs->count ? lhs->count : rhs->count;
-    int const cmp = memcmp(lhs->start, rhs->start, n);
+    int const cmp = autil_memcmp(lhs->start, rhs->start, n);
 
     if (cmp != 0 || lhs->count == rhs->count) {
         return cmp;
@@ -2092,7 +2092,7 @@ autil_string_cmp(struct autil_string const* lhs, struct autil_string const* rhs)
     assert(rhs != NULL);
 
     size_t const n = lhs->count < rhs->count ? lhs->count : rhs->count;
-    int const cmp = memcmp(lhs->start, rhs->start, n);
+    int const cmp = autil_memcmp(lhs->start, rhs->start, n);
 
     if (cmp != 0 || lhs->count == rhs->count) {
         return cmp;
