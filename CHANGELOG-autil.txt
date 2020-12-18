@@ -1,7 +1,7 @@
 Unreleased
 -------------------
-+ Add type autil_bstr type and associated macros and functions:
-  AUTIL_BSTR_LOCAL_PTR, AUTIL_BSTR_LITERAL, autil_bstr_cmp, autil_bstr_vpcmp
++ Add type autil_vstr and associated macros/functions:
+  AUTIL_VSTR_LOCAL_PTR, AUTIL_VSTR_LITERAL, autil_vstr_cmp, autil_vstr_vpcmp
 
 v0.5.0 - 2020-12-13
 -------------------

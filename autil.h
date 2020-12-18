@@ -236,35 +236,35 @@ AUTIL_API int
 autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
-//////// BSTR //////////////////////////////////////////////////////////////////
-// Byte string slice.
+//////// VSTR //////////////////////////////////////////////////////////////////
+// Byte string view.
 
-struct autil_bstr
+struct autil_vstr
 {
     char const* start;
     size_t count;
 };
 
-// Produce a pointer of type struct autil_bstr* constructed from the provided
+// Produce a pointer of type struct autil_vstr* constructed from the provided
 // parameters. This pointer has automatic storage duration associated with the
 // enclosing block.
-#define AUTIL_BSTR_LOCAL_PTR(start, count) (&(struct autil_bstr){start, count})
-// Create a bstring literal from the provided cstring literal.
+#define AUTIL_VSTR_LOCAL_PTR(start, count) (&(struct autil_vstr){start, count})
+// Create a vstring literal from the provided cstring literal.
 // Note: GCC (when compiling with -pedantic) and MSVC do *not* allow the result
 //       of this macro expression to be used for the initialization of objects
 //       with static storage duration. Clang, tcc, and icc *do* appear to allow
 //       this behavior.
-#define AUTIL_BSTR_LITERAL(cstr_literal)                                       \
-    ((struct autil_bstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
+#define AUTIL_VSTR_LITERAL(cstr_literal)                                       \
+    ((struct autil_vstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
 
 // Return an int less than, equal to, or greater than zero if lhs is
 // lexicographically less than, equal to, or greater than rhs, respectively.
 AUTIL_API int
-autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs);
+autil_vstr_cmp(struct autil_vstr const* lhs, struct autil_vstr const* rhs);
 // Comparison function satisfying autil_vpcmp_fn.
-// Parameters lhs and rhs must be of type struct autil_bstr const*.
+// Parameters lhs and rhs must be of type struct autil_vstr const*.
 AUTIL_API int
-autil_bstr_vpcmp(void const* lhs, void const* rhs);
+autil_vstr_vpcmp(void const* lhs, void const* rhs);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// ARR ///////////////////////////////////////////////////////////////////
@@ -1144,7 +1144,7 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
 }
 
 AUTIL_API int
-autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs)
+autil_vstr_cmp(struct autil_vstr const* lhs, struct autil_vstr const* rhs)
 {
     assert(lhs != NULL);
     assert(rhs != NULL);
@@ -1159,11 +1159,11 @@ autil_bstr_cmp(struct autil_bstr const* lhs, struct autil_bstr const* rhs)
 }
 
 AUTIL_API int
-autil_bstr_vpcmp(void const* lhs, void const* rhs)
+autil_vstr_vpcmp(void const* lhs, void const* rhs)
 {
     assert(lhs != NULL);
     assert(rhs != NULL);
-    return autil_bstr_cmp(lhs, rhs);
+    return autil_vstr_cmp(lhs, rhs);
 }
 
 AUTIL_STATIC_ASSERT(

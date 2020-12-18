@@ -65,8 +65,8 @@ TESTS = \
 	test/autil_file_read.test \
 	test/autil_file_write.test \
 	test/autil_stream_read_line.test \
-	test/autil_bstr_cmp.test \
-	test/autil_bstr.example.test \
+	test/autil_vstr_cmp.test \
+	test/autil_vstr.example.test \
 	test/autil_arr.example.test \
 	test/autil_bigint_new_cstr.test \
 	test/autil_bigint_cmp.test \
