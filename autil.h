@@ -250,6 +250,10 @@ struct autil_bstr
 // enclosing block.
 #define AUTIL_BSTR_LOCAL_PTR(start, count) (&(struct autil_bstr){start, count})
 // Create a bstring literal from the provided cstring literal.
+// Note: GCC (when compiling with -pedantic) and MSVC do *not* allow the result
+//       of this macro expression to be used for the initialization of objects
+//       with static storage duration. Clang, tcc, and icc *do* appear to allow
+//       this behavior.
 #define AUTIL_BSTR_LITERAL(cstr_literal)                                       \
     ((struct autil_bstr){cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)})
 
