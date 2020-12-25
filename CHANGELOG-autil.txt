@@ -66,4 +66,3 @@ v0.1.0 - 2020-07-30
   vec_remove.
 + Added type map and associated functions: map_new, map_del, map_count,
   map_keys, map_vals, map_lookup, map_insert, and map_remove.
-

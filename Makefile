@@ -97,7 +97,8 @@ TESTS = \
 	test/autil_map_remove.test \
 	test/autil_map_lookup.test \
 	test/autil_map.example.test \
-	test/autil_map.zero_size_elements.test
+	test/autil_map.zero_size_elements.test \
+	test/atest.example.test
 
 PERFS = \
 	perf/bigint-mul-256x256-bits.perf \

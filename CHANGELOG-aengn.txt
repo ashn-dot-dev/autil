@@ -19,4 +19,3 @@ v0.2.0 - 2020-09-16
 + Added resource loading functions: load_surface, load_texture, and load_sprite.
 + Added rendering functions: draw_clear, draw_texture, draw_sprite, and
   draw_show.
-

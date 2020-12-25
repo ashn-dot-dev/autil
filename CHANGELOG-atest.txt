@@ -1,0 +1,5 @@
+Unreleased
+-------------------
++ Add macros/functions:
+  ATEST_TEST, ATEST_FAIL, ATEST_EXPECT, ATEST_ASSERT, ATEST_RUN, ATEST_RUNF,
+  atest_tests_run, and atest_tests_failed.
