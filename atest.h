@@ -1,7 +1,8 @@
 /*
-ATEST - ASHN'S TESTING LIBRARY
+ATEST - ASHN'S TESTING LIBRARY - v0.6.0
     Single header file for unit testing in C99.
     This library has no dependencies outside of libc.
+
 
 USAGE
     To create function and object definitions:
@@ -70,15 +71,19 @@ LICENSE
 #define ATEST_RUN(ident) atest__run_(#ident, ident, NULL, NULL)
 // Run a test with the provided identifier, calling test-fixture functions init
 // and fini before and after the test is run, respectively.
+// The functions init and fini should have type void (*func)(void).
+// If init or fini is NULL then that function will *not* be executed.
 #define ATEST_RUNF(init, fini, ident) atest__run_(#ident, ident, init, fini)
 
+// The total number of tests that have been run.
 ATEST_API int
 atest_tests_run(void);
+// The total number of tests that have failed.
 ATEST_API int
 atest_tests_failed(void);
 
 // Internal utilities that must be visible to other header/source files that
-// wish to use the test_* API. Do not use these directly!
+// wish to use the atest_* API. Do not use these directly!
 // clang-format off
 #define ATEST__BLOCK_(code) do { code } while (0)
 #define ATEST__IFNOT_(expr, code) ATEST__BLOCK_(if (!(expr)){ code })
