@@ -62,23 +62,12 @@ $ make examples-web CFLAGS='$(GNU_REL)'  # Release (emscripten)
 ```
 
 ### Running
-Native applications are run as you would expect with no real surprises.
-For example applications that load assets relative to the working directory, you
-should run the application from within the `example/` directory.
-Note that some native applications built using `aengn.h` may provide additional
-command line options not seen when the binary is run by selecting it from within
-a file browser.
-
-Web applications built with separate HTML, JS, and WASM files will likely be
-blocked by your browser if you just open the `.html` page.
-This limitation can be avoided by serving the page with:
+To run an example with the name `example-name`:
 ```sh
-$ python3 -m http.server 8080
+$ (cd examples/ && ./example-name)
 ```
-and navigating to `http://localhost:8080/path/to/the/example.html` within your
-browser.
-Currently each web application and its assets are bundled into a single `.html`
-file to circumvent this issue.
+which will set the working directory to `example/` for applications that load
+assets via relative paths.
 
 
 ## License
