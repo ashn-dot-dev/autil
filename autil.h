@@ -85,9 +85,6 @@ struct autil_map;
 //      int val = AUTIL_DEREF_PTR(int, ptr);
 #define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
 
-// Unsigned long mask with the n-th bit set.
-#define AUTIL_BIT(n) (1UL << (n))
-
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
 // Number of characters in a cstring literal, excluding the null-terminator.
@@ -1880,24 +1877,24 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt)
         }
         // Match clang/gcc behavior:
         //      "flag '0' is ignored when flag '-' is present"
-        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
-            flags &= (unsigned)~AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_);
+        if (flags & (1u << AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
+            flags &= (unsigned)~(1u << AUTIL_BIGINT_FMT_FLAG_ZERO_);
         }
     }
 
     // Prefix.
     void* prefix = NULL;
     size_t prefix_size = 0;
-    if (self->sign == +1 && (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_PLUS_))) {
+    if (self->sign == +1 && (flags & (1u << AUTIL_BIGINT_FMT_FLAG_PLUS_))) {
         autil_xalloc_append(&prefix, &prefix_size, "+", 1);
     }
-    if (self->sign == +1 && (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_SPACE_))) {
+    if (self->sign == +1 && (flags & (1u << AUTIL_BIGINT_FMT_FLAG_SPACE_))) {
         autil_xalloc_append(&prefix, &prefix_size, " ", 1);
     }
     if (self->sign == -1) {
         autil_xalloc_append(&prefix, &prefix_size, "-", 1);
     }
-    if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_HASH_)) {
+    if (flags & (1u << AUTIL_BIGINT_FMT_FLAG_HASH_)) {
         if (specifier == 'b') {
             autil_xalloc_append(&prefix, &prefix_size, "0b", 2);
         }
@@ -1983,20 +1980,20 @@ autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt)
     size_t widths_size = 0;
     if ((prefix_size + digits_size) < width) {
         char pad = ' ';
-        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
-            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)));
+        if (flags & (1u << AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
+            assert(!(flags & (1u << AUTIL_BIGINT_FMT_FLAG_MINUS_)));
             pad = '0';
         }
         widths_size = width - (prefix_size + digits_size);
         widths = autil_xalloc(widths, widths_size);
         memset(widths, pad, widths_size);
 
-        if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
-            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)));
+        if (flags & (1u << AUTIL_BIGINT_FMT_FLAG_ZERO_)) {
+            assert(!(flags & (1u << AUTIL_BIGINT_FMT_FLAG_MINUS_)));
             autil_xalloc_prepend(&digits, &digits_size, widths, widths_size);
         }
-        else if (flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
-            assert(!(flags & AUTIL_BIT(AUTIL_BIGINT_FMT_FLAG_ZERO_)));
+        else if (flags & (1u << AUTIL_BIGINT_FMT_FLAG_MINUS_)) {
+            assert(!(flags & (1u << AUTIL_BIGINT_FMT_FLAG_ZERO_)));
             autil_xalloc_append(&digits, &digits_size, widths, widths_size);
         }
         else {

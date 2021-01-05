@@ -1,3 +1,7 @@
+Unreleased
+-------------------
++ Remove macro AUTIL_BIT.
+
 v0.6.0 - 2020-12-28
 -------------------
 + Add type autil_vstr and associated macros/functions:
