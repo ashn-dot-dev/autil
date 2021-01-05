@@ -60,13 +60,31 @@ LICENSE
 #    define AUTIL_API extern
 #endif
 
-#include <stddef.h> /* size_t, NULL */
-#include <stdio.h> /* FILE* */
+#include <stddef.h> /* size_t, NULL, offsetof */
+#include <stdio.h> /* FILE*, printf-family */
 
 struct autil_bigint;
 struct autil_string;
 struct autil_vec;
 struct autil_map;
+
+// C99 compatible max_align_t.
+// clang-format off
+typedef union
+{
+    _Bool       bool_;
+    char        char_;
+    short       short_;
+    int         int_;
+    long        long_;
+    long long   long_long_;
+    float       float_;
+    double      double_;
+    long double long_double_;
+    void*       void_ptr_;
+    void        (*fn_ptr_)();
+} autil_max_align_type;
+// clang-format on
 
 // Produce a pointer of type TYPE* whose contents is the scalar rvalue val.
 // This pointer has automatic storage duration associated with the enclosing
@@ -98,24 +116,6 @@ struct autil_map;
 #define AUTIL_ALIGNOF(type) offsetof(struct{char _; type ty;}, ty)
 // clang-format on
 
-// C99 compatible max_align_t.
-// clang-format off
-typedef union
-{
-    _Bool       bool_;
-    char        char_;
-    short       short_;
-    int         int_;
-    long        long_;
-    long long   long_long_;
-    float       float_;
-    double      double_;
-    long double long_double_;
-    void*       void_ptr_;
-    void        (*fn_ptr_)();
-} autil_max_align_type;
-// clang-format on
-
 // C99 compatible(ish) _Static_assert.
 // Macro parameter what should be a valid identifier describing the assertion.
 // Flips the order of arguments from C11's _Static_assert so that assertions
@@ -139,7 +139,7 @@ autil_cstr_vpcmp(void const* lhs, void const* rhs); // char const*
 AUTIL_API int
 autil_int_vpcmp(void const* lhs, void const* rhs); // int
 
-// Alternatives to the C99 character handling functions in ctype.h.
+// Alternatives to the C99 standard library functions in ctype.h.
 // These functions always use the "C" locale and will not result in undefined
 // behavior if passed a value not representable by an unsigned char.
 // clang-format off
@@ -157,12 +157,11 @@ AUTIL_API int autil_isupper(int c);
 AUTIL_API int autil_isbdigit(int c); // Not in C99. Binary digit.
 AUTIL_API int autil_isodigit(int c); // Not in C99. Octal digit.
 AUTIL_API int autil_isxdigit(int c);
-//
 AUTIL_API int autil_tolower(int c);
 AUTIL_API int autil_toupper(int c);
 // clang-format on
 
-// Alternatives to the C99 memory handling functions in string.h.
+// Alternatives to the C99 standard library functions in string.h.
 // These functions do not result in undefined behavior when passed an invalid
 // pointer argument paired with a memory-size argument of zero.
 // clang-format off
