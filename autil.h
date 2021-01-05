@@ -169,19 +169,6 @@ AUTIL_API int autil_memcmp(void const* s1, void const* s2, size_t n);
 AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
 // clang-format on
 
-// Write a formatted info message to stderr.
-// A newline is automatically appended to the end of the formatted message.
-AUTIL_API void
-autil_infof(char const* fmt, ...);
-// Write a formatted error message to stderr.
-// A newline is automatically appended to the end of the formatted message.
-AUTIL_API void
-autil_errorf(char const* fmt, ...);
-// Write a formatted error message to stderr and exit with EXIT_FAILURE status.
-// A newline is automatically appended to the end of the formatted message.
-AUTIL_API void
-autil_fatalf(char const* fmt, ...);
-
 // General purpose allocator functions with out-of-memory error checking.
 // The behavior of autil_xalloc and autil_xallocn is similar to libc realloc and
 // *BSD reallocarray with the following exceptions:
@@ -197,11 +184,22 @@ autil_fatalf(char const* fmt, ...);
 // free operation.
 AUTIL_API void*
 autil_xalloc(void* ptr, size_t size);
-//
 AUTIL_API void*
 autil_xallocn(void* ptr, size_t nmemb, size_t size);
-//
 #define AUTIL_XALLOC_FREE ((size_t)0)
+
+// Write a formatted info message to stderr.
+// A newline is automatically appended to the end of the formatted message.
+AUTIL_API void
+autil_infof(char const* fmt, ...);
+// Write a formatted error message to stderr.
+// A newline is automatically appended to the end of the formatted message.
+AUTIL_API void
+autil_errorf(char const* fmt, ...);
+// Write a formatted error message to stderr and exit with EXIT_FAILURE status.
+// A newline is automatically appended to the end of the formatted message.
+AUTIL_API void
+autil_fatalf(char const* fmt, ...);
 
 // Read the full contents of the file specified by path.
 // Memory for the read content is allocated with autil_xalloc.
@@ -936,6 +934,29 @@ autil_memmove(void* dest, void const* src, size_t n)
     return memmove(dest, src, n);
 }
 
+AUTIL_API void*
+autil_xalloc(void* ptr, size_t size)
+{
+    if (size == 0) {
+        AUTIL_FREE(ptr);
+        return NULL;
+    }
+    if ((ptr = AUTIL_REALLOC(ptr, size)) == NULL) {
+        autil_fatalf("[%s] Out of memory", __func__);
+    }
+    return ptr;
+}
+
+AUTIL_API void*
+autil_xallocn(void* ptr, size_t nmemb, size_t size)
+{
+    size_t const sz = nmemb * size;
+    if (nmemb != 0 && sz / nmemb != size) {
+        autil_fatalf("[%s] Integer overflow", __func__);
+    }
+    return autil_xalloc(ptr, sz);
+}
+
 AUTIL_API void
 autil_infof(char const* fmt, ...)
 {
@@ -974,29 +995,6 @@ autil_fatalf(char const* fmt, ...)
 
     va_end(args);
     exit(EXIT_FAILURE);
-}
-
-AUTIL_API void*
-autil_xalloc(void* ptr, size_t size)
-{
-    if (size == 0) {
-        AUTIL_FREE(ptr);
-        return NULL;
-    }
-    if ((ptr = AUTIL_REALLOC(ptr, size)) == NULL) {
-        autil_fatalf("[%s] Out of memory", __func__);
-    }
-    return ptr;
-}
-
-AUTIL_API void*
-autil_xallocn(void* ptr, size_t nmemb, size_t size)
-{
-    size_t const sz = nmemb * size;
-    if (nmemb != 0 && sz / nmemb != size) {
-        autil_fatalf("[%s] Integer overflow", __func__);
-    }
-    return autil_xalloc(ptr, sz);
 }
 
 // Prepend othr_size bytes from othr onto the autil_xalloc-allocated buffer of
