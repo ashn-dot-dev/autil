@@ -101,7 +101,7 @@ typedef union
 // Example:
 //      void* ptr = some_func();
 //      int val = AUTIL_DEREF_PTR(int, ptr);
-#define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*(TYPE*)(__VA_ARGS__))
+#define AUTIL_DEREF_PTR(TYPE, /*ptr*/...) (*((TYPE*)(__VA_ARGS__)))
 
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
