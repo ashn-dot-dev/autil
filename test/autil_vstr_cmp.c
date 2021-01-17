@@ -17,37 +17,37 @@ main(void)
     EXPECT(autil_vstr_cmp(&lhs, &rhs) == 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) == 0);
 
-    lhs = AUTIL_VSTR_LITERAL("A");
-    rhs = AUTIL_VSTR_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) == 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) == 0);
 
-    lhs = AUTIL_VSTR_LITERAL("A");
-    rhs = AUTIL_VSTR_LITERAL("AA");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("AA");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);
 
-    lhs = AUTIL_VSTR_LITERAL("AA");
-    rhs = AUTIL_VSTR_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("AA");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = AUTIL_VSTR_LITERAL("A");
-    rhs = AUTIL_VSTR_LITERAL("B");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("B");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);
 
-    lhs = AUTIL_VSTR_LITERAL("B");
-    rhs = AUTIL_VSTR_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("B");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = AUTIL_VSTR_LITERAL("FooBar");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("FooBar");
     rhs = (struct autil_vstr){"Fo\0Bar", 6};
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = AUTIL_VSTR_LITERAL("Fo\0\0ar");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("Fo\0\0ar");
     rhs = (struct autil_vstr){"Fo\0Bar", 6};
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);

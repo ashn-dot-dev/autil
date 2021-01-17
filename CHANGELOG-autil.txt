@@ -1,6 +1,8 @@
 Unreleased
 -------------------
 + Remove macro AUTIL_BIT.
++ Replace macros AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
+  AUTIL_VSTR_INIT_LITERAL
 
 v0.6.0 - 2020-12-28
 -------------------
