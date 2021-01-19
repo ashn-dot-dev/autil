@@ -311,7 +311,7 @@ autil_vstr_vpcmp(void const* lhs, void const* rhs);
 // Free resources associated with the arr.
 // Macro parameter arr is evaluated multiple times.
 #define autil_arr_fini(arr)                                                    \
-    ((void)((arr) != NULL ? AUTIL__ARR_FREE_NON_NULL_HEADER(arr) : NULL))
+    ((void)((arr) != NULL ? AUTIL__ARR_FREE_NON_NULL_HEADER_(arr) : NULL))
 
 // size_t autil_arr_count(TYPE* arr)
 // ------------------------------------------------------------
@@ -356,14 +356,14 @@ autil_vstr_vpcmp(void const* lhs, void const* rhs);
 // wish to use the autil_arr_* API. Do not use these directly!
 // clang-format off
 struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_type _[];};
-enum{AUTIL__ARR_HEADER_OFFSET = sizeof(struct autil__arr_header_)};
+enum{AUTIL__ARR_HEADER_OFFSET_ = sizeof(struct autil__arr_header_)};
 #define AUTIL__ARR_PHEADER_MUTBL_(arr_)                                        \
     ((struct autil__arr_header_      *)                                        \
-     ((char      *)(arr_)-AUTIL__ARR_HEADER_OFFSET))
+     ((char      *)(arr_)-AUTIL__ARR_HEADER_OFFSET_))
 #define AUTIL__ARR_PHEADER_CONST_(arr_)                                        \
     ((struct autil__arr_header_ const*)                                        \
-     ((char const*)(arr_)-AUTIL__ARR_HEADER_OFFSET))
-#define AUTIL__ARR_FREE_NON_NULL_HEADER(arr_)                                  \
+     ((char const*)(arr_)-AUTIL__ARR_HEADER_OFFSET_))
+#define AUTIL__ARR_FREE_NON_NULL_HEADER_(arr_)                                 \
     (autil_xalloc(AUTIL__ARR_PHEADER_MUTBL_(arr_), AUTIL_XALLOC_FREE))
 #define AUTIL__ARR_MAYBE_GROW_(arr_)                                           \
     ((autil_arr_count(arr_) == autil_arr_capacity(arr_))                       \
@@ -1167,7 +1167,7 @@ autil_vstr_vpcmp(void const* lhs, void const* rhs)
 
 AUTIL_STATIC_ASSERT(
     ARR_HEADER_OFFSET_IS_ALIGNED,
-    AUTIL__ARR_HEADER_OFFSET % AUTIL_ALIGNOF(autil_max_align_type) == 0);
+    AUTIL__ARR_HEADER_OFFSET_ % AUTIL_ALIGNOF(autil_max_align_type) == 0);
 
 /* reserve */
 AUTIL_API void*
@@ -1180,12 +1180,12 @@ autil__arr_rsv_(size_t elemsize, void* arr, size_t cap)
     }
 
     assert(cap != 0);
-    size_t const size = AUTIL__ARR_HEADER_OFFSET + elemsize * cap;
+    size_t const size = AUTIL__ARR_HEADER_OFFSET_ + elemsize * cap;
     struct autil__arr_header_* const header =
         autil_xalloc(arr != NULL ? AUTIL__ARR_PHEADER_MUTBL_(arr) : NULL, size);
     header->cnt_ = arr != NULL ? header->cnt_ : 0;
     header->cap_ = cap;
-    return (char*)header + AUTIL__ARR_HEADER_OFFSET;
+    return (char*)header + AUTIL__ARR_HEADER_OFFSET_;
 }
 
 /* resize */
