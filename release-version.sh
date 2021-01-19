@@ -4,8 +4,16 @@ set -e
 
 usage() {
     echo "Usage: $0 VERSION"
-    echo 'Prepare a release of the autil with the provided version number.'
-    echo 'VERSION should be in the form MAJOR.MINOR.PATCH.'
+    echo "Prepare a release of autil with the provided version number."
+    echo "VERSION should be in the form MAJOR.MINOR.PATCH."
+    printf '\n'
+    echo "Full release process:"
+    echo "  \$ sh $0 \${VERSION}"
+    echo "  \$ git add --all"
+    echo "  \$ git commit --message='Release v\${VERSION}'"
+    echo "  \$ git push origin master"
+    echo "  \$ git tag v\${VERSION}"
+    echo "  \$ git push origin v\${VERSION}"
 }
 
 if [ $# != '1' ]; then
