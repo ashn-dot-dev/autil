@@ -1,12 +1,12 @@
 v0.3.0 - 2020-10-29
--------------------
+--------------------------------
 + Namespace library with AENGN_ and aengn_.
 + Add rendering functions: aengn_draw_point, aengn_draw_line, and
   aengn_draw_rect.
 + Rename draw_show to aengn_end_frame.
 
 v0.2.0 - 2020-09-16
--------------------
+--------------------------------
 + Initial release.
 + Added engine initialization, finalization, execution, timing, and other
   misc. functions: aengn_init, aengn_fini, aengn_run, and aengn_now,

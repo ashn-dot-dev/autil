@@ -1,17 +1,17 @@
 Unreleased
--------------------
+--------------------------------
 + Remove macro AUTIL_BIT.
 + Replace macros AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
   AUTIL_VSTR_INIT_LITERAL
 
 v0.6.0 - 2020-12-28
--------------------
+--------------------------------
 + Add type autil_vstr and associated macros/functions:
   AUTIL_VSTR_LOCAL_PTR, AUTIL_VSTR_LITERAL, AUTIL_VSTR_LITERAL_INIT,
   autil_vstr_cmp, and autil_vstr_vpcmp.
 
 v0.5.0 - 2020-12-13
--------------------
+--------------------------------
 + Add macros AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
 + Add functions autil_memcmp and autil_memmove.
@@ -23,7 +23,7 @@ v0.5.0 - 2020-12-13
 + Rename autil_string_split to autil_string_split_to_vec.
 
 v0.4.0 - 2020-11-25
--------------------
+--------------------------------
 + Add functions autil_isbdigit and autil_isodigit.
 + Add function autil_stream_read and autil_stream_read_line.
 + Add macro AUTIL_BIT.
@@ -43,7 +43,7 @@ v0.4.0 - 2020-11-25
 + Rename autil_vec_data to autil_vec_start and make const correct.
 
 v0.3.0 - 2020-10-29
--------------------
+--------------------------------
 + Namespace library with AUTIL_ and autil_.
 + Added macro AUTIL_FMT_COUNT.
 + Added safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
@@ -53,14 +53,14 @@ v0.3.0 - 2020-10-29
 + Added function autil_vec_elemsize.
 
 v0.2.0 - 2020-09-16
--------------------
+--------------------------------
 + Added function infof.
 + Added macro ARRAY_COUNT.
 + Added macro CSTR_COUNT.
 + Fixed missing const qualifier for vec_get parameter self.
 
 v0.1.0 - 2020-07-30
--------------------
+--------------------------------
 + Initial release.
 + Added type vpcmp_fn and functions str_vpcmp and int_vpcmp.
 + Added macros LOCAL_PTR and DEREF_PTR.
