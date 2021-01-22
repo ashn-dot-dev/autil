@@ -270,6 +270,15 @@ autil_vstr_cmp(struct autil_vstr const* lhs, struct autil_vstr const* rhs);
 AUTIL_API int
 autil_vstr_vpcmp(void const* lhs, void const* rhs);
 
+// Returns a non-zero value if vstr starts with target.
+AUTIL_API int
+autil_vstr_starts_with(
+    struct autil_vstr const* vstr, struct autil_vstr const* target);
+// Returns a non-zero value if vstr ends with target.
+AUTIL_API int
+autil_vstr_ends_with(
+    struct autil_vstr const* vstr, struct autil_vstr const* target);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// ARR ///////////////////////////////////////////////////////////////////
 // General purpose typesafe dynamic array (a.k.a stretchy buffer).
@@ -725,7 +734,7 @@ autil_map_lookup_const(struct autil_map const* self, void const* key);
 //
 // If oldkey is not NULL then the removed key will be copied into oldkey.
 // If oldval is not NULL then the removed value will be copied into oldval.
-// Returns non-zero value if a key-value pair associated with key was replaced
+// Returns a non-zero value if a key-value pair associated with key was replaced
 // by the provided key and value.
 AUTIL_API int
 autil_map_insert(
@@ -739,7 +748,7 @@ autil_map_insert(
 //
 // If oldkey is not NULL then the removed key will be copied into oldkey.
 // If oldval is not NULL then the removed value will be copied into oldval.
-// Returns non-zero value if a key-value pair associated with key was removed.
+// Returns a non-zero value if a key-value pair associated with key was removed.
 AUTIL_API int
 autil_map_remove(
     struct autil_map* self, void const* key, void* oldkey, void* oldval);
@@ -1173,6 +1182,27 @@ autil_vstr_vpcmp(void const* lhs, void const* rhs)
     assert(lhs != NULL);
     assert(rhs != NULL);
     return autil_vstr_cmp(lhs, rhs);
+}
+
+AUTIL_API int
+autil_vstr_starts_with(
+    struct autil_vstr const* vstr, struct autil_vstr const* target)
+{
+    if (vstr->count < target->count) {
+        return 0;
+    }
+    return autil_memcmp(vstr->start, target->start, target->count) == 0;
+}
+
+AUTIL_API int
+autil_vstr_ends_with(
+    struct autil_vstr const* vstr, struct autil_vstr const* target)
+{
+    if (vstr->count < target->count) {
+        return 0;
+    }
+    char const* start = vstr->start + (vstr->count - target->count);
+    return autil_memcmp(start, target->start, target->count) == 0;
 }
 
 AUTIL_STATIC_ASSERT(
