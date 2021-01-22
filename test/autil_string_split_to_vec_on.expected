@@ -6,3 +6,6 @@
 "ABCBB" => "A" "C" "" ""
 "ABC" => "ABC"
 "ABC" => "ABC"
+
+"ABCBB" => "A" "C" "" ""
+"ABC" => "ABC"

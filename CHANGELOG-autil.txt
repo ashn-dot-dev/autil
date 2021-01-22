@@ -3,6 +3,8 @@ v0.6.1 - 2021-01-18
 + Remove macro AUTIL_BIT.
 + Replace macros AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
   AUTIL_VSTR_INIT_LITERAL
++ Add macro AUTIL_VSTR_LOCAL_PTR_LITERAL.
++ Add function autil_string_split_to_vec_on_vstr.
 
 v0.6.0 - 2020-12-28
 --------------------------------

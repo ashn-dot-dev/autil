@@ -243,6 +243,11 @@ struct autil_vstr
 // parameters. This pointer has automatic storage duration associated with the
 // enclosing block.
 #define AUTIL_VSTR_LOCAL_PTR(start, count) (&(struct autil_vstr){start, count})
+// Produce a pointer of type struct autil_vstr* from the provided cstring
+// literal. This pointer has automatic storage duration associated with the
+// enclosing block.
+#define AUTIL_VSTR_LOCAL_PTR_LITERAL(cstr_literal)                             \
+    AUTIL_VSTR_LOCAL_PTR(cstr_literal, AUTIL_CSTR_COUNT(cstr_literal))
 
 // Initializer for a vstring literal from a cstring literal.
 // Example:
@@ -586,6 +591,11 @@ autil_string_split_to_vec_on(
     struct autil_string const* self,
     char const* separator,
     size_t separator_size,
+    struct autil_vec /* struct autil_string* */* res);
+AUTIL_API void
+autil_string_split_to_vec_on_vstr(
+    struct autil_string const* self,
+    struct autil_vstr const* separator,
     struct autil_vec /* struct autil_string* */* res);
 AUTIL_API void
 autil_string_split_to_vec_on_cstr(
@@ -2265,12 +2275,27 @@ autil_string_split_to_vec_on(
 }
 
 AUTIL_API void
+autil_string_split_to_vec_on_vstr(
+    struct autil_string const* self,
+    struct autil_vstr const* separator,
+    struct autil_vec /* struct autil_string* */* res)
+{
+    assert(self != NULL);
+    assert(separator != NULL);
+    assert(res != NULL);
+    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
+
+    autil_string_split_to_vec_on(self, separator->start, separator->count, res);
+}
+
+AUTIL_API void
 autil_string_split_to_vec_on_cstr(
     struct autil_string const* self,
     char const* separator,
     struct autil_vec* res)
 {
     assert(self != NULL);
+    assert(separator != NULL);
     assert(res != NULL);
     assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
 

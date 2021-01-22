@@ -29,6 +29,7 @@ main(void)
     struct autil_string* string = NULL;
     struct autil_vec* const split = autil_vec_new(sizeof(struct autil_string*));
 
+    // Main tests mostly testing core functionality and cstr splits.
     string = autil_string_new_cstr("");
     autil_string_split_to_vec_on_cstr(string, "", split);
     dump(string, split);
@@ -66,6 +67,20 @@ main(void)
 
     string = autil_string_new_cstr("ABC");
     autil_string_split_to_vec_on_cstr(string, "FOOBAR", split);
+    dump(string, split);
+    cleanup(string, split);
+
+    fputc('\n', stdout);
+    // Some vstr tests.
+    string = autil_string_new_cstr("ABCBB");
+    autil_string_split_to_vec_on_vstr(
+        string, AUTIL_VSTR_LOCAL_PTR_LITERAL("B"), split);
+    dump(string, split);
+    cleanup(string, split);
+
+    string = autil_string_new_cstr("ABC");
+    autil_string_split_to_vec_on_vstr(
+        string, AUTIL_VSTR_LOCAL_PTR_LITERAL("FOOBAR"), split);
     dump(string, split);
     cleanup(string, split);
 
