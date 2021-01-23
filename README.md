@@ -1,5 +1,5 @@
-AUTIL - ASHN'S UTILITY LIBRARY(S)
-=================================
+AUTIL - ASHN'S UTILITIES
+========================
 
 Single header files containing functions and data structures for rapid
 application development in C99 (or later).
