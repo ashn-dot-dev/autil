@@ -592,7 +592,7 @@ autil_string_split_to_vec(
     struct autil_string const* self,
     struct autil_vec /* struct autil_string* */* res);
 // Split the string on all occurrences of the provided separator.
-// Empty strings are *NOT* rmoved from the result.
+// Empty strings are *NOT* removed from the result.
 // Parameter res will be populated with the collection of resulting strings.
 //      "ABCBB" ===split on "B"===> "A" "C" "" ""
 AUTIL_API void
