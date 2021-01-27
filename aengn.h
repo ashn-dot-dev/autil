@@ -10,7 +10,7 @@ DEPENDENCIES
         #include "autil.h"
         #include "aengn.h"
 
-    This library depends on and links against the development-libraries:
+    This library depends on and links against the libraries:
     1. libm
     2. libSDL2
     3. libSDL2_image

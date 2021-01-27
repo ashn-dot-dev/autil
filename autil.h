@@ -63,6 +63,7 @@ LICENSE
 #include <stddef.h> /* size_t, NULL, offsetof */
 #include <stdio.h> /* FILE*, printf-family */
 
+struct autil_vstr;
 struct autil_bigint;
 struct autil_string;
 struct autil_vec;
