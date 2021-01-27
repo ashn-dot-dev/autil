@@ -6,8 +6,8 @@ application development in C99 (or later).
 
 | Library | Description                                                        |
 |---------|--------------------------------------------------------------------|
-| autil.h | General purpose utility functions and data structures.             |
-| atest.h | Dead simple unit testing library.                                  |
+| autil.h | General purpose utility functions and data structures              |
+| atest.h | Dead simple unit testing library                                   |
 | aengn.h | 2D game engine with pixel coordinates (SDL2 backend)               |
 
 See individual header files for usage instructions.
