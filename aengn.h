@@ -16,11 +16,12 @@ DEPENDENCIES
     3. libSDL2_image
 
     Linker flags (gcc/clang):
-        -lm -lSDL2 -lSDL2_image
+        -lm -lSDL2 -lSDL2_image -lSDL_mixer
 
     Installation (Debian/Ubuntu):
         $ apt-get install libsdl2-dev
         $ apt-get install libsdl2-image-dev
+        $ apt-get install libsdl2-mixer-dev
 
 
 USAGE
@@ -73,6 +74,7 @@ LICENSE
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 // These macros are used in place of the SDL2 SDL_BUTTON_* value-like macros
 // and SDL_BUTTON function-like macro to avoid the somewhat awkward use of
@@ -202,16 +204,19 @@ aengn_sprite_update_texture(struct aengn_sprite* self);
 
 // Load and create an SDL_Surface from a file with the provided path.
 // This suface must be explicitly deinitialized with SDL_FreeSurface.
+// Path must reference a JPEG (.jpg) or PNG (.png) file.
 // Returns NULL on error.
 AENGN_API SDL_Surface*
 aengn_load_surface(char const* path);
 // Load and create an SDL_Texture from a file with the provided path.
 // This texture must be explicitly deinitialized with SDL_DestroyTexture.
+// Path must reference a JPEG (.jpg) or PNG (.png) file.
 // Returns NULL on error.
 AENGN_API SDL_Texture*
 aengn_load_texture(char const* path);
 // Load and create a sprite from a file with the provided path.
 // This sprite must be explicitly deinitialized with aengn_sprite_del.
+// Path must reference a JPEG (.jpg) or PNG (.png) file.
 // Returns NULL on error.
 AENGN_API struct aengn_sprite*
 aengn_load_sprite(char const* path);
@@ -241,6 +246,24 @@ aengn_draw_texture(SDL_Texture* tex, int x, int y);
 // Returns a non-zero value on error.
 AENGN_API int
 aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y);
+
+// Load and create a sound sample (chunk) from a file with the provided path.
+// This chunk must be explicitly deinitialized with Mix_FreeChunk.
+// Path must reference a WAVE (.wav) or OGG (.ogg) file.
+// Returns NULL on error.
+AENGN_API Mix_Chunk*
+aengn_load_chunk(char const* path);
+// Load and create a music data from a file with the provided path.
+// This music data must be explicitly deinitialized with Mix_FreeMusic.
+// Path must reference a WAVE (.wav), OGG (.ogg), or MP3 (.mp3) file.
+// Returns NULL on error.
+AENGN_API Mix_Music*
+aengn_load_music(char const* path);
+
+// Play the provided chunk on the first free unreserved channel.
+// Returns a non-zero value on error.
+AENGN_API int
+aengn_play_chunk(Mix_Chunk* chunk);
 
 #endif // AENGN_H_INCLUDED
 
@@ -275,6 +298,9 @@ static Uint64 g_run_start; // SDL_GetPerformanceCounter
 static Uint64 g_frame_start; // SDL_GetPerformanceCounter
 static Uint64 g_fps_period_start; // SDL_GetPerformanceCounter
 static size_t g_fps_period_count; // Frames in the fps period.
+
+int g_img_is_init = 0;
+int g_mix_is_init = 0;
 
 static int
 scankey_map_vpcmp(void const* lhs, void const* rhs)
@@ -339,11 +365,16 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         virtkey_map_vpcmp);
     memset(g_mousebutton_state, 0x00, sizeof(g_mousebutton_state));
 
-    SDL_version ver;
-    SDL_GetVersion(&ver);
-    autil_infof("Using SDL version %d.%d.%d", ver.major, ver.minor, ver.patch);
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    // SDL2
+    SDL_version sdl_ver;
+    SDL_GetVersion(&sdl_ver); // Version linked against.
+    autil_infof(
+        "Using SDL version %d.%d.%d",
+        sdl_ver.major,
+        sdl_ver.minor,
+        sdl_ver.patch);
+    int const sdl_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
+    if (SDL_Init(sdl_flags) != 0) {
         autil_errorf("[%s][SDL_Init] %s", __func__, SDL_GetError());
         goto error;
     }
@@ -368,6 +399,42 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
     }
     SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
 
+    // SDL2 Image
+    SDL_version const* img_ver = IMG_Linked_Version();
+    autil_infof(
+        "Using SDL Image version %d.%d.%d",
+        img_ver->major,
+        img_ver->minor,
+        img_ver->patch);
+    int const img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int const img_init = IMG_Init(img_flags);
+    if ((img_init & img_flags) != img_flags) {
+        autil_errorf("[%s][IMG_Init] %s", __func__, IMG_GetError());
+        goto error;
+    }
+    g_img_is_init = 1;
+
+    // SDL2 Mixer
+    SDL_version const* mix_ver = Mix_Linked_Version();
+    autil_infof(
+        "Using SDL Mixer version %d.%d.%d",
+        mix_ver->major,
+        mix_ver->minor,
+        mix_ver->patch);
+    // NOTE: Calling Mix_Init with bitwise ORed flags of audio formats will
+    // always fail with the error "<FORMAT> support not available". Despite what
+    // the documentation says, the actual way to initialize the SDL_Mixer
+    // library is with the Mix_OpenAudio call below.
+    int const frequency = MIX_DEFAULT_FREQUENCY;
+    int const format = MIX_DEFAULT_FORMAT;
+    int const channels = 2; // Stereo
+    int const chunksize = 2048; // In bytes.
+    if (Mix_OpenAudio(frequency, format, channels, chunksize) != 0) {
+        autil_errorf("[%s][Mix_OpenAudio] %s", __func__, Mix_GetError());
+        goto error;
+    }
+    g_mix_is_init = 1;
+
     return 0;
 
 error:
@@ -378,6 +445,19 @@ error:
 AENGN_API void
 aengn_fini(void)
 {
+    // SLD2 Mixer
+    if (g_mix_is_init) {
+        Mix_CloseAudio();
+        g_mix_is_init = 0;
+    }
+
+    // SDL2 Image
+    if (g_img_is_init) {
+        IMG_Quit();
+        g_img_is_init = 0;
+    }
+
+    // SDL2
     if (g_window != NULL) {
         SDL_DestroyWindow(g_window);
         g_window = NULL;
@@ -1042,6 +1122,44 @@ aengn_draw_rect(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
     if (err) {
         autil_errorf(
             "[%s][aengn_draw_line] Failed to draw rect line(s)", __func__);
+    }
+    return err;
+}
+
+AENGN_API Mix_Chunk*
+aengn_load_chunk(char const* path)
+{
+    Mix_Chunk* const chunk = Mix_LoadWAV(path);
+    if (chunk == NULL) {
+        autil_errorf(
+            "[%s(%s)][Mix_LoadWAV] %s",
+            __func__,
+            path,
+            Mix_GetError());
+    }
+    return chunk;
+}
+
+AENGN_API Mix_Music*
+aengn_load_music(char const* path)
+{
+    Mix_Music* const music = Mix_LoadMUS(path);
+    if (music == NULL) {
+        autil_errorf(
+            "[%s(%s)][Mix_LoadMUS] %s",
+            __func__,
+            path,
+            Mix_GetError());
+    }
+    return music;
+}
+
+AENGN_API int
+aengn_play_chunk(Mix_Chunk* chunk)
+{
+    int const err = Mix_PlayChannel(-1, chunk, 0);
+    if (err) {
+        autil_errorf("[%s][Mix_PlayChannel] %s", __func__, Mix_GetError());
     }
     return err;
 }

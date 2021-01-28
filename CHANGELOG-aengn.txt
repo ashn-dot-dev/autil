@@ -1,3 +1,7 @@
+Unreleased
+--------------------------------
++ Add functions aengn_load_chunk, aengn_load_music, and aengn_play_chunk.
+
 v0.3.0 - 2020-10-29
 --------------------------------
 + Namespace library with AENGN_ and aengn_.

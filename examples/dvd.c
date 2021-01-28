@@ -10,6 +10,7 @@
 #define PIXEL_SCALE 2
 
 struct aengn_sprite* dvd = NULL;
+struct Mix_Chunk* bump = NULL;
 static int x = 0;
 static int y = 20;
 static int dx = 1;
@@ -80,10 +81,12 @@ runtick(void* ctx)
     if (x <= 0 || (x + aengn_sprite_w(dvd)) >= aengn_screen_w()) {
         dx *= -1;
         update_color_random(dvd);
+        aengn_play_chunk(bump);
     }
     if (y <= 0 || (y + aengn_sprite_h(dvd)) >= aengn_screen_h()) {
         dy *= -1;
         update_color_random(dvd);
+        aengn_play_chunk(bump);
     }
 
     aengn_draw_clear(NULL);
@@ -104,9 +107,14 @@ main(void)
     if (dvd == NULL) {
         return EXIT_FAILURE;
     }
+    bump = aengn_load_chunk("dvd-assets/bump.ogg");
+    if (bump == NULL) {
+        return EXIT_FAILURE;
+    }
 
     aengn_run(runtick, NULL);
 
     aengn_sprite_del(dvd);
+    Mix_FreeChunk(bump);
     return EXIT_SUCCESS;
 }

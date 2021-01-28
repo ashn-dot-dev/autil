@@ -30,14 +30,15 @@ $ make test CC=clang CFLAGS='$(GNU_REL)'              # Release
 
 ## Building and Running Examples
 ### Dependencies
-Applications built using `aengn.h` link against `SDL2` and `SDL2_image` for
-native builds and compile with Emscripten's `emcc` for web builds.
-SDL2 and its extension libraries are provided by most package managers, and can
-be installed on Debian-based distros with:
+Applications built using `aengn.h` link against `SDL2`, `SDL2_image`, and
+`SDL2_mixer` for native builds and compile with Emscripten's `emcc` for web
+builds. SDL2 and its extension libraries are provided by most package managers,
+and can be installed on Debian-based distros with:
 
 ```sh
 $ apt-get install libsdl2-dev
 $ apt-get install libsdl2-image-dev
+$ apt-get install libsdl2-mixer-dev
 ```
 
 The Emscripten toolchain can be downloaded and activated with:

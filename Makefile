@@ -33,7 +33,8 @@ EMFLAGS = \
 	--shell-file examples/emscripten-shell.html \
 	-s SINGLE_FILE=1 \
 	-s USE_SDL=2 \
-	-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]'
+	-s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["jpg", "png"]' \
+	-s USE_SDL_MIXER=2
 
 TESTS = \
 	test/static.test \
@@ -136,11 +137,14 @@ examples: $(EXAMPLES)
 examples/bigint-calculator: examples/bigint-calculator.c
 	$(CC) -o $@ $< $(CFLAGS)
 examples/dvd: examples/dvd.c
-	$(CC) -o $@ $< $(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 examples/life: examples/life.c
-	$(CC) -o $@ $< $(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 examples/shapes: examples/shapes.c
-	$(CC) -o $@ $< $(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image
+	$(CC) -o $@ $< $(CFLAGS) \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 
 examples-web: $(EXAMPLES_WEB)
 examples/dvd.html: examples/dvd.c
