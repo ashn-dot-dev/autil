@@ -2461,6 +2461,10 @@ autil_vec_ref(struct autil_vec* self, size_t idx)
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
+    if (self->elemsize == 0) {
+        return NULL;
+    }
+
     return ((char*)self->start) + (idx * self->elemsize);
 }
 
@@ -2472,6 +2476,10 @@ autil_vec_ref_const(struct autil_vec const* self, size_t idx)
     if (idx >= self->count) {
         autil_fatalf("[%s] Index out of bounds (%zu)", __func__, idx);
     }
+    if (self->elemsize == 0) {
+        return NULL;
+    }
+
     return ((char*)self->start) + (idx * self->elemsize);
 }
 

@@ -3,6 +3,8 @@ Unreleased
 + Add macro AUTIL_VSTR_LOCAL_PTR_LITERAL.
 + Add functions autil_vstr_starts_with and autil_vstr_ends_with.
 + Add function autil_string_split_to_vec_on_vstr.
++ Fix UB when applying zero offset to null pointer in autil_vec_ref and
+  autil_vec_ref_const.
 
 v0.6.1 - 2021-01-18
 --------------------------------
