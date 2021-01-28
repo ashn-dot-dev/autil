@@ -278,29 +278,45 @@ aengn_play_chunk(Mix_Chunk* chunk);
 #    include <emscripten.h>
 #endif
 
-static int g_screen_w = 0;
-static int g_screen_h = 0;
-static int g_pixel_scale = 0;
+static struct aengn_button_state AENGN_BUTTON_STATE_DEFAULT = {0};
 
-// SDL_Scancode => struct aengn_button_state
-static struct autil_map* g_scankey_map = NULL;
-// SDL_Keycode  => struct aengn_button_state
-static struct autil_map* g_virtkey_map = NULL;
-// Array mapping AENGN-supported mouse buttons => struct aengn_button_state.
-static struct aengn_button_state g_mousebutton_state[AENGN_MOUSEBUTTON_COUNT];
-static struct aengn_button_state BUTTON_STATE_DEFAULT = {0};
+static struct
+{
+    int img_is_init;
+    int mix_is_init;
 
-static SDL_Window* g_window = NULL;
-static SDL_Renderer* g_renderer = NULL;
+    int screen_w;
+    int screen_h;
+    int pixel_scale;
 
-static bool g_should_quit;
-static Uint64 g_run_start; // SDL_GetPerformanceCounter
-static Uint64 g_frame_start; // SDL_GetPerformanceCounter
-static Uint64 g_fps_period_start; // SDL_GetPerformanceCounter
-static size_t g_fps_period_count; // Frames in the fps period.
+    // SDL_Scancode => struct aengn_button_state
+    struct autil_map* scankey_map;
+    // SDL_Keycode  => struct aengn_button_state
+    struct autil_map* virtkey_map;
+    // Array mapping AENGN-supported mouse buttons => struct aengn_button_state.
+    struct aengn_button_state mousebutton_state[AENGN_MOUSEBUTTON_COUNT];
 
-int g_img_is_init = 0;
-int g_mix_is_init = 0;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+
+    bool should_quit;
+    Uint64 run_start; // SDL_GetPerformanceCounter
+    Uint64 frame_start; // SDL_GetPerformanceCounter
+    Uint64 fps_period_start; // SDL_GetPerformanceCounter
+    size_t fps_period_count; // Frames in the fps period.
+
+    // Variables needed to "pass" the update and ctx parameters to
+    // aengn_run_update in a way that is compatible with Emscripten.
+    // The Emscripten main loop can be initialized using:
+    //  1. emscripten_set_main_loop     => takes em_callback_func
+    //  2. emscripten_set_main_loop_arg => takes em_arg_callback_func
+    // With either function we need these adaptor variables to properly forward
+    // the update and ctx parameters to the callback.
+    // clang-format off
+    aengn_runtick_fn run__main_loop_body__update;
+    void*            run__main_loop_body__ctx;
+    // clang-format on
+} aengn__global_ = {0};
 
 static int
 scankey_map_vpcmp(void const* lhs, void const* rhs)
@@ -352,18 +368,21 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         goto error;
     }
 
-    g_screen_w = screen_w;
-    g_screen_h = screen_h;
-    g_pixel_scale = pixel_scale;
-    g_scankey_map = autil_map_new(
+    aengn__global_.screen_w = screen_w;
+    aengn__global_.screen_h = screen_h;
+    aengn__global_.pixel_scale = pixel_scale;
+    aengn__global_.scankey_map = autil_map_new(
         sizeof(SDL_Scancode),
         sizeof(struct aengn_button_state),
         scankey_map_vpcmp);
-    g_virtkey_map = autil_map_new(
+    aengn__global_.virtkey_map = autil_map_new(
         sizeof(SDL_Keycode),
         sizeof(struct aengn_button_state),
         virtkey_map_vpcmp);
-    memset(g_mousebutton_state, 0x00, sizeof(g_mousebutton_state));
+    memset(
+        aengn__global_.mousebutton_state,
+        0x00,
+        sizeof(aengn__global_.mousebutton_state));
 
     // SDL2
     SDL_version sdl_ver;
@@ -382,22 +401,24 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
     static char const* const window_title = "";
     static int const window_x = SDL_WINDOWPOS_CENTERED;
     static int const window_y = SDL_WINDOWPOS_CENTERED;
-    int const window_w = g_screen_w * g_pixel_scale;
-    int const window_h = g_screen_h * g_pixel_scale;
-    g_window = SDL_CreateWindow(
+    int const window_w = aengn__global_.screen_w * aengn__global_.pixel_scale;
+    int const window_h = aengn__global_.screen_h * aengn__global_.pixel_scale;
+    aengn__global_.window = SDL_CreateWindow(
         window_title, window_x, window_y, window_w, window_h, SDL_WINDOW_SHOWN);
-    if (g_window == NULL) {
+    if (aengn__global_.window == NULL) {
         autil_errorf("[%s][SDL_CreateWindow] %s", __func__, SDL_GetError());
         goto error;
     }
 
-    g_renderer = SDL_CreateRenderer(
-        g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (g_renderer == NULL) {
+    aengn__global_.renderer = SDL_CreateRenderer(
+        aengn__global_.window,
+        -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (aengn__global_.renderer == NULL) {
         autil_errorf("[%s][SDL_CreateRenderer] %s", __func__, SDL_GetError());
         goto error;
     }
-    SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(aengn__global_.renderer, SDL_BLENDMODE_BLEND);
 
     // SDL2 Image
     SDL_version const* img_ver = IMG_Linked_Version();
@@ -412,7 +433,7 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         autil_errorf("[%s][IMG_Init] %s", __func__, IMG_GetError());
         goto error;
     }
-    g_img_is_init = 1;
+    aengn__global_.img_is_init = 1;
 
     // SDL2 Mixer
     SDL_version const* mix_ver = Mix_Linked_Version();
@@ -433,7 +454,7 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         autil_errorf("[%s][Mix_OpenAudio] %s", __func__, Mix_GetError());
         goto error;
     }
-    g_mix_is_init = 1;
+    aengn__global_.mix_is_init = 1;
 
     return 0;
 
@@ -446,78 +467,71 @@ AENGN_API void
 aengn_fini(void)
 {
     // SLD2 Mixer
-    if (g_mix_is_init) {
+    if (aengn__global_.mix_is_init) {
         Mix_CloseAudio();
-        g_mix_is_init = 0;
+        aengn__global_.mix_is_init = 0;
     }
 
     // SDL2 Image
-    if (g_img_is_init) {
+    if (aengn__global_.img_is_init) {
         IMG_Quit();
-        g_img_is_init = 0;
+        aengn__global_.img_is_init = 0;
     }
 
     // SDL2
-    if (g_window != NULL) {
-        SDL_DestroyWindow(g_window);
-        g_window = NULL;
+    if (aengn__global_.window != NULL) {
+        SDL_DestroyWindow(aengn__global_.window);
+        aengn__global_.window = NULL;
     }
-    if (g_renderer != NULL) {
-        SDL_DestroyRenderer(g_renderer);
-        g_renderer = NULL;
+    if (aengn__global_.renderer != NULL) {
+        SDL_DestroyRenderer(aengn__global_.renderer);
+        aengn__global_.renderer = NULL;
     }
 
     if (SDL_WasInit(SDL_INIT_EVERYTHING)) {
         SDL_Quit();
     }
 
-    g_screen_w = -1;
-    g_screen_h = -1;
-    g_pixel_scale = -1;
+    aengn__global_.screen_w = -1;
+    aengn__global_.screen_h = -1;
+    aengn__global_.pixel_scale = -1;
 
-    if (g_scankey_map != NULL) {
-        autil_map_del(g_scankey_map);
-        g_scankey_map = NULL;
+    if (aengn__global_.scankey_map != NULL) {
+        autil_map_del(aengn__global_.scankey_map);
+        aengn__global_.scankey_map = NULL;
     }
-    if (g_virtkey_map != NULL) {
-        autil_map_del(g_virtkey_map);
-        g_virtkey_map = NULL;
+    if (aengn__global_.virtkey_map != NULL) {
+        autil_map_del(aengn__global_.virtkey_map);
+        aengn__global_.virtkey_map = NULL;
     }
-    memset(g_mousebutton_state, 0x00, sizeof(g_mousebutton_state)); // scrub
+    memset(
+        aengn__global_.mousebutton_state,
+        0x00,
+        sizeof(aengn__global_.mousebutton_state)); // scrub
 }
 
-// Variables needed to "pass" the update and ctx parameters to
-// aengn_run_update in a way that is compatible with Emscripten.
-// The Emscripten main loop can be initialized using:
-//  1. emscripten_set_main_loop     => takes em_callback_func
-//  2. emscripten_set_main_loop_arg => takes em_arg_callback_func
-// With either function we need these adaptor variables to properly forward the
-// update and ctx parameters to the callback.
-// clang-format off
-static aengn_runtick_fn g_run__main_loop_body__update = NULL;
-static void*            g_run__main_loop_body__ctx    = NULL;
-// clang-format on
 // Compatible with em_callback_func (Emscripten v2.0.2+).
 static void
 aengn_run__main_loop_body(void)
 {
-    if (g_run__main_loop_body__update(g_run__main_loop_body__ctx)) {
-        g_should_quit = true;
+    if (aengn__global_.run__main_loop_body__update(
+            aengn__global_.run__main_loop_body__ctx)) {
+        aengn__global_.should_quit = true;
     }
 }
 
 AENGN_API void
 aengn_run(aengn_runtick_fn update, void* ctx)
 {
-    g_run__main_loop_body__update = update;
-    g_run__main_loop_body__ctx = ctx;
+    aengn__global_.run__main_loop_body__update = update;
+    aengn__global_.run__main_loop_body__ctx = ctx;
 
     Uint64 const now = SDL_GetPerformanceCounter();
-    g_should_quit = false;
-    g_run_start = now;
-    g_frame_start = now;
-    g_fps_period_start = now;
-    g_fps_period_count = 0;
+    aengn__global_.should_quit = false;
+    aengn__global_.run_start = now;
+    aengn__global_.frame_start = now;
+    aengn__global_.fps_period_start = now;
+    aengn__global_.fps_period_count = 0;
 
     aengn_draw_clear(NULL);
     aengn_end_frame();
@@ -525,7 +539,7 @@ aengn_run(aengn_runtick_fn update, void* ctx)
     em_callback_func const main_loop_body = aengn_run__main_loop_body;
     emscripten_set_main_loop(main_loop_body, 0, 1);
 #else
-    while (!g_should_quit) {
+    while (!aengn__global_.should_quit) {
         aengn_run__main_loop_body();
     }
 #endif
@@ -535,7 +549,7 @@ AENGN_API double
 aengn_now(void)
 {
     Uint64 const now = SDL_GetPerformanceCounter();
-    Uint64 const elapsed = now - g_run_start;
+    Uint64 const elapsed = now - aengn__global_.run_start;
     return (double)elapsed / (double)SDL_GetPerformanceFrequency();
 }
 
@@ -546,7 +560,7 @@ process_event_(SDL_Event const* event)
 
     // SDL_QuitEvent
     if (event->type == SDL_QUIT) {
-        g_should_quit = true;
+        aengn__global_.should_quit = true;
     }
 
     // SDL_KeyboardEvent
@@ -557,17 +571,25 @@ process_event_(SDL_Event const* event)
     if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP) {
         scankey = event->key.keysym.scancode;
         virtkey = event->key.keysym.sym;
-        scanstate = autil_map_lookup(g_scankey_map, &scankey);
-        virtstate = autil_map_lookup(g_virtkey_map, &virtkey);
+        scanstate = autil_map_lookup(aengn__global_.scankey_map, &scankey);
+        virtstate = autil_map_lookup(aengn__global_.virtkey_map, &virtkey);
         if (scanstate == NULL) {
             autil_map_insert(
-                g_scankey_map, &scankey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            scanstate = autil_map_lookup(g_scankey_map, &scankey);
+                aengn__global_.scankey_map,
+                &scankey,
+                &AENGN_BUTTON_STATE_DEFAULT,
+                NULL,
+                NULL);
+            scanstate = autil_map_lookup(aengn__global_.scankey_map, &scankey);
         }
         if (virtstate == NULL) {
             autil_map_insert(
-                g_virtkey_map, &virtkey, &BUTTON_STATE_DEFAULT, NULL, NULL);
-            virtstate = autil_map_lookup(g_virtkey_map, &virtkey);
+                aengn__global_.virtkey_map,
+                &virtkey,
+                &AENGN_BUTTON_STATE_DEFAULT,
+                NULL,
+                NULL);
+            virtstate = autil_map_lookup(aengn__global_.virtkey_map, &virtkey);
         }
         assert(scanstate != NULL);
         assert(virtstate != NULL);
@@ -594,13 +616,16 @@ process_event_(SDL_Event const* event)
     if (event->type == SDL_MOUSEBUTTONDOWN
         || event->type == SDL_MOUSEBUTTONUP) {
         if (event->button.button == SDL_BUTTON_LEFT) {
-            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_LEFT];
+            mousebtnstate =
+                &aengn__global_.mousebutton_state[AENGN_MOUSEBUTTON_LEFT];
         }
         if (event->button.button == SDL_BUTTON_RIGHT) {
-            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_RIGHT];
+            mousebtnstate =
+                &aengn__global_.mousebutton_state[AENGN_MOUSEBUTTON_RIGHT];
         }
         if (event->button.button == SDL_BUTTON_MIDDLE) {
-            mousebtnstate = &g_mousebutton_state[AENGN_MOUSEBUTTON_MIDDLE];
+            mousebtnstate =
+                &aengn__global_.mousebutton_state[AENGN_MOUSEBUTTON_MIDDLE];
         }
     }
     if (mousebtnstate != NULL && event->type == SDL_MOUSEBUTTONDOWN) {
@@ -617,32 +642,33 @@ AENGN_API void
 aengn_end_frame(void)
 {
     // Render the frame.
-    SDL_RenderPresent(g_renderer);
+    SDL_RenderPresent(aengn__global_.renderer);
 
     // Since a frame has just ended, perform FPS calculations.
     Uint64 const ONE_SECOND = SDL_GetPerformanceFrequency();
     Uint64 const now = SDL_GetPerformanceCounter();
-    Uint64 const fps_period_elapsed = now - g_fps_period_start;
-    g_fps_period_count += 1;
+    Uint64 const fps_period_elapsed = now - aengn__global_.fps_period_start;
+    aengn__global_.fps_period_count += 1;
     if (fps_period_elapsed >= ONE_SECOND) {
         double const sec = (double)fps_period_elapsed / (double)ONE_SECOND;
-        double const fps = (double)g_fps_period_count / sec;
+        double const fps = (double)aengn__global_.fps_period_count / sec;
         char title[256] = {0};
         snprintf(title, AUTIL_ARRAY_COUNT(title) - 1, "FPS: %0.2f", fps);
-        SDL_SetWindowTitle(g_window, title);
-        g_fps_period_start = now;
-        g_fps_period_count = 0;
+        SDL_SetWindowTitle(aengn__global_.window, title);
+        aengn__global_.fps_period_start = now;
+        aengn__global_.fps_period_count = 0;
     }
     // From this moment on we consider all work done part of the *next* frame
     // since any future work will have happened *after* the user was shown the
     // result of previous draw calls (i.e. the content of the frame).
-    g_frame_start = now;
+    aengn__global_.frame_start = now;
 
     // Clear previous frame's input state.
     // TODO: Remove const-casts that break const correctness. This isn't a big
     //       deal right now since these are private global variables, but they
     //       hint at a deeper rooted design problem.
-    struct autil_vec const* const scankeys = autil_map_vals(g_scankey_map);
+    struct autil_vec const* const scankeys =
+        autil_map_vals(aengn__global_.scankey_map);
     for (size_t i = 0; i < autil_vec_count(scankeys); ++i) {
         struct aengn_button_state* const sk =
             autil_vec_ref((struct autil_vec*)scankeys, i);
@@ -650,7 +676,8 @@ aengn_end_frame(void)
         sk->pressed = false;
         sk->released = false;
     }
-    struct autil_vec const* const virtkeys = autil_map_vals(g_virtkey_map);
+    struct autil_vec const* const virtkeys =
+        autil_map_vals(aengn__global_.virtkey_map);
     for (size_t i = 0; i < autil_vec_count(virtkeys); ++i) {
         struct aengn_button_state* const vk =
             autil_vec_ref((struct autil_vec*)virtkeys, i);
@@ -659,7 +686,8 @@ aengn_end_frame(void)
         vk->released = false;
     }
     for (size_t i = 0; i < AENGN_MOUSEBUTTON_COUNT; ++i) {
-        struct aengn_button_state* const btn = &g_mousebutton_state[i];
+        struct aengn_button_state* const btn =
+            &aengn__global_.mousebutton_state[i];
         btn->pressed = false;
         btn->released = false;
     }
@@ -674,42 +702,42 @@ aengn_end_frame(void)
 AENGN_API int
 aengn_screen_w(void)
 {
-    return g_screen_w;
+    return aengn__global_.screen_w;
 }
 
 AENGN_API int
 aengn_screen_h(void)
 {
-    return g_screen_h;
+    return aengn__global_.screen_h;
 }
 
 AENGN_API int
 aengn_pixel_scale(void)
 {
-    return g_pixel_scale;
+    return aengn__global_.pixel_scale;
 }
 
 AENGN_API struct aengn_button_state const*
 aengn_scankey_state(SDL_Scancode key)
 {
     struct aengn_button_state const* const state =
-        autil_map_lookup(g_scankey_map, &key);
-    return state != NULL ? state : &BUTTON_STATE_DEFAULT;
+        autil_map_lookup(aengn__global_.scankey_map, &key);
+    return state != NULL ? state : &AENGN_BUTTON_STATE_DEFAULT;
 }
 
 AENGN_API struct aengn_button_state const*
 aengn_virtkey_state(SDL_Keycode key)
 {
     struct aengn_button_state const* const state =
-        autil_map_lookup(g_virtkey_map, &key);
-    return state != NULL ? state : &BUTTON_STATE_DEFAULT;
+        autil_map_lookup(aengn__global_.virtkey_map, &key);
+    return state != NULL ? state : &AENGN_BUTTON_STATE_DEFAULT;
 }
 
 AENGN_API struct aengn_button_state const*
 aengn_mousebutton_state(int button)
 {
     assert(0 <= button && button < (int)AENGN_MOUSEBUTTON_COUNT);
-    return &g_mousebutton_state[button];
+    return &aengn__global_.mousebutton_state[button];
 }
 
 AENGN_API int
@@ -717,7 +745,7 @@ aengn_mousepos_x(void)
 {
     int x;
     SDL_GetMouseState(&x, NULL);
-    return x / g_pixel_scale;
+    return x / aengn__global_.pixel_scale;
 }
 
 AENGN_API int
@@ -725,7 +753,7 @@ aengn_mousepos_y(void)
 {
     int y;
     SDL_GetMouseState(NULL, &y);
-    return y / g_pixel_scale;
+    return y / aengn__global_.pixel_scale;
 }
 
 struct aengn_sprite
@@ -761,7 +789,7 @@ aengn_sprite_new(int w, int h)
     }
 
     texture = SDL_CreateTexture(
-        g_renderer,
+        aengn__global_.renderer,
         SDL_PIXELFORMAT_ARGB8888,
         SDL_TEXTUREACCESS_STREAMING,
         w,
@@ -906,7 +934,7 @@ aengn_load_texture(char const* path)
     }
 
     SDL_Texture* const texture =
-        SDL_CreateTextureFromSurface(g_renderer, surface);
+        SDL_CreateTextureFromSurface(aengn__global_.renderer, surface);
     SDL_FreeSurface(surface);
     if (texture == NULL) {
         autil_errorf(
@@ -976,8 +1004,9 @@ aengn_draw_clear(struct aengn_rgba const* color)
     if (color == NULL) {
         color = &black;
     }
-    SDL_SetRenderDrawColor(g_renderer, color->r, color->g, color->b, color->a);
-    SDL_RenderClear(g_renderer);
+    SDL_SetRenderDrawColor(
+        aengn__global_.renderer, color->r, color->g, color->b, color->a);
+    SDL_RenderClear(aengn__global_.renderer);
 }
 
 AENGN_API int
@@ -985,12 +1014,13 @@ aengn_draw_point(int x, int y, struct aengn_rgba const* color)
 {
     assert(color != NULL);
 
-    SDL_SetRenderDrawColor(g_renderer, color->r, color->g, color->b, color->a);
-    SDL_Rect const rect = {.x = x * g_pixel_scale,
-                           .y = y * g_pixel_scale,
-                           .w = g_pixel_scale,
-                           .h = g_pixel_scale};
-    int const err = SDL_RenderFillRect(g_renderer, &rect);
+    SDL_SetRenderDrawColor(
+        aengn__global_.renderer, color->r, color->g, color->b, color->a);
+    SDL_Rect const rect = {.x = x * aengn__global_.pixel_scale,
+                           .y = y * aengn__global_.pixel_scale,
+                           .w = aengn__global_.pixel_scale,
+                           .h = aengn__global_.pixel_scale};
+    int const err = SDL_RenderFillRect(aengn__global_.renderer, &rect);
     if (err) {
         autil_errorf("[%s][SDL_RenderFillRect] %s", __func__, SDL_GetError());
     }
@@ -1098,11 +1128,11 @@ aengn_draw_texture(SDL_Texture* tex, int x, int y)
     int w;
     int h;
     SDL_QueryTexture(tex, NULL, NULL, &w, &h);
-    SDL_Rect dst = {.x = x * g_pixel_scale,
-                    .y = y * g_pixel_scale,
-                    .w = w * g_pixel_scale,
-                    .h = h * g_pixel_scale};
-    int const err = SDL_RenderCopy(g_renderer, tex, NULL, &dst);
+    SDL_Rect dst = {.x = x * aengn__global_.pixel_scale,
+                    .y = y * aengn__global_.pixel_scale,
+                    .w = w * aengn__global_.pixel_scale,
+                    .h = h * aengn__global_.pixel_scale};
+    int const err = SDL_RenderCopy(aengn__global_.renderer, tex, NULL, &dst);
     if (err) {
         autil_errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
     }
@@ -1132,10 +1162,7 @@ aengn_load_chunk(char const* path)
     Mix_Chunk* const chunk = Mix_LoadWAV(path);
     if (chunk == NULL) {
         autil_errorf(
-            "[%s(%s)][Mix_LoadWAV] %s",
-            __func__,
-            path,
-            Mix_GetError());
+            "[%s(%s)][Mix_LoadWAV] %s", __func__, path, Mix_GetError());
     }
     return chunk;
 }
@@ -1146,10 +1173,7 @@ aengn_load_music(char const* path)
     Mix_Music* const music = Mix_LoadMUS(path);
     if (music == NULL) {
         autil_errorf(
-            "[%s(%s)][Mix_LoadMUS] %s",
-            __func__,
-            path,
-            Mix_GetError());
+            "[%s(%s)][Mix_LoadMUS] %s", __func__, path, Mix_GetError());
     }
     return music;
 }
