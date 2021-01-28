@@ -6,6 +6,7 @@ packages:
   - tcc
   - libsdl2-dev
   - libsdl2-image-dev
+  - libsdl2-mixer-dev
 sources:
   - https://git.sr.ht/~ashn/autil
 tasks:
