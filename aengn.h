@@ -969,40 +969,6 @@ error:
     return NULL;
 }
 
-AENGN_API int
-aengn_draw_texture(SDL_Texture* tex, int x, int y)
-{
-    int w;
-    int h;
-    SDL_QueryTexture(tex, NULL, NULL, &w, &h);
-    SDL_Rect dst = {.x = x * g_pixel_scale,
-                    .y = y * g_pixel_scale,
-                    .w = w * g_pixel_scale,
-                    .h = h * g_pixel_scale};
-    int const err = SDL_RenderCopy(g_renderer, tex, NULL, &dst);
-    if (err) {
-        autil_errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
-    }
-    return err;
-}
-
-AENGN_API int
-aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y)
-{
-    assert(sprite != NULL);
-
-    if (sprite->texture_needs_update) {
-        aengn_sprite_update_texture(sprite);
-    }
-
-    int const err = aengn_draw_texture(sprite->texture, x, y);
-    if (err) {
-        autil_errorf(
-            "[%s][aengn_draw_texture] Failed to draw sprite texture", __func__);
-    }
-    return err;
-}
-
 AENGN_API void
 aengn_draw_clear(struct aengn_rgba const* color)
 {
@@ -1122,6 +1088,40 @@ aengn_draw_rect(int x1, int y1, int x2, int y2, struct aengn_rgba const* color)
     if (err) {
         autil_errorf(
             "[%s][aengn_draw_line] Failed to draw rect line(s)", __func__);
+    }
+    return err;
+}
+
+AENGN_API int
+aengn_draw_texture(SDL_Texture* tex, int x, int y)
+{
+    int w;
+    int h;
+    SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+    SDL_Rect dst = {.x = x * g_pixel_scale,
+                    .y = y * g_pixel_scale,
+                    .w = w * g_pixel_scale,
+                    .h = h * g_pixel_scale};
+    int const err = SDL_RenderCopy(g_renderer, tex, NULL, &dst);
+    if (err) {
+        autil_errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
+    }
+    return err;
+}
+
+AENGN_API int
+aengn_draw_sprite(struct aengn_sprite* sprite, int x, int y)
+{
+    assert(sprite != NULL);
+
+    if (sprite->texture_needs_update) {
+        aengn_sprite_update_texture(sprite);
+    }
+
+    int const err = aengn_draw_texture(sprite->texture, x, y);
+    if (err) {
+        autil_errorf(
+            "[%s][aengn_draw_texture] Failed to draw sprite texture", __func__);
     }
     return err;
 }
