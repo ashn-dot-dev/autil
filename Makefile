@@ -6,8 +6,8 @@
 	perf \
 	examples \
 	examples-web \
-	clean \
-	format
+	format \
+	clean
 .SILENT: clean
 
 C99_DBG = -O0 -g
@@ -155,12 +155,6 @@ examples/life.html: examples/life.c
 examples/shapes.html: examples/shapes.c
 	emcc -o $@ $< $(CFLAGS) $(EMFLAGS)
 
-clean:
-	rm -f test/*.test
-	rm -f perf/*.perf
-	rm -f $(EXAMPLES)
-	rm -f $(EXAMPLES_WEB)
-
 format:
 	clang-format -i \
 		*.h \
@@ -170,6 +164,12 @@ format:
 		$$(find perf/ -type f -name '*.c') \
 		$$(find examples/ -type f -name '*.h') \
 		$$(find examples/ -type f -name '*.c')
+
+clean:
+	rm -f test/*.test
+	rm -f perf/*.perf
+	rm -f $(EXAMPLES)
+	rm -f $(EXAMPLES_WEB)
 
 .SUFFIXES: .c .test .perf
 .c.test:
