@@ -2,7 +2,7 @@
 
 TESTSRUN=0
 FAILURES=0
-for t in *.test; do
+for t in $(find -type f -name  '*.test' | sort); do
     TESTNAME=$(basename "${t}" .test)
     sh test-one.sh "${TESTNAME}"
     RESULT="$?"
