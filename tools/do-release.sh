@@ -13,7 +13,7 @@ usage() {
     echo "  \$ sh $0 \${VERSION}"
     echo "  \$ git add --all"
     echo "  \$ git commit --message='Release \${VERSION}'"
-    echo "  \$ git push origin master"
+    echo "  \$ git push \${REMOTE(s)} master"
     echo "  \$ git tag \${VERSION}"
     echo "  \$ git push origin \${VERSION}"
 }
