@@ -56,7 +56,7 @@ stack_print(struct autil_vec const* stack)
     for (size_t i = 0; i < autil_vec_count(stack); ++i) {
         struct autil_bigint const* num = AUTIL_DEREF_PTR(
             struct autil_bigint const*, autil_vec_ref_const(stack, i));
-        char* const s = autil_bigint_to_cstr(num, NULL);
+        char* const s = autil_bigint_to_new_cstr(num, NULL);
         printf("%s%s", i != 0 ? " " : "", s);
         autil_xalloc(s, AUTIL_XALLOC_FREE);
     }
