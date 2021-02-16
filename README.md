@@ -1,7 +1,7 @@
 AUTIL - ASHN'S UTILITIES
 ========================
 
-Single header files containing functions and data structures for rapid
+Public domain headers containing functions and data structures for rapid
 application development in C99 (or later).
 
 | Library | Description                                                        |
