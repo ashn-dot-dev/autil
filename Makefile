@@ -166,8 +166,8 @@ format:
 		$$(find examples/ -type f -name '*.c')
 
 clean:
-	rm -f test/*.test
-	rm -f perf/*.perf
+	rm -f $$(find . -type f -name '*.test')
+	rm -f $$(find . -type f -name '*.perf')
 	rm -f $(EXAMPLES)
 	rm -f $(EXAMPLES_WEB)
 

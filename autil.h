@@ -1328,7 +1328,7 @@ static void
 autil__bigint_shiftl_limbs_(struct autil_bigint* self, size_t nlimbs)
 {
     assert(self != NULL);
-    if (self->sign == 0) {
+    if (nlimbs == 0) {
         return;
     }
 
@@ -1336,6 +1336,29 @@ autil__bigint_shiftl_limbs_(struct autil_bigint* self, size_t nlimbs)
     self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
     memmove((char*)self->limbs + nlimbs, self->limbs, self->count - nlimbs);
     memset(self->limbs, 0x00, nlimbs);
+}
+
+// Shift right by nlimbs number of limbs.
+// Example:
+//      -0xFFEE00 shifted right by nlimbs=2 becomes -0xFF with 8-bit limbs.
+static void
+autil__bigint_shiftr_limbs_(struct autil_bigint* self, size_t nlimbs)
+{
+    assert(self != NULL);
+    if (nlimbs == 0) {
+        return;
+    }
+    if (nlimbs > self->count) {
+        autil_fatalf(
+            "[%s] Attempted right shift of %zu limbs on bigint with %zu limbs",
+            __func__,
+            nlimbs,
+            self->count);
+    }
+
+    memmove((char*)self->limbs, self->limbs + nlimbs, self->count - nlimbs);
+    self->count -= nlimbs;
+    autil__bigint_normalize_(self);
 }
 
 AUTIL_API struct autil_bigint*
@@ -1805,9 +1828,9 @@ autil_bigint_divrem(
         return;
     }
 
-    struct autil_bigint RES = {0};
-    struct autil_bigint REM = {0}; // abs(rem) (sign is calculated later)
-    struct autil_bigint RHS = {0}; // abs(rhs) (sign is calculated later)
+    struct autil_bigint RES = {0}; // abs(res) (sign is adjusted later)
+    struct autil_bigint REM = {0}; // abs(rem) (sign is adjusted later)
+    struct autil_bigint RHS = {0}; // abs(rhs)
     autil_bigint_assign(&REM, lhs);
     autil_bigint_abs(&REM);
     autil_bigint_assign(&RHS, rhs);
