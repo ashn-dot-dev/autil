@@ -1769,6 +1769,10 @@ autil_bigint_divrem(
     assert(lhs != NULL);
     assert(rhs != NULL);
 
+    // lhs / 0 == undefined
+    if (rhs->sign == 0) {
+        autil_fatalf("[%s] Divide by zero", __func__);
+    }
     // 0 / rhs == 0
     if (lhs->sign == 0) {
         if (res != NULL) {
@@ -1779,9 +1783,26 @@ autil_bigint_divrem(
         }
         return;
     }
-    // lhs / 0 == undefined
-    if (rhs->sign == 0) {
-        autil_fatalf("[%s] Divide by zero", __func__);
+    // lhs / 1 == lhs
+    if (autil_bigint_cmp(rhs, AUTIL_BIGINT_POS_ONE) == 0) {
+        if (res != NULL) {
+            autil_bigint_assign(res, lhs);
+        }
+        if (rem != NULL) {
+            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
+        }
+        return;
+    }
+    // lhs / -1 == -lhs
+    if (autil_bigint_cmp(rhs, AUTIL_BIGINT_NEG_ONE) == 0) {
+        if (res != NULL) {
+            autil_bigint_assign(res, lhs);
+            autil_bigint_negate(res);
+        }
+        if (rem != NULL) {
+            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
+        }
+        return;
     }
 
     struct autil_bigint RES = {0};
@@ -1801,6 +1822,7 @@ autil_bigint_divrem(
     //               TOP=0400   TOP=450   TOP=16
     //               BOT=1100   BOT=110   BOT=11
     //               NUM=0      NUM=4     NUM=1
+    //               TOT=0      TOT=440   TOT=11
     // RES        ->    0          04        041       041
     //    ____         ____       ____      ____      ____
     // RHS)REM    -> 11)456  => 11)456 => 11)016 => 11)005 => 41 w/rem 5
@@ -1808,7 +1830,7 @@ autil_bigint_divrem(
     //                  ---        ---       ---
     //                  456        016       005
     size_t ls_idx = REM.count - 1; // Index of the least-significant digit.
-    while (autil_bigint_cmp(&REM, &RHS) >= 0) {
+    for (; autil_bigint_cmp(&REM, &RHS) >= 0; ls_idx -= 1) {
         struct autil_bigint TOP = {0};
         autil_bigint_assign(&TOP, &REM);
         memset(TOP.limbs, 0x00, ls_idx);
@@ -1816,6 +1838,12 @@ autil_bigint_divrem(
         struct autil_bigint BOT = {0};
         autil_bigint_assign(&BOT, &RHS);
         autil__bigint_shiftl_limbs_(&BOT, ls_idx);
+
+        if (autil_bigint_cmp(&BOT, &TOP) > 0) {
+            autil_bigint_fini_(&TOP);
+            autil_bigint_fini_(&BOT);
+            continue;
+        }
 
         // Magnitude (MAG).
         // The expression (MAG * NUM) is the partial sum added to the result.
@@ -1829,7 +1857,6 @@ autil_bigint_divrem(
             autil_bigint_sub(&REM, &REM, &BOT);
             autil_bigint_add(&RES, &RES, &MAG);
         }
-        ls_idx -= 1;
 
         autil_bigint_fini_(&TOP);
         autil_bigint_fini_(&BOT);
