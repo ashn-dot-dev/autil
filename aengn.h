@@ -1,5 +1,5 @@
 /*
-AENGN - ASHN'S GAME ENGINE - v0.6.2
+AENGN - ASHN'S GAME ENGINE - v0.7.0
     Single header file containing the guts of a 2D engine for games and simple
     applications with pixel graphics.
 

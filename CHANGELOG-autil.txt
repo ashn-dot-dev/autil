@@ -1,4 +1,4 @@
-Unreleased
+v0.7.0 - 2021-02-15
 --------------------------------
 + Add macro AUTIL_VSTR_LOCAL_PTR_LITERAL.
 + Add functions autil_vstr_starts_with and autil_vstr_ends_with.

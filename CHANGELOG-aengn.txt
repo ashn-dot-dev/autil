@@ -1,4 +1,4 @@
-Unreleased
+v0.7.0 - 2021-02-15
 --------------------------------
 + Add functions aengn_load_chunk, aengn_load_music, and aengn_play_chunk.
 
