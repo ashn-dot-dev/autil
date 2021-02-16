@@ -519,7 +519,7 @@ autil_bigint_divrem(
 //   X      The provided bigint will be represented using signed hexadecimal
 //          notation with *UPPER CASE* alphanumeric digits.
 AUTIL_API char*
-autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt);
+autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// STRING ////////////////////////////////////////////////////////////////
@@ -1867,7 +1867,7 @@ autil_bigint_divrem(
 #define AUTIL_BIGINT_FMT_FLAG_SPACE_ ((unsigned)4)
 // clang-format on
 AUTIL_API char*
-autil_bigint_to_cstr(struct autil_bigint const* self, char const* fmt)
+autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
 {
     assert(self != NULL);
 

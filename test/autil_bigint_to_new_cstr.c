@@ -10,7 +10,7 @@ test_valid(char const* input, char const* fmt)
     struct autil_bigint* const num = autil_bigint_new_cstr(input);
     ASSERT(num != NULL);
 
-    char* const cstr = autil_bigint_to_cstr(num, fmt);
+    char* const cstr = autil_bigint_to_new_cstr(num, fmt);
     ASSERT(cstr != NULL);
 
     printf("%-26s | %-8s | \"%s\"\n", input, fmt ? fmt : "NULL", cstr);
@@ -69,13 +69,13 @@ main(void)
     test_valid("0xbeefbeefbeefbeef", "#X");
 
     struct autil_bigint* const num = autil_bigint_new_cstr("0xDEADBEEF");
-    EXPECT(NULL == autil_bigint_to_cstr(num, ""));
-    EXPECT(NULL == autil_bigint_to_cstr(num, "#"));
-    EXPECT(NULL == autil_bigint_to_cstr(num, "0"));
-    EXPECT(NULL == autil_bigint_to_cstr(num, "+"));
-    EXPECT(NULL == autil_bigint_to_cstr(num, "-"));
-    EXPECT(NULL == autil_bigint_to_cstr(num, " "));
-    EXPECT(NULL == autil_bigint_to_cstr(num, "1"));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, ""));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, "#"));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, "0"));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, "+"));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, "-"));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, " "));
+    EXPECT(NULL == autil_bigint_to_new_cstr(num, "1"));
     autil_bigint_del(num);
 
     return EXIT_SUCCESS;

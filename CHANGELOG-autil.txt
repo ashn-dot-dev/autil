@@ -5,6 +5,7 @@ Unreleased
 + Add function autil_string_split_to_vec_on_vstr.
 + Fix UB when applying zero offset to null pointer in autil_vec_ref and
   autil_vec_ref_const.
++ Rename autil_bigint_to_cstr to autil_bigint_to_new_cstr
 
 v0.6.1 - 2021-01-18
 --------------------------------

@@ -11,7 +11,7 @@ test_valid(char const* input, char const* fmt)
     struct autil_bigint* const num = autil_bigint_new_cstr(input);
     ASSERT(num != NULL);
 
-    char* const cstr = autil_bigint_to_cstr(num, fmt);
+    char* const cstr = autil_bigint_to_new_cstr(num, fmt);
     ASSERT(cstr != NULL);
 
     ASSERT((strlen(cstr) <= 36) && "NEED TO INCREASE PRINTF FORMAT LENGTH");

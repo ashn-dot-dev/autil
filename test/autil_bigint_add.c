@@ -141,7 +141,7 @@ test_autil_bigint_add__misc(void)
     RHS = autil_bigint_new_cstr("+0xffffffffffffffffffffffffffffffff");
     RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_add(RES, LHS, RHS);
-    CSTR = autil_bigint_to_cstr(RES, "#+x");
+    CSTR = autil_bigint_to_new_cstr(RES, "#+x");
     puts(CSTR);
     autil_bigint_del(RES);
     autil_bigint_del(LHS);
@@ -156,7 +156,7 @@ test_autil_bigint_add__misc(void)
         "78b9091631d4444d2c12fb0d35ef6185e9bdf454c842afc5891a18616df60f09");
     RES = autil_bigint_new(AUTIL_BIGINT_ZERO);
     autil_bigint_add(RES, LHS, RHS);
-    CSTR = autil_bigint_to_cstr(RES, "#+x");
+    CSTR = autil_bigint_to_new_cstr(RES, "#+x");
     puts(CSTR);
     autil_bigint_del(RES);
     autil_bigint_del(LHS);

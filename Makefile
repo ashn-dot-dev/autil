@@ -73,7 +73,7 @@ TESTS = \
 	test/autil_arr.example.test \
 	test/autil_bigint_new_cstr.test \
 	test/autil_bigint_cmp.test \
-	test/autil_bigint_to_cstr.test \
+	test/autil_bigint_to_new_cstr.test \
 	test/autil_bigint_add.test \
 	test/autil_bigint_sub.test \
 	test/autil_bigint_mul.test \
