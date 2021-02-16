@@ -1309,7 +1309,7 @@ autil_bigint_fini_(struct autil_bigint* self)
 }
 
 static void
-autil_bigint_normalize_(struct autil_bigint* self)
+autil__bigint_normalize_(struct autil_bigint* self)
 {
     assert(self != NULL);
 
@@ -1325,7 +1325,7 @@ autil_bigint_normalize_(struct autil_bigint* self)
 // Example:
 //      -0xFFEE shifted left by nlimbs=2 becomes -0xFFEE0000 with 8-bit limbs.
 static void
-autil_bigint_shiftl_(struct autil_bigint* self, size_t nlimbs)
+autil__bigint_shiftl_limbs_(struct autil_bigint* self, size_t nlimbs)
 {
     assert(self != NULL);
     if (self->sign == 0) {
@@ -1446,7 +1446,7 @@ digits:
     }
 
     self->sign = sign;
-    autil_bigint_normalize_(self);
+    autil__bigint_normalize_(self);
     return self;
 
 error:
@@ -1606,7 +1606,7 @@ autil_bigint_add(
     }
     assert(carry == 0);
 
-    autil_bigint_normalize_(&RES);
+    autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
     autil_bigint_fini_(&RES);
 }
@@ -1688,7 +1688,7 @@ autil_bigint_sub(
     if (neg) {
         autil_bigint_negate(&RES);
     }
-    autil_bigint_normalize_(&RES);
+    autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
     autil_bigint_fini_(&RES);
 }
@@ -1754,7 +1754,7 @@ autil_bigint_mul(
         }
     }
 
-    autil_bigint_normalize_(&RES);
+    autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
     autil_bigint_fini_(&RES);
 }
@@ -1814,13 +1814,13 @@ autil_bigint_divrem(
 
         struct autil_bigint BOT = {0};
         autil_bigint_assign(&BOT, &RHS);
-        autil_bigint_shiftl_(&BOT, ls_idx);
+        autil__bigint_shiftl_limbs_(&BOT, ls_idx);
 
         // Magnitude (MAG).
         // The expression (MAG * NUM) is the partial sum added to the result.
         struct autil_bigint MAG = {0};
         autil_bigint_assign(&MAG, AUTIL_BIGINT_POS_ONE);
-        autil_bigint_shiftl_(&MAG, ls_idx);
+        autil__bigint_shiftl_limbs_(&MAG, ls_idx);
 
         // While loop is executed NUM times.
         while (autil_bigint_cmp(&TOP, &BOT) >= 0) {
@@ -1847,11 +1847,11 @@ autil_bigint_divrem(
     REM.sign = lhs->sign;
 
     if (res != NULL) {
-        autil_bigint_normalize_(&RES);
+        autil__bigint_normalize_(&RES);
         autil_bigint_assign(res, &RES);
     }
     if (rem != NULL) {
-        autil_bigint_normalize_(&REM);
+        autil__bigint_normalize_(&REM);
         autil_bigint_assign(rem, &REM);
     }
     autil_bigint_fini_(&RES);
