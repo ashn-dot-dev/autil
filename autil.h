@@ -1798,7 +1798,8 @@ autil_bigint_divrem(
     // as many most-significant digits of REM as required for one iteration of
     // "goes into".
     //
-    //               TOP=4      TOP=45    TOP=16
+    //               TOP=0400   TOP=450   TOP=16
+    //               BOT=1100   BOT=110   BOT=11
     //               NUM=0      NUM=4     NUM=1
     // RES        ->    0          04        041       041
     //    ____         ____       ____      ____      ____
