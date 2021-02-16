@@ -1,5 +1,5 @@
 /*
-ATEST - ASHN'S TESTING LIBRARY - v0.7.0
+ATEST - ASHN'S TESTING LIBRARY - v0.7.1
     Single header file for unit testing in C99.
     This library has no dependencies outside of libc.
 
