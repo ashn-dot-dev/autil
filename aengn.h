@@ -392,7 +392,7 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         sdl_ver.major,
         sdl_ver.minor,
         sdl_ver.patch);
-    int const sdl_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
+    Uint32 const sdl_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
     if (SDL_Init(sdl_flags) != 0) {
         autil_errorf("[%s][SDL_Init] %s", __func__, SDL_GetError());
         goto error;
@@ -447,7 +447,7 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
     // the documentation says, the actual way to initialize the SDL_Mixer
     // library is with the Mix_OpenAudio call below.
     int const frequency = MIX_DEFAULT_FREQUENCY;
-    int const format = MIX_DEFAULT_FORMAT;
+    Uint16 const format = MIX_DEFAULT_FORMAT;
     int const channels = 2; // Stereo
     int const chunksize = 2048; // In bytes.
     if (Mix_OpenAudio(frequency, format, channels, chunksize) != 0) {
