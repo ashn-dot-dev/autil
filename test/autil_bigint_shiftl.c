@@ -24,7 +24,12 @@ main(void)
     autil_bigint_shiftl(y, 1);
     autil_bigint_dump(y);
 
+    struct autil_bigint* const z = autil_bigint_new(AUTIL_BIGINT_ZERO);
+    autil_bigint_shiftl(z, 1);
+    autil_bigint_dump(z);
+
     autil_bigint_del(x);
     autil_bigint_del(y);
+    autil_bigint_del(z);
     return EXIT_SUCCESS;
 }

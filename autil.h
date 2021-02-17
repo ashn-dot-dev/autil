@@ -453,7 +453,11 @@ autil_bigint_shiftl(struct autil_bigint* self, size_t nbits);
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
-// Return the value (one or zero) of the nth bit (zero indexed) of self.
+// Returns the number of bits required to store the magnitude of self.
+// This function is sign-oblivious (the sign of self is not considered).
+AUTIL_API size_t
+autil_bigint_bit_count(struct autil_bigint const* self);
+// Returns the value (one or zero) of the nth bit (zero indexed) of self.
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API int
 autil_bigint_bit_get(struct autil_bigint const* self, size_t n);
@@ -1648,6 +1652,9 @@ autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
     if (nbits == 0) {
         return;
     }
+    if (self->sign == 0) {
+        return;
+    }
 
     autil__bigint_shiftl_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
     for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
@@ -1698,6 +1705,24 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
             (uint8_t)(self->limbs[self->count - 1] >> 1u);
     }
     autil__bigint_normalize_(self);
+}
+
+AUTIL_API size_t
+autil_bigint_bit_count(struct autil_bigint const* self)
+{
+    assert(self != NULL);
+
+    if (self->count == 0) {
+        return 0;
+    }
+
+    uint8_t top = self->limbs[self->count-1];
+    size_t top_bit_count = 0;
+    while (top != 0) {
+        top_bit_count += 1;
+        top = top >> 1;
+    }
+    return (self->count-1) * AUTIL__BIGINT_BITS_PER_LIMB_ + top_bit_count;
 }
 
 AUTIL_API int
