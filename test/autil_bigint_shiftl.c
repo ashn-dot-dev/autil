@@ -22,4 +22,3 @@ main(void)
     autil_bigint_del(x);
     return EXIT_SUCCESS;
 }
-
