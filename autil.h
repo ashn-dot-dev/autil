@@ -1754,7 +1754,7 @@ autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value)
 
     uint8_t* const plimb = self->limbs + limb_idx;
     uint8_t const mask = (uint8_t)(1 << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
-    *plimb = value ? *plimb | mask : *plimb & ~mask;
+    *plimb = (uint8_t)(value ? *plimb | mask : *plimb & ~mask);
     autil__bigint_normalize_(self);
 }
 
