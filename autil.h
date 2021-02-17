@@ -1755,6 +1755,12 @@ autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value)
     uint8_t* const plimb = self->limbs + limb_idx;
     uint8_t const mask = (uint8_t)(1 << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
     *plimb = (uint8_t)(value ? *plimb | mask : *plimb & ~mask);
+    if (self->sign == 0 && value) {
+        // If the integer was zero (i.e. had sign zero) before and a bit was
+        // just flipped "on" then treat that integer as it if turned from the
+        // integer zero to a positive integer.
+        self->sign = +1;
+    }
     autil__bigint_normalize_(self);
 }
 
@@ -2017,62 +2023,42 @@ autil_bigint_divrem(
         return;
     }
 
-    struct autil_bigint RES = {0}; // abs(res) (sign is adjusted later)
-    struct autil_bigint REM = {0}; // abs(rem) (sign is adjusted later)
-    struct autil_bigint RHS = {0}; // abs(rhs)
-    autil_bigint_assign(&REM, lhs);
-    autil_bigint_abs(&REM);
-    autil_bigint_assign(&RHS, rhs);
-    autil_bigint_abs(&RHS);
-
-    // Division using goes-into method.
-    // In practice the expression (-RHS*NUM) is calculated by repeated
-    // subtraction of RHS from TOP a total of NUM times where TOP is composed of
-    // as many most-significant digits of REM as required for one iteration of
-    // "goes into".
+    // Binary Long Division Algorithm
+    // ------------------------------
+    // Source: https://en.wikipedia.org/wiki/Division_algorithm#Long_division
     //
-    //               TOP=0400   TOP=450   TOP=16
-    //               BOT=1100   BOT=110   BOT=11
-    //               NUM=0      NUM=4     NUM=1
-    //               TOT=0      TOT=440   TOT=11
-    // RES        ->    0          04        041       041
-    //    ____         ____       ____      ____      ____
-    // RHS)REM    -> 11)456  => 11)456 => 11)016 => 11)005 => 41 w/rem 5
-    // -RHS*NUM   ->   -0         -44        -11    RHS>REM
-    //                  ---        ---       ---
-    //                  456        016       005
-    size_t ls_idx = REM.count - 1; // Index of the least-significant digit.
-    for (; autil_bigint_cmp(&REM, &RHS) >= 0; ls_idx -= 1) {
-        struct autil_bigint TOP = {0};
-        autil_bigint_assign(&TOP, &REM);
-        memset(TOP.limbs, 0x00, ls_idx);
-
-        struct autil_bigint BOT = {0};
-        autil_bigint_assign(&BOT, &RHS);
-        autil__bigint_shiftl_limbs_(&BOT, ls_idx);
-
-        if (autil_bigint_cmp(&BOT, &TOP) > 0) {
-            autil_bigint_fini_(&TOP);
-            autil_bigint_fini_(&BOT);
-            continue;
+    // The following algorithm, the binary version of the famous long division,
+    // will divide N by D, placing the quotient in Q and the remainder in R. In
+    // the following code, all values are treated as unsigned integers.
+    //
+    // if D = 0 then error(DivisionByZeroException) end
+    // Q := 0                  -- Initialize quotient and remainder to zero
+    // R := 0
+    // for i := n − 1 .. 0 do  -- Where n is number of bits in N
+    //   R := R << 1           -- Left-shift R by 1 bit
+    //   R(0) := N(i)          -- Set the least-significant bit of R equal to
+    //                            bit i of the numerator
+    //   if R ≥ D then
+    //     R := R − D
+    //     Q(i) := 1
+    //   end
+    // end
+    struct autil_bigint Q = {0}; // abs(res)
+    struct autil_bigint R = {0}; // abs(rem)
+    struct autil_bigint N = {0}; // abs(lhs)
+    autil_bigint_assign(&N, lhs);
+    autil_bigint_abs(&N);
+    struct autil_bigint D = {0}; // abs(rhs)
+    autil_bigint_assign(&D, rhs);
+    autil_bigint_abs(&D);
+    size_t const n = autil_bigint_bit_count(lhs);
+    for (size_t i = n - 1; i < n; --i) {
+        autil_bigint_shiftl(&R, 1);
+        autil_bigint_bit_set(&R, 0, autil_bigint_bit_get(&N, i));
+        if (autil_bigint_cmp(&R, &D) >= 0) {
+            autil_bigint_sub(&R, &R, &D);
+            autil_bigint_bit_set(&Q, i, 1);
         }
-
-        // Magnitude (MAG).
-        // The expression (MAG * NUM) is the partial sum added to the result.
-        struct autil_bigint MAG = {0};
-        autil_bigint_assign(&MAG, AUTIL_BIGINT_POS_ONE);
-        autil__bigint_shiftl_limbs_(&MAG, ls_idx);
-
-        // While loop is executed NUM times.
-        while (autil_bigint_cmp(&TOP, &BOT) >= 0) {
-            autil_bigint_sub(&TOP, &TOP, &BOT);
-            autil_bigint_sub(&REM, &REM, &BOT);
-            autil_bigint_add(&RES, &RES, &MAG);
-        }
-
-        autil_bigint_fini_(&TOP);
-        autil_bigint_fini_(&BOT);
-        autil_bigint_fini_(&MAG);
     }
 
     // printf("%2d %2d\n", +7 / +3, +7 % +3); // 2  1
@@ -2083,20 +2069,21 @@ autil_bigint_divrem(
     // > When integers are divided, the result of the / operator is the
     // > algebraic quotient with any fractional part discarded. If the quotient
     // > a/b is representable, the expression (a/b)*b + a%b shall equal a.
-    RES.sign = lhs->sign * rhs->sign;
-    REM.sign = lhs->sign;
+    Q.sign = lhs->sign * rhs->sign;
+    R.sign = lhs->sign;
 
     if (res != NULL) {
-        autil__bigint_normalize_(&RES);
-        autil_bigint_assign(res, &RES);
+        autil__bigint_normalize_(&Q);
+        autil_bigint_assign(res, &Q);
     }
     if (rem != NULL) {
-        autil__bigint_normalize_(&REM);
-        autil_bigint_assign(rem, &REM);
+        autil__bigint_normalize_(&R);
+        autil_bigint_assign(rem, &R);
     }
-    autil_bigint_fini_(&RES);
-    autil_bigint_fini_(&REM);
-    autil_bigint_fini_(&RHS);
+    autil_bigint_fini_(&Q);
+    autil_bigint_fini_(&R);
+    autil_bigint_fini_(&N);
+    autil_bigint_fini_(&D);
 }
 
 // clang-format off

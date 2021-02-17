@@ -28,8 +28,14 @@ main(void)
     autil_bigint_shiftl(z, 1);
     autil_bigint_dump(z);
 
+    struct autil_bigint* const w = autil_bigint_new_cstr("0b1");
+    autil_bigint_dump(w);
+    autil_bigint_shiftl(w, 1);
+    autil_bigint_dump(w);
+
     autil_bigint_del(x);
     autil_bigint_del(y);
     autil_bigint_del(z);
+    autil_bigint_del(w);
     return EXIT_SUCCESS;
 }
