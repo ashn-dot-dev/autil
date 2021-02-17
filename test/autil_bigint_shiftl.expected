@@ -1,0 +1,5 @@
+SIGN: '+', COUNT: 1, LIMBS: [0xFF]
+SIGN: '+', COUNT: 1, LIMBS: [0xFF]
+SIGN: '+', COUNT: 2, LIMBS: [0xFE, 0x01]
+SIGN: '+', COUNT: 2, LIMBS: [0x00, 0xFF]
+SIGN: '+', COUNT: 3, LIMBS: [0x00, 0xF0, 0x0F]

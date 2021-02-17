@@ -1,3 +1,7 @@
+Unreleased
+--------------------------------
++ Add functions autil_bigint_shiftl and autil_bigint_shiftr.
+
 v0.7.0 - 2021-02-15
 --------------------------------
 + Add macro AUTIL_VSTR_LOCAL_PTR_LITERAL.

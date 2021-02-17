@@ -1,0 +1,6 @@
+SIGN: '+', COUNT: 3, LIMBS: [0x00, 0x00, 0xFF]
+SIGN: '+', COUNT: 3, LIMBS: [0x00, 0x00, 0xFF]
+SIGN: '+', COUNT: 3, LIMBS: [0x00, 0xF0, 0x0F]
+SIGN: '+', COUNT: 2, LIMBS: [0xE0, 0x1F]
+SIGN: '+', COUNT: 2, LIMBS: [0xF0, 0x0F]
+error: [autil_bigint_shiftr] Attempted right shift of 32 bits on bigint with 16 bits

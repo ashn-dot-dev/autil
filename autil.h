@@ -444,6 +444,12 @@ autil_bigint_negate(struct autil_bigint* self);
 // self = abs(self)
 AUTIL_API void
 autil_bigint_abs(struct autil_bigint* self);
+// self = self << nbits (logical shift left)
+AUTIL_API void
+autil_bigint_shiftl(struct autil_bigint* self, size_t nbits);
+// self = self >> nbits (logical shift right)
+AUTIL_API void
+autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
 // res = lhs + rhs
 AUTIL_API void
 autil_bigint_add(
@@ -1593,6 +1599,65 @@ autil_bigint_abs(struct autil_bigint* self)
     // -1 * -1 == +1
     //  0 *  0 ==  0
     self->sign = self->sign * self->sign;
+}
+
+AUTIL_API void
+autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
+{
+    assert(self != NULL);
+    if (nbits == 0) {
+        return;
+    }
+
+    static size_t const BITS_PER_LIMB = sizeof(*self->limbs) * CHAR_BIT;
+    autil__bigint_shiftl_limbs_(self, nbits / BITS_PER_LIMB);
+    for (size_t n = 0; n < nbits % BITS_PER_LIMB; ++n) {
+        if (self->limbs[self->count-1] & 0x80) {
+            self->count += 1;
+            self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+            self->limbs[self->count-1] = 0x00;
+        }
+        // [limb0 << 1][limb1 << 1 | msbit(limb0)][limb2 << 1 | msbit(limb1)]...
+        for (size_t i = self->count - 1; i > 0; --i) {
+            self->limbs[i] = (uint8_t)(self->limbs[i] << 1u);
+            if (self->limbs[i - 1] & 0x80) {
+                self->limbs[i] |= 0x01;
+            }
+        }
+        self->limbs[0] = (uint8_t)(self->limbs[0] << 1u);
+    }
+}
+
+AUTIL_API void
+autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
+{
+    assert(self != NULL);
+    if (nbits == 0) {
+        return;
+    }
+
+    static size_t const BITS_PER_LIMB = sizeof(*self->limbs) * CHAR_BIT;
+    size_t const self_bits = self->count * BITS_PER_LIMB;
+    if (nbits > self_bits) {
+        autil_fatalf(
+            "[%s] Attempted right shift of %zu bits on bigint with %zu bits",
+            __func__,
+            nbits,
+            self_bits);
+    }
+
+    autil__bigint_shiftr_limbs_(self, nbits / BITS_PER_LIMB);
+    for (size_t n = 0; n < nbits % BITS_PER_LIMB; ++n) {
+        // [limb0 >> 1 | lsbit(limb1)][limb1 >> 1 | lsbit(limb2)]...
+        for (size_t i = 0; i < self->count-1; ++i) {
+            self->limbs[i] = (uint8_t)(self->limbs[i] >> 1u);
+            if (self->limbs[i + 1] & 0x01) {
+                self->limbs[i] |= 0x80;
+            }
+        }
+        self->limbs[self->count-1] = (uint8_t)(self->limbs[self->count-1] >> 1u);
+    }
+    autil__bigint_normalize_(self);
 }
 
 AUTIL_API void
