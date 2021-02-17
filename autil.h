@@ -1361,6 +1361,32 @@ autil__bigint_shiftr_limbs_(struct autil_bigint* self, size_t nlimbs)
     autil__bigint_normalize_(self);
 }
 
+// This function is "technically" part of the public API, but it is not given a
+// prototype, and is intended for debugging purposes only.
+// Expect this function to be removed in future versions of this header.
+AUTIL_API void
+autil_bigint_dump(struct autil_bigint const* self)
+{
+    int sign = self->sign;
+    char signc = '0';
+    if (sign == +1) {
+        signc = '+';
+    }
+    if (sign == -1) {
+        signc = '-';
+    }
+
+    FILE* const fp = stdout;
+    fprintf(fp, "SIGN: '%c', COUNT: %zu, LIMBS: [", signc, self->count);
+    for (size_t i = 0; i < self->count; ++i) {
+        fprintf(fp, "0x%02X", (int)self->limbs[i]);
+        if (i != self->count - 1) {
+            fputs(", ", fp);
+        }
+    }
+    fputs("]\n", fp);
+}
+
 AUTIL_API struct autil_bigint*
 autil_bigint_new(struct autil_bigint const* othr)
 {
@@ -2089,32 +2115,6 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     autil_xalloc(digits, AUTIL_XALLOC_FREE);
     autil_xalloc(widths, AUTIL_XALLOC_FREE);
     return cstr;
-}
-
-// This function is "technically" part of the public API, but it is not given a
-// prototype, and is intended for debugging purposes only.
-// Expect this function to be removed in future versions of this header.
-AUTIL_API void
-autil_bigint_dump(struct autil_bigint const* self)
-{
-    int sign = self->sign;
-    char signc = '0';
-    if (sign == +1) {
-        signc = '+';
-    }
-    if (sign == -1) {
-        signc = '-';
-    }
-
-    FILE* const fp = stdout;
-    fprintf(fp, "SIGN: '%c', COUNT: %zu, LIMBS: [", signc, self->count);
-    for (size_t i = 0; i < self->count; ++i) {
-        fprintf(fp, "0x%02X", (int)self->limbs[i]);
-        if (i != self->count - 1) {
-            fputs(", ", fp);
-        }
-    }
-    fputs("]\n", fp);
 }
 
 struct autil_string
