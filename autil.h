@@ -1332,7 +1332,7 @@ static struct autil_bigint const* const AUTIL_BIGINT_HEX =
     &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x10}, .count = 1u};
 
 static void
-autil_bigint_fini_(struct autil_bigint* self)
+autil__bigint_fini_(struct autil_bigint* self)
 {
     assert(self != NULL);
 
@@ -1560,7 +1560,7 @@ autil_bigint_del(struct autil_bigint* self)
         return;
     }
 
-    autil_bigint_fini_(self);
+    autil__bigint_fini_(self);
     autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
 
@@ -1826,7 +1826,7 @@ autil_bigint_add(
 
     autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
-    autil_bigint_fini_(&RES);
+    autil__bigint_fini_(&RES);
 }
 
 AUTIL_API void
@@ -1908,7 +1908,7 @@ autil_bigint_sub(
     }
     autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
-    autil_bigint_fini_(&RES);
+    autil__bigint_fini_(&RES);
 }
 
 // res  = lhs * rhs
@@ -1968,13 +1968,13 @@ autil_bigint_mul(
             partial.limbs[i + j + 1] = prodh;
 
             autil_bigint_add(&RES, &RES, &partial);
-            autil_bigint_fini_(&partial);
+            autil__bigint_fini_(&partial);
         }
     }
 
     autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
-    autil_bigint_fini_(&RES);
+    autil__bigint_fini_(&RES);
 }
 
 AUTIL_API void
@@ -2049,10 +2049,10 @@ autil_bigint_divrem(
         autil__bigint_normalize_(&R);
         autil_bigint_assign(rem, &R);
     }
-    autil_bigint_fini_(&Q);
-    autil_bigint_fini_(&R);
-    autil_bigint_fini_(&N);
-    autil_bigint_fini_(&D);
+    autil__bigint_fini_(&Q);
+    autil__bigint_fini_(&R);
+    autil__bigint_fini_(&N);
+    autil__bigint_fini_(&D);
 }
 
 // clang-format off
@@ -2147,8 +2147,8 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
             autil_xalloc_prepend(
                 &digits, &digits_size, digit_buf, strlen(digit_buf));
         }
-        autil_bigint_fini_(&DEC);
-        autil_bigint_fini_(&SELF);
+        autil__bigint_fini_(&DEC);
+        autil__bigint_fini_(&SELF);
     }
     else if (specifier == 'b') {
         for (size_t i = self->count - 1; i < self->count; --i) {
