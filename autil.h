@@ -1991,37 +1991,6 @@ autil_bigint_divrem(
     if (rhs->sign == 0) {
         autil_fatalf("[%s] Divide by zero", __func__);
     }
-    // 0 / rhs == 0
-    if (lhs->sign == 0) {
-        if (res != NULL) {
-            autil_bigint_assign(res, AUTIL_BIGINT_ZERO);
-        }
-        if (rem != NULL) {
-            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
-        }
-        return;
-    }
-    // lhs / 1 == lhs
-    if (autil_bigint_cmp(rhs, AUTIL_BIGINT_POS_ONE) == 0) {
-        if (res != NULL) {
-            autil_bigint_assign(res, lhs);
-        }
-        if (rem != NULL) {
-            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
-        }
-        return;
-    }
-    // lhs / -1 == -lhs
-    if (autil_bigint_cmp(rhs, AUTIL_BIGINT_NEG_ONE) == 0) {
-        if (res != NULL) {
-            autil_bigint_assign(res, lhs);
-            autil_bigint_negate(res);
-        }
-        if (rem != NULL) {
-            autil_bigint_assign(rem, AUTIL_BIGINT_ZERO);
-        }
-        return;
-    }
 
     // Binary Long Division Algorithm
     // ------------------------------
