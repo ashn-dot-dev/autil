@@ -76,6 +76,8 @@ TESTS = \
 	test/autil_bigint_to_new_cstr.test \
 	test/autil_bigint_shiftl.test \
 	test/autil_bigint_shiftr.test \
+	test/autil_bigint_bit_get.test \
+	test/autil_bigint_bit_set.test \
 	test/autil_bigint_add.test \
 	test/autil_bigint_sub.test \
 	test/autil_bigint_mul.test \

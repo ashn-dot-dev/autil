@@ -1,6 +1,7 @@
 Unreleased
 --------------------------------
-+ Add functions autil_bigint_shiftl and autil_bigint_shiftr.
++ Add functions autil_bigint_shiftl, autil_bigint_shiftr, autil_bigint_bit_get,
+  and autil_bigint_bit_set.
 
 v0.7.0 - 2021-02-15
 --------------------------------

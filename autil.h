@@ -444,12 +444,24 @@ autil_bigint_negate(struct autil_bigint* self);
 // self = abs(self)
 AUTIL_API void
 autil_bigint_abs(struct autil_bigint* self);
+
 // self = self << nbits (logical shift left)
+// This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_shiftl(struct autil_bigint* self, size_t nbits);
 // self = self >> nbits (logical shift right)
+// This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
+// Return the value (one or zero) of the nth bit (zero indexed) of self.
+// This function is sign-oblivious (the sign of self is not considered).
+AUTIL_API int
+autil_bigint_bit_get(struct autil_bigint const* self, size_t n);
+// Set the nth bit (zero indexed) of self to value.
+// This function is sign-oblivious (the sign of self is not altered).
+AUTIL_API void
+autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value);
+
 // res = lhs + rhs
 AUTIL_API void
 autil_bigint_add(
@@ -1290,6 +1302,16 @@ struct autil_bigint
     // The integer zero will have count == 0.
     size_t count;
 };
+#define AUTIL__BIGINT_BITS_PER_LIMB_                                           \
+    (size_t)(sizeof(*((struct autil_bigint*)0)->limbs) * CHAR_BIT)
+
+// TODO: A *lot* of the bigint code assumes that limbs are 8-bits. These
+// assumptions crop up in memmoves that do not multiply by the
+// sizeof(*bigint->limbs), hard-coded constants like 0x80, and more. At some
+// point the sizeof the limbs member should either be frozen at 8-bits forever
+// or tested with something like a 32 bit word to detect and correct these
+// broken assumptions.
+AUTIL_STATIC_ASSERT(eight_bit_limbs, AUTIL__BIGINT_BITS_PER_LIMB_ == 8);
 
 struct autil_bigint const* const AUTIL_BIGINT_ZERO =
     &(struct autil_bigint){.sign = 0, .limbs = NULL, .count = 0u};
@@ -1312,6 +1334,22 @@ autil_bigint_fini_(struct autil_bigint* self)
 
     autil_xalloc(self->limbs, AUTIL_XALLOC_FREE);
     memset(self, 0x00, sizeof(*self)); // scrub
+}
+
+static void
+autil__bigint_resize_(struct autil_bigint* self, size_t count)
+{
+    assert(self != NULL);
+
+    if (count <= self->count) {
+        self->count = count;
+        return;
+    }
+
+    size_t const nlimbs = count - self->count; // Number of limbs to add.
+    self->count = count;
+    self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+    memset(self->limbs + self->count - nlimbs, 0x00, nlimbs);
 }
 
 static void
@@ -1373,6 +1411,8 @@ autil__bigint_shiftr_limbs_(struct autil_bigint* self, size_t nlimbs)
 AUTIL_API void
 autil_bigint_dump(struct autil_bigint const* self)
 {
+    assert(self != NULL);
+
     int sign = self->sign;
     char signc = '0';
     if (sign == +1) {
@@ -1609,9 +1649,8 @@ autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    static size_t const BITS_PER_LIMB = sizeof(*self->limbs) * CHAR_BIT;
-    autil__bigint_shiftl_limbs_(self, nbits / BITS_PER_LIMB);
-    for (size_t n = 0; n < nbits % BITS_PER_LIMB; ++n) {
+    autil__bigint_shiftl_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
+    for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
         if (self->limbs[self->count - 1] & 0x80) {
             self->count += 1;
             self->limbs =
@@ -1637,8 +1676,7 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    static size_t const BITS_PER_LIMB = sizeof(*self->limbs) * CHAR_BIT;
-    size_t const self_bits = self->count * BITS_PER_LIMB;
+    size_t const self_bits = self->count * AUTIL__BIGINT_BITS_PER_LIMB_;
     if (nbits > self_bits) {
         autil_fatalf(
             "[%s] Attempted right shift of %zu bits on bigint with %zu bits",
@@ -1647,8 +1685,8 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
             self_bits);
     }
 
-    autil__bigint_shiftr_limbs_(self, nbits / BITS_PER_LIMB);
-    for (size_t n = 0; n < nbits % BITS_PER_LIMB; ++n) {
+    autil__bigint_shiftr_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
+    for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
         // [limb0 >> 1 | lsbit(limb1)][limb1 >> 1 | lsbit(limb2)]...
         for (size_t i = 0; i < self->count - 1; ++i) {
             self->limbs[i] = (uint8_t)(self->limbs[i] >> 1u);
@@ -1659,6 +1697,43 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
         self->limbs[self->count - 1] =
             (uint8_t)(self->limbs[self->count - 1] >> 1u);
     }
+    autil__bigint_normalize_(self);
+}
+
+AUTIL_API int
+autil_bigint_bit_get(struct autil_bigint const* self, size_t n)
+{
+    assert(self != NULL);
+
+    if (n >= (self->count * AUTIL__BIGINT_BITS_PER_LIMB_)) {
+        return 0;
+    }
+
+    uint8_t const limb = self->limbs[n / AUTIL__BIGINT_BITS_PER_LIMB_];
+    uint8_t const mask = (uint8_t)(1u << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
+    return (limb & mask) != 0;
+}
+
+AUTIL_API void
+autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value)
+{
+    assert(self != NULL);
+
+    size_t const limb_idx = (n / AUTIL__BIGINT_BITS_PER_LIMB_);
+    if (limb_idx >= self->count) {
+        if (!value) {
+            // The abstact unallocated bit is already zero so re-setting it to
+            // zero does not change the representation of self. Return early
+            // rather than going through the trouble of resizeing and then
+            // normalizing for what is essentially a NOP.
+            return;
+        }
+        autil__bigint_resize_(self, limb_idx + 1);
+    }
+
+    uint8_t* const plimb = self->limbs + limb_idx;
+    uint8_t const mask = (uint8_t)(1 << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
+    *plimb = value ? *plimb | mask : *plimb & ~mask;
     autil__bigint_normalize_(self);
 }
 
