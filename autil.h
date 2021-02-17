@@ -1683,13 +1683,9 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    size_t const self_bits = self->count * AUTIL__BIGINT_BITS_PER_LIMB_;
-    if (nbits > self_bits) {
-        autil_fatalf(
-            "[%s] Attempted right shift of %zu bits on bigint with %zu bits",
-            __func__,
-            nbits,
-            self_bits);
+    if (nbits >= autil_bigint_bit_count(self)) {
+        autil_bigint_assign(self, AUTIL_BIGINT_ZERO);
+        return;
     }
 
     autil__bigint_shiftr_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
