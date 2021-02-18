@@ -123,6 +123,7 @@ PERFS = \
 
 EXAMPLES = \
 	examples/bigint-calculator \
+	examples/bigint-fib \
 	examples/dvd \
 	examples/life \
 	examples/shapes
@@ -140,6 +141,8 @@ perf: $(PERFS)
 
 examples: $(EXAMPLES)
 examples/bigint-calculator: examples/bigint-calculator.c
+	$(CC) -o $@ $< $(CFLAGS)
+examples/bigint-fib: examples/bigint-fib.c
 	$(CC) -o $@ $< $(CFLAGS)
 examples/dvd: examples/dvd.c
 	$(CC) -o $@ $< $(CFLAGS) \

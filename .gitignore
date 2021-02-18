@@ -10,6 +10,7 @@ emsdk/
 *.wasm
 
 examples/bigint-calculator
+examples/bigint-fib
 examples/dvd
 examples/life
 examples/shapes
