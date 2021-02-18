@@ -1712,13 +1712,13 @@ autil_bigint_bit_count(struct autil_bigint const* self)
         return 0;
     }
 
-    uint8_t top = self->limbs[self->count-1];
+    uint8_t top = self->limbs[self->count - 1];
     size_t top_bit_count = 0;
     while (top != 0) {
         top_bit_count += 1;
         top = top >> 1;
     }
-    return (self->count-1) * AUTIL__BIGINT_BITS_PER_LIMB_ + top_bit_count;
+    return (self->count - 1) * AUTIL__BIGINT_BITS_PER_LIMB_ + top_bit_count;
 }
 
 AUTIL_API int
@@ -1953,9 +1953,8 @@ autil_bigint_mul(
 
         unsigned k = 0;
         for (size_t i = 0; i < m; ++i) {
-            unsigned const t =
-                (unsigned)u[i] * (unsigned)v[j] +
-                (unsigned)w[i + j] + (unsigned)k;
+            unsigned const t = (unsigned)u[i] * (unsigned)v[j]
+                + (unsigned)w[i + j] + (unsigned)k;
             w[i + j] = (uint8_t)(t % b);
             k = t / b;
             assert(k <= b && "k will always be in the range 0 <= k < b");
