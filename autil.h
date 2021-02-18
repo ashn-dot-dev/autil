@@ -1950,11 +1950,9 @@ autil_bigint_mul(
             w[j + m] = 0;
             continue;
         }
-
         unsigned k = 0;
         for (size_t i = 0; i < m; ++i) {
-            unsigned const t = (unsigned)u[i] * (unsigned)v[j]
-                + (unsigned)w[i + j] + (unsigned)k;
+            unsigned const t = (unsigned)(u[i] * v[j]) + w[i + j] + k;
             w[i + j] = (uint8_t)(t % b);
             k = t / b;
             assert(k <= b && "k will always be in the range 0 <= k < b");
