@@ -2,6 +2,7 @@ Unreleased
 --------------------------------
 + Add functions autil_bigint_shiftl, autil_bigint_shiftr,
   autil_bigint_bit_count, autil_bigint_bit_get, and autil_bigint_bit_set.
++ Improved performance of autil_bigint_mul by switching to Knuth's "Algorithm M"
 + Improved performance of autil_bigint_divrem by switching from long division
   with repeated subtraction to binary long division.
 

@@ -1933,48 +1933,40 @@ autil_bigint_mul(
         return;
     }
 
-    int const sign = lhs->sign * rhs->sign;
-    assert(sign == +1 || sign == -1);
+    // Algorithm M (Multiplication of Nonnegative Integers)
+    // Source: Art of Computer Programming, Volume 2: Seminumerical Algorithms
+    //         (Third Edition) page. 268.
     size_t const count = lhs->count + rhs->count;
-    assert(count > 0);
-
-    struct autil_bigint RES = {0};
-    // Multiplication using partial products.
-    // When multiplying the digit at lhs position i by the digit at rhs position
-    // j the resulting 2-digit partial product is added at positions i+j (i.e.
-    // low digit) and i+j+1 (i.e. high digit).
-    //
-    //  79 =>  79    79 =>   70     09     70     09
-    // *67    *60 + *07     *60 +  *60 +  *07 +  *07
-    // ---    ---------    -------------------------
-    //                     4200 + 0540 + 0490 + 0063
-    //                     ^^      ^^     ^^      ^^
-    //                     -------------------------
-    //                                          5293
-    for (size_t j = 0; j < rhs->count; ++j) {
-        for (size_t i = 0; i < lhs->count; ++i) {
-            uint16_t const prod = (uint16_t)(lhs->limbs[i] * rhs->limbs[j]);
-            uint8_t const prodl = (uint8_t)prod;
-            uint8_t const prodh = (uint8_t)(prod >> 8);
-
-            uint8_t* const limbs = autil_xallocn(NULL, count, sizeof(uint8_t));
-            memset(limbs, 0x00, count * sizeof(*limbs));
-
-            struct autil_bigint partial;
-            partial.sign = sign;
-            partial.count = count;
-            partial.limbs = limbs;
-            partial.limbs[i + j] = prodl;
-            partial.limbs[i + j + 1] = prodh;
-
-            autil_bigint_add(&RES, &RES, &partial);
-            autil__bigint_fini_(&partial);
+    struct autil_bigint W = {0}; // abs(res)
+    autil__bigint_resize_(&W, count);
+    uint8_t* const w = W.limbs;
+    uint8_t const* const u = lhs->limbs;
+    uint8_t const* const v = rhs->limbs;
+    size_t const m = lhs->count;
+    size_t const n = rhs->count;
+    static unsigned const b = UINT8_MAX + 1;
+    for (size_t j = 0; j < n; ++j) {
+        if (v[j] == 0) {
+            w[j + m] = 0;
+            continue;
         }
+
+        unsigned k = 0;
+        for (size_t i = 0; i < m; ++i) {
+            unsigned const t =
+                (unsigned)u[i] * (unsigned)v[j] +
+                (unsigned)w[i + j] + (unsigned)k;
+            w[i + j] = (uint8_t)(t % b);
+            k = t / b;
+            assert(k <= b && "k will always be in the range 0 <= k < b");
+        }
+        w[j + m] = (uint8_t)k;
     }
 
-    autil__bigint_normalize_(&RES);
-    autil_bigint_assign(res, &RES);
-    autil__bigint_fini_(&RES);
+    W.sign = lhs->sign * rhs->sign;
+    autil__bigint_normalize_(&W);
+    autil_bigint_assign(res, &W);
+    autil__bigint_fini_(&W);
 }
 
 AUTIL_API void
@@ -1993,7 +1985,6 @@ autil_bigint_divrem(
     }
 
     // Binary Long Division Algorithm
-    // ------------------------------
     // Source: https://en.wikipedia.org/wiki/Division_algorithm#Long_division
     //
     // The following algorithm, the binary version of the famous long division,
