@@ -1,6 +1,4 @@
-AUTIL - ASHN'S UTILITIES
-========================
-
+# AUTIL - ASHN'S UTILITIES
 Public domain headers containing functions and data structures for rapid
 application development in C99 (or later).
 
