@@ -141,27 +141,27 @@ perf: $(PERFS)
 
 examples: $(EXAMPLES)
 examples/bigint-calculator: examples/bigint-calculator.c
-	$(CC) -o $@ examples/bigint-calculator.c $(CFLAGS)
+	$(CC) -o $@ $(CFLAGS) examples/bigint-calculator.c
 examples/bigint-fib: examples/bigint-fib.c
-	$(CC) -o $@ examples/bigint-fib.c $(CFLAGS)
+	$(CC) -o $@ $(CFLAGS) examples/bigint-fib.c
 examples/dvd: examples/dvd.c
-	$(CC) -o $@ examples/dvd.c \
-		$(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
+	$(CC) -o $@ $(CFLAGS) examples/dvd.c \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 examples/life: examples/life.c
-	$(CC) -o $@ examples/life.c \
-		$(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
+	$(CC) -o $@ $(CFLAGS) examples/life.c \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 examples/shapes: examples/shapes.c
-	$(CC) -o $@ examples/shapes.c \
-		$(CFLAGS) -lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
+	$(CC) -o $@ $(CFLAGS) examples/shapes.c \
+		-lm $$(sdl2-config --libs) -lSDL2_image -lSDL2_mixer
 
 examples-web: $(EXAMPLES_WEB)
 examples/dvd.html: examples/dvd.c
-	emcc -o $@ examples/dvd.c $(CFLAGS) $(EMFLAGS) \
+	emcc -o $@ $(CFLAGS) $(EMFLAGS) examples/dvd.c \
 		--embed-file examples/dvd-assets@dvd-assets/
 examples/life.html: examples/life.c
-	emcc -o $@ examples/life.c $(CFLAGS) $(EMFLAGS)
+	emcc -o $@ $(CFLAGS) $(EMFLAGS) examples/life.c
 examples/shapes.html: examples/shapes.c
-	emcc -o $@ examples/shapes.c $(CFLAGS) $(EMFLAGS)
+	emcc -o $@ $(CFLAGS) $(EMFLAGS) examples/shapes.c
 
 format:
 	clang-format -i \
