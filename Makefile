@@ -109,6 +109,7 @@ TESTS = \
 	test/atest.example.test
 
 PERFS = \
+	perf/bigint-add-4096x4096-bits.perf \
 	perf/bigint-mul-256x256-bits.perf \
 	perf/bigint-mul-512x512-bits.perf \
 	perf/bigint-mul-1024x1024-bits.perf \
