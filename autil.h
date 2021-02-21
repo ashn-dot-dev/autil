@@ -1306,16 +1306,21 @@ struct autil_bigint
     // The integer zero will have count == 0.
     size_t count;
 };
-#define AUTIL__BIGINT_BITS_PER_LIMB_                                           \
-    (size_t)(sizeof(*((struct autil_bigint*)0)->limbs) * CHAR_BIT)
-
-// TODO: A *lot* of the bigint code assumes that limbs are 8-bits. These
-// assumptions crop up in memmoves that do not multiply by the
-// sizeof(*bigint->limbs), hard-coded constants like 0x80, and more. At some
-// point the sizeof the limbs member should either be frozen at 8-bits forever
-// or tested with something like a 32 bit word to detect and correct these
-// broken assumptions.
-AUTIL_STATIC_ASSERT(eight_bit_limbs, AUTIL__BIGINT_BITS_PER_LIMB_ == 8);
+// Most arbitrary precision integer implementations use a limb size relative to
+// the natural word size of the target machine. For instance the GMP mp_limb_t
+// type is a typedef of either unsigned int, unsigned long int, or unsigned
+// long long int depending on configuration options and the host environment.
+// The autil arbitrary precision integer implementation uses eight-bit limbs to
+// avoid configuration options, preprocessor checks, and/or bugs that would
+// come about from having multiple potential limb sizes. On every (modern)
+// machine uint8_t and uint16_t values will implicitly cast up to unsigned int
+// values cleanly which makes addition and multiplication of limbs work without
+// needing to think too hard.
+#define AUTIL__BIGINT_BITS_PER_LIMB_ ((size_t)8)
+AUTIL_STATIC_ASSERT(
+    correct_bits_per_limb,
+    AUTIL__BIGINT_BITS_PER_LIMB_
+        == (sizeof(*((struct autil_bigint*)0)->limbs) * CHAR_BIT));
 
 struct autil_bigint const* const AUTIL_BIGINT_ZERO =
     &(struct autil_bigint){.sign = 0, .limbs = NULL, .count = 0u};
@@ -1352,7 +1357,7 @@ autil__bigint_resize_(struct autil_bigint* self, size_t count)
 
     size_t const nlimbs = count - self->count; // Number of limbs to add.
     self->count = count;
-    self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+    self->limbs = autil_xalloc(self->limbs, self->count);
     memset(self->limbs + self->count - nlimbs, 0x00, nlimbs);
 }
 
@@ -1381,7 +1386,7 @@ autil__bigint_shiftl_limbs_(struct autil_bigint* self, size_t nlimbs)
     }
 
     self->count += nlimbs;
-    self->limbs = autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+    self->limbs = autil_xalloc(self->limbs, self->count);
     memmove((char*)self->limbs + nlimbs, self->limbs, self->count - nlimbs);
     memset(self->limbs, 0x00, nlimbs);
 }
@@ -1440,6 +1445,8 @@ autil_bigint_dump(struct autil_bigint const* self)
 AUTIL_API struct autil_bigint*
 autil_bigint_new(struct autil_bigint const* othr)
 {
+    assert(othr != NULL);
+
     struct autil_bigint* const self =
         autil_xalloc(NULL, sizeof(struct autil_bigint));
     *self = *AUTIL_BIGINT_ZERO;
@@ -1459,6 +1466,7 @@ AUTIL_API struct autil_bigint*
 autil_bigint_new_utf8(void const* utf8, size_t utf8_size)
 {
     assert(utf8 != NULL);
+
     struct autil_bigint* self = NULL;
     unsigned char const* const end = (unsigned char const*)utf8 + utf8_size;
 
@@ -1614,12 +1622,12 @@ autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr)
     }
 
     self->sign = othr->sign;
-    self->limbs = autil_xallocn(self->limbs, othr->count, sizeof(*othr->limbs));
+    self->limbs = autil_xalloc(self->limbs, othr->count);
     self->count = othr->count;
     if (self->sign != 0) {
         assert(self->limbs != NULL);
         assert(othr->limbs != NULL);
-        memcpy(self->limbs, othr->limbs, othr->count * sizeof(*othr->limbs));
+        memcpy(self->limbs, othr->limbs, othr->count);
     }
 }
 
@@ -1660,8 +1668,7 @@ autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
     for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
         if (self->limbs[self->count - 1] & 0x80) {
             self->count += 1;
-            self->limbs =
-                autil_xallocn(self->limbs, self->count, sizeof(*self->limbs));
+            self->limbs = autil_xalloc(self->limbs, self->count);
             self->limbs[self->count - 1] = 0x00;
         }
         // [limb0 << 1][limb1 << 1 | msbit(limb0)][limb2 << 1 | msbit(limb1)]...
@@ -1811,7 +1818,7 @@ autil_bigint_add(
     struct autil_bigint RES = {0};
     RES.sign = sign;
     RES.count = 1 + (lhs->count > rhs->count ? lhs->count : rhs->count);
-    RES.limbs = autil_xallocn(RES.limbs, RES.count, sizeof(*RES.limbs));
+    RES.limbs = autil_xalloc(RES.limbs, RES.count);
 
     unsigned carry = 0;
     for (size_t i = 0; i < RES.count; ++i) {
@@ -1890,7 +1897,7 @@ autil_bigint_sub(
     struct autil_bigint RES = {0};
     RES.sign = lhs->sign;
     RES.count = lhs->count > rhs->count ? lhs->count : rhs->count;
-    RES.limbs = autil_xallocn(RES.limbs, RES.count, sizeof(*RES.limbs));
+    RES.limbs = autil_xalloc(RES.limbs, RES.count);
 
     unsigned borrow = 0;
     for (size_t i = 0; i < RES.count; ++i) {
