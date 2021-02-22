@@ -38,6 +38,7 @@ EMFLAGS = \
 
 TESTS = \
 	test/static.test \
+	test/include-multiple-times.test \
 	test/custom-allocator.test \
 	test/autil_array_count.test \
 	test/autil_cstr_count.test \
