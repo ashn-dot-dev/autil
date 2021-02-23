@@ -1,3 +1,7 @@
+Unreleased
+--------------------------------
++ Add functions autil_cstr_starts_with and autil_cstr_ends_with.
+
 v0.8.0 - 2021-02-21
 --------------------------------
 + Add functions autil_bigint_shiftl, autil_bigint_shiftr,

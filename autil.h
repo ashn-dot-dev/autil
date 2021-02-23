@@ -231,6 +231,16 @@ AUTIL_API int
 autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 
 ////////////////////////////////////////////////////////////////////////////////
+//////// CSTR //////////////////////////////////////////////////////////////////
+
+// Returns a non-zero value if cstr starts with target.
+AUTIL_API int
+autil_cstr_starts_with(char const* cstr, char const* target);
+// Returns a non-zero value if cstr ends with target.
+AUTIL_API int
+autil_cstr_ends_with(char const* cstr, char const* target);
+
+////////////////////////////////////////////////////////////////////////////////
 //////// VSTR //////////////////////////////////////////////////////////////////
 // Byte string view.
 
@@ -1185,6 +1195,26 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
 }
 
 AUTIL_API int
+autil_cstr_starts_with(char const* cstr, char const* target)
+{
+    assert(cstr != NULL);
+    assert(target != NULL);
+
+    return strncmp(cstr, target, strlen(target)) == 0;
+}
+
+AUTIL_API int
+autil_cstr_ends_with(char const* cstr, char const* target)
+{
+    assert(cstr != NULL);
+    assert(target != NULL);
+
+    return autil_vstr_ends_with(
+        AUTIL_VSTR_LOCAL_PTR(cstr, strlen(cstr)),
+        AUTIL_VSTR_LOCAL_PTR(target, strlen(target)));
+}
+
+AUTIL_API int
 autil_vstr_cmp(struct autil_vstr const* lhs, struct autil_vstr const* rhs)
 {
     assert(lhs != NULL);
@@ -1211,6 +1241,9 @@ AUTIL_API int
 autil_vstr_starts_with(
     struct autil_vstr const* vstr, struct autil_vstr const* target)
 {
+    assert(vstr != NULL);
+    assert(target != NULL);
+
     if (vstr->count < target->count) {
         return 0;
     }
@@ -1221,6 +1254,9 @@ AUTIL_API int
 autil_vstr_ends_with(
     struct autil_vstr const* vstr, struct autil_vstr const* target)
 {
+    assert(vstr != NULL);
+    assert(target != NULL);
+
     if (vstr->count < target->count) {
         return 0;
     }
