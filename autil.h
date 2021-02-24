@@ -292,7 +292,7 @@ autil_vstr_ends_with(
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// ARR ///////////////////////////////////////////////////////////////////
-// General purpose typesafe dynamic array (a.k.a stretchy buffer).
+// General purpose type-safe dynamic array (a.k.a stretchy buffer).
 //
 // A stretchy buffer works by storing metadata about the number of allocated and
 // in-use elements in a header just before the address of the buffer's first
