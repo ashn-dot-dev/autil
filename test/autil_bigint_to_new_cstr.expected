@@ -32,6 +32,9 @@
 0b111100001100110010101010 | b        | "111100001100110010101010"
 0b111100001100110010101010 | #b       | "0b111100001100110010101010"
 
+0o765432107654321076543210 | o        | "765432107654321076543210"
+0o765432107654321076543210 | #o       | "0o765432107654321076543210"
+
 0xbeefbeefbeefbeef         | x        | "beefbeefbeefbeef"
 0xbeefbeefbeefbeef         | X        | "BEEFBEEFBEEFBEEF"
 0xbeefbeefbeefbeef         | #x       | "0xbeefbeefbeefbeef"

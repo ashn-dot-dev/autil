@@ -421,7 +421,7 @@ autil_bigint_new(struct autil_bigint const* othr);
 // non-negative number.
 //
 // The digits of the cstring may be prefixed with a radix identifier:
-// 0b (binary) or 0x (hexadecimal).
+// 0b (binary), 0o (octal), or 0x (hexadecimal).
 // In the absence of a radix identifier, the digits of the cstring will decoded
 // with radix 10 (decimal).
 //
@@ -524,10 +524,10 @@ autil_bigint_divrem(
 // string grammar.
 //
 // Flags (optional):
-//   #      Prefix the digits of the output string with "0b", "0x", or "0x" when
-//          used in conjunction with the "b", "x", or "X" specifiers,
-//          respectively. Note that "0x" is used for both the "x" and "X"
-//          specifiers.
+//   #      Prefix the digits of the output string with "0b", "0o", "0x", or
+//          "0x" when used in conjunction with the "b", "o", "x", or "X"
+//          specifiers, respectively. Note that "0x" is used for both the "x"
+//          and "X" specifiers.
 //   0      Left pad the output string up to the field width using zeros.
 //          Default behavior is to pad with spaces.
 //   +      Prefix the numeric representation of the output string with a plus
@@ -542,14 +542,13 @@ autil_bigint_divrem(
 //   of the output string.
 //
 // Specifier (required):
-//   d      The provided bigint will be represented using signed decimal
-//          notation.
-//   b      The provided bigint will be represented using signed binary
-//          notation using sign magnitude representation.
-//   x      The provided bigint will be represented using signed hexadecimal
-//          notation with *lower case* alphanumeric digits.
-//   X      The provided bigint will be represented using signed hexadecimal
-//          notation with *UPPER CASE* alphanumeric digits.
+//   d      The provided bigint will be represented using decimal notation.
+//   b      The provided bigint will be represented using binary notation.
+//   o      The provided bigint will be represented using octal notation.
+//   x      The provided bigint will be represented using hexadecimal notation
+//          with *lower case* alphanumeric digits.
+//   X      The provided bigint will be represented using hexadecimal notation
+//          with *UPPER CASE* alphanumeric digits.
 AUTIL_API char*
 autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt);
 
@@ -1369,6 +1368,8 @@ static struct autil_bigint const* const AUTIL_BIGINT_DEC =
     &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x0A}, .count = 1u};
 static struct autil_bigint const* const AUTIL_BIGINT_BIN =
     &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x02}, .count = 1u};
+static struct autil_bigint const* const AUTIL_BIGINT_OCT =
+    &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x08}, .count = 1u};
 static struct autil_bigint const* const AUTIL_BIGINT_HEX =
     &(struct autil_bigint){.sign = +1, .limbs = (uint8_t[]){0x10}, .count = 1u};
 
@@ -1545,6 +1546,13 @@ radix:
         radix = 2;
         radix_bigint = AUTIL_BIGINT_BIN;
         radix_isdigit = autil_isbdigit;
+        cur += 2;
+        goto digits;
+    }
+    if (cur[1] == 'o') {
+        radix = 8;
+        radix_bigint = AUTIL_BIGINT_OCT;
+        radix_isdigit = autil_isodigit;
         cur += 2;
         goto digits;
     }
@@ -2120,7 +2128,7 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
         }
         fmt = fmt_;
         // Specifier
-        char const* whichspec = strchr("dbxX", *fmt);
+        char const* whichspec = strchr("dboxX", *fmt);
         if (*fmt == '\0' || whichspec == NULL) {
             return NULL;
         }
@@ -2153,6 +2161,9 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
         if (specifier == 'b') {
             autil_xalloc_append(&prefix, &prefix_size, "0b", 2);
         }
+        if (specifier == 'o') {
+            autil_xalloc_append(&prefix, &prefix_size, "0o", 2);
+        }
         if (specifier == 'x') {
             autil_xalloc_append(&prefix, &prefix_size, "0x", 2);
         }
@@ -2164,7 +2175,7 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     // Digits.
     void* digits = NULL;
     size_t digits_size = 0;
-    char digit_buf[8u + AUTIL_CSTR_COUNT("\0")] = {0};
+    char digit_buf[AUTIL__BIGINT_BITS_PER_LIMB_ + AUTIL_CSTR_COUNT("\0")] = {0};
     if (specifier == 'd') {
         struct autil_bigint DEC = {0};
         struct autil_bigint SELF = {0};
@@ -2197,6 +2208,22 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
             autil_xalloc_append(
                 &digits, &digits_size, digit_buf, strlen(digit_buf));
         }
+    }
+    else if (specifier == 'o') {
+        struct autil_bigint OCT = {0};
+        struct autil_bigint SELF = {0};
+        autil_bigint_assign(&SELF, self);
+        autil_bigint_abs(&SELF);
+        while (autil_bigint_cmp(&SELF, AUTIL_BIGINT_ZERO) != 0) {
+            autil_bigint_divrem(&SELF, &OCT, &SELF, AUTIL_BIGINT_OCT);
+            assert(OCT.count <= 1);
+            assert(OCT.limbs == NULL || OCT.limbs[0] < 8);
+            sprintf(digit_buf, "%o", OCT.limbs != NULL ? (int)OCT.limbs[0] : 0);
+            autil_xalloc_prepend(
+                &digits, &digits_size, digit_buf, strlen(digit_buf));
+        }
+        autil__bigint_fini_(&OCT);
+        autil__bigint_fini_(&SELF);
     }
     else if (specifier == 'x') {
         for (size_t i = self->count - 1; i < self->count; --i) {

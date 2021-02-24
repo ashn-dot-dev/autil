@@ -63,6 +63,10 @@ main(void)
     test_valid("0b111100001100110010101010", "#b");
 
     fputc('\n', stdout);
+    test_valid("0o765432107654321076543210", "o");
+    test_valid("0o765432107654321076543210", "#o");
+
+    fputc('\n', stdout);
     test_valid("0xbeefbeefbeefbeef", "x");
     test_valid("0xbeefbeefbeefbeef", "X");
     test_valid("0xbeefbeefbeefbeef", "#x");
