@@ -233,6 +233,10 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 ////////////////////////////////////////////////////////////////////////////////
 //////// CSTR //////////////////////////////////////////////////////////////////
 
+// Returns an autil_xalloc-allocated copy of the provided cstring.
+// This function behaves similarly to the POSIX strdup function.
+AUTIL_API char*
+autil_cstr_new_cstr(char const* cstr);
 // Returns a non-zero value if cstr starts with target.
 AUTIL_API int
 autil_cstr_starts_with(char const* cstr, char const* target);
@@ -1191,6 +1195,16 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
     *buf = bf;
     *buf_size = sz;
     return 0;
+}
+
+AUTIL_API char*
+autil_cstr_new_cstr(char const* cstr)
+{
+    assert(cstr != NULL);
+
+    size_t const count = strlen(cstr);
+    char* const dest = autil_xalloc(NULL, count + AUTIL_CSTR_COUNT("\0"));
+    return strcpy(dest, cstr);
 }
 
 AUTIL_API int
