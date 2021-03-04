@@ -2,6 +2,7 @@ Unreleased
 --------------------------------
 + Add functions autil_cstr_new_cstr, autil_cstr_starts_with,
   and autil_cstr_ends_with.
++ Add function autil_string_append.
 + The functions autil_bigint_new* and autil_bigint_to_new_cstr can now parse
   and stringify octal numbers (prefixed with "0o").
 

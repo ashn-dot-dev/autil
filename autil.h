@@ -612,6 +612,10 @@ autil_string_insert(
 AUTIL_API void
 autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 
+// Append count bytes of start onto the end of the string.
+AUTIL_API void
+autil_string_append(struct autil_string* self, char const* start, size_t count);
+
 // Trim leading and trailing whitespace from the string.
 // Bytes of the string are decoded using the "C" locale.
 AUTIL_API void
@@ -2455,6 +2459,14 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count)
     }
     memmove(self->start + idx, self->start + idx + count, self->count - count);
     autil_string_resize(self, self->count - count);
+}
+
+AUTIL_API void
+autil_string_append(struct autil_string* self, char const* start, size_t count)
+{
+    assert(self != NULL);
+
+    autil_string_insert(self, autil_string_count(self), start, count);
 }
 
 AUTIL_API void

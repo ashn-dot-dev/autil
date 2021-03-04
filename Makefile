@@ -95,6 +95,7 @@ TESTS = \
 	test/autil_string_ref_const.test \
 	test/autil_string_insert.test \
 	test/autil_string_remove.test \
+	test/autil_string_append.test \
 	test/autil_string_trim.test \
 	test/autil_string_split_to_vec.test \
 	test/autil_string_split_to_vec_on.test \
