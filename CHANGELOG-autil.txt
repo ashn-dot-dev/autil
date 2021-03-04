@@ -1,32 +1,31 @@
 Unreleased
 --------------------------------
-+ Add functions autil_cstr_new_cstr, autil_cstr_starts_with,
-  and autil_cstr_ends_with.
-+ Add function autil_string_append.
++ Add autil_cstr_new_cstr, autil_cstr_starts_with, and autil_cstr_ends_with.
++ Add autil_string_append.
 + The functions autil_bigint_new* and autil_bigint_to_new_cstr can now parse
   and stringify octal numbers (prefixed with "0o").
 
 v0.8.0 - 2021-02-21
 --------------------------------
-+ Add functions autil_bigint_shiftl, autil_bigint_shiftr,
-  autil_bigint_bit_count, autil_bigint_bit_get, and autil_bigint_bit_set.
++ Add autil_bigint_shiftl, autil_bigint_shiftr, autil_bigint_bit_count,
+  autil_bigint_bit_get, and autil_bigint_bit_set.
 + Improved performance of autil_bigint_mul by switching to Knuth's "Algorithm M"
 + Improved performance of autil_bigint_divrem by switching from long division
   with repeated subtraction to binary long division.
 
 v0.7.0 - 2021-02-15
 --------------------------------
-+ Add macro AUTIL_VSTR_LOCAL_PTR_LITERAL.
-+ Add functions autil_vstr_starts_with and autil_vstr_ends_with.
-+ Add function autil_string_split_to_vec_on_vstr.
++ Add AUTIL_VSTR_LOCAL_PTR_LITERAL.
++ Add autil_vstr_starts_with and autil_vstr_ends_with.
++ Add autil_string_split_to_vec_on_vstr.
 + Fix UB when applying zero offset to null pointer in autil_vec_ref and
   autil_vec_ref_const.
 + Rename autil_bigint_to_cstr to autil_bigint_to_new_cstr
 
 v0.6.1 - 2021-01-18
 --------------------------------
-+ Remove macro AUTIL_BIT.
-+ Replace macros AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
++ Remove AUTIL_BIT.
++ Replace AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
   AUTIL_VSTR_INIT_LITERAL
 
 v0.6.0 - 2020-12-28
@@ -37,10 +36,10 @@ v0.6.0 - 2020-12-28
 
 v0.5.0 - 2020-12-13
 --------------------------------
-+ Add macros AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
++ Add AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
-+ Add functions autil_memcmp and autil_memmove.
-+ Add functions autil_string_split_to_vec_on and
++ Add autil_memcmp and autil_memmove.
++ Add autil_string_split_to_vec_on and
   autil_string_split_to_vec_on_cstr.
 + Add autil_arr macros: autil_arr_fini, autil_arr_count, autil_arr_capacity,
   autil_arr_reserve, autil_arr_resize, autil_arr_push, and autil_arr_pop.
@@ -49,9 +48,9 @@ v0.5.0 - 2020-12-13
 
 v0.4.0 - 2020-11-25
 --------------------------------
-+ Add functions autil_isbdigit and autil_isodigit.
-+ Add function autil_stream_read and autil_stream_read_line.
-+ Add macro AUTIL_BIT.
++ Add autil_isbdigit and autil_isodigit.
++ Add autil_stream_read and autil_stream_read_line.
++ Add AUTIL_BIT.
 + Add type autil_bigint and associated functions: autil_bigint_new,
   autil_bigint_new_cstr, autil_bigint_new_utf8,autil_bigint_del,
   autil_bigint_cmp, autil_bigint_vpcmp, autil_bigint_assign,
@@ -62,38 +61,38 @@ v0.4.0 - 2020-11-25
   autil_string_count, autil_string_resize, autil_string_ref,
   autil_string_ref_const, autil_string_insert, autil_string_remove,
   autil_string_trim, and autil_string_split.
-+ Add function autil_vec_ref_const and make autil_ref_get* const correct.
-+ Add function autil_map_lookup_const and make autil_map_lookup* const correct.
++ Add autil_vec_ref_const and make autil_ref_get* const correct.
++ Add autil_map_lookup_const and make autil_map_lookup* const correct.
 + Rename autil_vec_get to autil_vec_ref.
 + Rename autil_vec_data to autil_vec_start and make const correct.
 
 v0.3.0 - 2020-10-29
 --------------------------------
 + Namespace library with AUTIL_ and autil_.
-+ Added macro AUTIL_FMT_COUNT.
-+ Added safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
++ Add AUTIL_FMT_COUNT.
++ Add safe ctype functions: autil_isalnum, autil_isalpha, autil_isblank,
   autil_iscntrl, autil_isdigit, autil_isgraph, autil_islower, autil_isprint,
   autil_ispunct, autil_isspace, autil_isupper, autil_isxdigit, autil_tolower,
   and autil_toupper.
-+ Added function autil_vec_elemsize.
++ Add autil_vec_elemsize.
 
 v0.2.0 - 2020-09-16
 --------------------------------
-+ Added function infof.
-+ Added macro ARRAY_COUNT.
-+ Added macro CSTR_COUNT.
-+ Fixed missing const qualifier for vec_get parameter self.
++ Add infof.
++ Add ARRAY_COUNT.
++ Add CSTR_COUNT.
++ Fix missing const qualifier for vec_get parameter self.
 
 v0.1.0 - 2020-07-30
 --------------------------------
 + Initial release.
-+ Added type vpcmp_fn and functions str_vpcmp and int_vpcmp.
-+ Added macros LOCAL_PTR and DEREF_PTR.
-+ Added functions errorf and fatalf.
-+ Added functions xalloc and xallocn and macro XALLOC_FREE.
-+ Added functions file_read and file_write.
-+ Added type vec and associated functions: vec_new, vec_del, vec_count,
++ Add type vpcmp_fn and functions str_vpcmp and int_vpcmp.
++ Add LOCAL_PTR and DEREF_PTR.
++ Add errorf and fatalf.
++ Add xalloc and xallocn and XALLOC_FREE.
++ Add file_read and file_write.
++ Add type vec and associated functions: vec_new, vec_del, vec_count,
   vec_capacity, vec_reserve, vec_resize, vec_set, vec_get, vec_insert, and
   vec_remove.
-+ Added type map and associated functions: map_new, map_del, map_count,
-  map_keys, map_vals, map_lookup, map_insert, and map_remove.
++ Add type map and associated functions: map_new, map_del, map_count, map_keys,
+  map_vals, map_lookup, map_insert, and map_remove.
