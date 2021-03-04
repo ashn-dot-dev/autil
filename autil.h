@@ -616,6 +616,13 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 AUTIL_API void
 autil_string_append(struct autil_string* self, char const* start, size_t count);
 
+// Append the formatted text to the end of the string.
+AUTIL_API void
+autil_string_append_fmt(struct autil_string* self, char const* fmt, ...);
+AUTIL_API void
+autil_string_append_vfmt(
+    struct autil_string* self, char const* fmt, va_list args);
+
 // Trim leading and trailing whitespace from the string.
 // Bytes of the string are decoded using the "C" locale.
 AUTIL_API void
@@ -2467,6 +2474,37 @@ autil_string_append(struct autil_string* self, char const* start, size_t count)
     assert(self != NULL);
 
     autil_string_insert(self, autil_string_count(self), start, count);
+}
+
+AUTIL_API void
+autil_string_append_fmt(struct autil_string* self, char const* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    autil_string_append_vfmt(self, fmt, args);
+
+    va_end(args);
+}
+
+AUTIL_API void
+autil_string_append_vfmt(
+    struct autil_string* self, char const* fmt, va_list args)
+{
+    va_list copy;
+    va_copy(copy, args);
+    int const len = vsnprintf(NULL, 0, fmt, copy);
+    va_end(copy);
+
+    if (len < 0) {
+        autil_fatalf("[%s] Formatting failure", __func__);
+    }
+
+    size_t size = (size_t)len + AUTIL_CSTR_COUNT("\0");
+    char* const buf = autil_xalloc(NULL, size);
+    vsnprintf(buf, size, fmt, args);
+    autil_string_append(self, buf, (size_t)len);
+    autil_xalloc(buf, AUTIL_XALLOC_FREE);
 }
 
 AUTIL_API void
