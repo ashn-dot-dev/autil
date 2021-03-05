@@ -813,12 +813,12 @@ autil_map_remove(
 // USE: AUTIL_REALLOC(ptr, size)
 #ifndef AUTIL_REALLOC
 #    define AUTIL_REALLOC realloc
-#endif // AUTIL_REALLOC
+#endif
 
 // USE: AUTIL_FREE(ptr)
 #ifndef AUTIL_FREE
 #    define AUTIL_FREE free
-#endif // AUTIL_FREE
+#endif
 
 #include <assert.h>
 #include <errno.h>
