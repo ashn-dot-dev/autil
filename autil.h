@@ -60,6 +60,7 @@ LICENSE
 #    define AUTIL_API extern
 #endif
 
+#include <stdarg.h> /* va_list */
 #include <stddef.h> /* size_t, NULL, offsetof */
 #include <stdio.h> /* FILE*, printf-family */
 
@@ -822,7 +823,6 @@ autil_map_remove(
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
-#include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
