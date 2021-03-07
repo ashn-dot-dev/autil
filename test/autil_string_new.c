@@ -17,15 +17,18 @@ main(void)
     ASSERT(autil_string_count(s) == 0);
     autil_string_del(s);
 
-    s = autil_string_new("foobar", AUTIL_CSTR_COUNT("foobar"));
+    s = autil_string_new("foobar", AUTIL_STR_LITERAL_COUNT("foobar"));
     ASSERT(strcmp(autil_string_start(s), "foobar") == 0);
     ASSERT(autil_string_count(s) == strlen("foobar"));
     autil_string_del(s);
 
-    s = autil_string_new("foo\0bar", AUTIL_CSTR_COUNT("foo\0bar"));
+    s = autil_string_new("foo\0bar", AUTIL_STR_LITERAL_COUNT("foo\0bar"));
     ASSERT(strcmp(autil_string_start(s), "foo") == 0);
     ASSERT(
-        memcmp(autil_string_start(s), "foo\0bar", AUTIL_CSTR_COUNT("foo\0bar"))
+        memcmp(
+            autil_string_start(s),
+            "foo\0bar",
+            AUTIL_STR_LITERAL_COUNT("foo\0bar"))
         == 0);
     autil_string_del(s);
 }

@@ -6,6 +6,6 @@
 int
 main(void)
 {
-    printf("%zu\n", AUTIL_CSTR_COUNT(FOO));
+    printf("%zu\n", AUTIL_STR_LITERAL_COUNT(FOO));
     return EXIT_SUCCESS;
 }

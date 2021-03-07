@@ -107,8 +107,9 @@ typedef union
 
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
-// Number of characters in a cstring literal, excluding the null-terminator.
-#define AUTIL_CSTR_COUNT(cstr_literal) (AUTIL_ARRAY_COUNT(cstr_literal) - 1)
+// Number of characters in a string literal, excluding the null-terminator.
+#define AUTIL_STR_LITERAL_COUNT(str_literal)                                   \
+    (AUTIL_ARRAY_COUNT(str_literal) - 1)
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
 
@@ -262,8 +263,8 @@ struct autil_vstr
 // Produce a pointer of type struct autil_vstr* from the provided cstring
 // literal. This pointer has automatic storage duration associated with the
 // enclosing block.
-#define AUTIL_VSTR_LOCAL_PTR_LITERAL(cstr_literal)                             \
-    AUTIL_VSTR_LOCAL_PTR(cstr_literal, AUTIL_CSTR_COUNT(cstr_literal))
+#define AUTIL_VSTR_LOCAL_PTR_LITERAL(str_literal)                              \
+    AUTIL_VSTR_LOCAL_PTR(str_literal, AUTIL_STR_LITERAL_COUNT(str_literal))
 
 // Initializer for a vstring literal from a cstring literal.
 // Example:
@@ -274,8 +275,8 @@ struct autil_vstr
 //      // some time later...
 //      bar = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("bar");
 // clang-format off
-#define AUTIL_VSTR_INIT_STR_LITERAL(cstr_literal)                                  \
-    {cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)}
+#define AUTIL_VSTR_INIT_STR_LITERAL(str_literal)                                  \
+    {str_literal, AUTIL_STR_LITERAL_COUNT(str_literal)}
 // clang-format on
 
 // Return an int less than, equal to, or greater than zero if lhs is
@@ -1215,7 +1216,8 @@ autil_cstr_new_cstr(char const* cstr)
     assert(cstr != NULL);
 
     size_t const count = strlen(cstr);
-    char* const dest = autil_xalloc(NULL, count + AUTIL_CSTR_COUNT("\0"));
+    char* const dest =
+        autil_xalloc(NULL, count + AUTIL_STR_LITERAL_COUNT("\0"));
     return strcpy(dest, cstr);
 }
 
@@ -1560,7 +1562,7 @@ sign:
     }
 
 radix:
-    if ((size_t)(end - cur) < AUTIL_CSTR_COUNT("0x")) {
+    if ((size_t)(end - cur) < AUTIL_STR_LITERAL_COUNT("0x")) {
         // String is not long enough to have a radix identifier.
         goto digits;
     }
@@ -2201,7 +2203,8 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     // Digits.
     void* digits = NULL;
     size_t digits_size = 0;
-    char digit_buf[AUTIL__BIGINT_BITS_PER_LIMB_ + AUTIL_CSTR_COUNT("\0")] = {0};
+    char digit_buf
+        [AUTIL__BIGINT_BITS_PER_LIMB_ + AUTIL_STR_LITERAL_COUNT("\0")] = {0};
     if (specifier == 'd') {
         struct autil_bigint DEC = {0};
         struct autil_bigint SELF = {0};
@@ -2325,7 +2328,7 @@ struct autil_string
     char* start;
     size_t count;
 };
-#define AUTIL_STRING_SIZE_(count_) (count_ + AUTIL_CSTR_COUNT("\0"))
+#define AUTIL_STRING_SIZE_(count_) (count_ + AUTIL_STR_LITERAL_COUNT("\0"))
 
 AUTIL_API struct autil_string*
 autil_string_new(char const* start, size_t count)
@@ -2501,7 +2504,7 @@ autil_string_append_vfmt(
         autil_fatalf("[%s] Formatting failure", __func__);
     }
 
-    size_t size = (size_t)len + AUTIL_CSTR_COUNT("\0");
+    size_t size = (size_t)len + AUTIL_STR_LITERAL_COUNT("\0");
     char* const buf = autil_xalloc(NULL, size);
     vsnprintf(buf, size, fmt, args);
     autil_string_append(self, buf, (size_t)len);
