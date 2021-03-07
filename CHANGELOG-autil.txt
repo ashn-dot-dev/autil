@@ -4,6 +4,9 @@ Unreleased
 + Add autil_string_append, autil_string_append_fmt, and autil_string_append_fmt.
 + The functions autil_bigint_new* and autil_bigint_to_new_cstr can now parse
   and stringify octal numbers (prefixed with "0o").
++ The macros autil_arr_reserve, autil_arr_resize, and autil_arr_push may now be
+  used with second arguments containing commas that would otherwise be rejected
+  by the preprocessor (e.g. struct literals).
 
 v0.8.0 - 2021-02-21
 --------------------------------

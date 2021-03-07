@@ -2,8 +2,8 @@
 #include "../autil.h"
 #include "test.h"
 
-int
-main(void)
+static void
+basics(void)
 {
     // Initialize a zero element arr by assigning it NULL.
     int* a = NULL;
@@ -56,5 +56,51 @@ main(void)
     ASSERT(autil_arr_count(a) == count - 2);
 
     autil_arr_fini(a);
+}
+
+struct point
+{
+    int x;
+    int y;
+};
+
+static struct point
+make_point(int x, int y)
+{
+    return (struct point){x, y};
+}
+
+static void
+variadic_macros(void)
+{
+    struct point* a = NULL;
+
+    // Despite being implemented as macros, the autil_arr_* functions accept
+    // function calls and struct literals just fine.
+    struct point foo = {1, 2};
+    struct point bar = {.y = 4, .x = 3};
+    autil_arr_push(a, foo);
+    autil_arr_push(a, bar);
+    autil_arr_push(a, (struct point){5, 6});
+    autil_arr_push(a, (struct point){.y = 8, .x = 7});
+    autil_arr_push(a, make_point(9, 10));
+
+    for (size_t i = 0; i < autil_arr_count(a); ++i) {
+        printf("x=%d y=%d\n", a[i].x, a[i].y);
+    }
+
+    // This is just silly. The point structure is reused just to show that
+    // commas may appear in these macros.
+    autil_arr_reserve(a, (size_t)(struct point){0, 20}.y);
+    autil_arr_resize(a, (size_t)(struct point){0, 10}.y);
+
+    autil_arr_fini(a);
+}
+
+int
+main(void)
+{
+    basics();
+    variadic_macros();
     return EXIT_SUCCESS;
 }

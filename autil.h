@@ -360,21 +360,21 @@ autil_vstr_ends_with(
 // ------------------------------------------------------------
 // Update the minimum capacity of the arr to n elements.
 // Macro parameter arr is evaluated multiple times.
-#define autil_arr_reserve(arr, n)                                              \
-    ((void)((arr) = autil__arr_rsv_(sizeof(*(arr)), arr, n)))
+#define autil_arr_reserve(arr, /*n*/...)                                       \
+    ((void)((arr) = autil__arr_rsv_(sizeof(*(arr)), arr, __VA_ARGS__)))
 // void autil_arr_resize(TYPE* arr, size_t n)
 // ------------------------------------------------------------
 // Update the count of the arr to n elements.
 // Macro parameter arr is evaluated multiple times.
-#define autil_arr_resize(arr, n)                                               \
-    ((void)((arr) = autil__arr_rsz_(sizeof(*(arr)), arr, n)))
+#define autil_arr_resize(arr, /*n*/...)                                        \
+    ((void)((arr) = autil__arr_rsz_(sizeof(*(arr)), arr, __VA_ARGS__)))
 
 // void autil_arr_push(TYPE* arr, TYPE val)
 // ------------------------------------------------------------
 // Append val as the last element of arr.
 // Macro parameter arr is evaluated multiple times.
-#define autil_arr_push(arr, val)                                               \
-    ((void)(AUTIL__ARR_MAYBE_GROW_(arr), AUTIL__ARR_APPEND_VAL_(arr, val)))
+#define autil_arr_push(arr, /*val*/...)                                        \
+    ((void)(AUTIL__ARR_MAYBE_GROW_(arr), AUTIL__ARR_APPEND_(arr, __VA_ARGS__)))
 // TYPE autil_arr_pop(TYPE* arr)
 // ------------------------------------------------------------
 // Remove and return the last element of arr.
@@ -399,8 +399,8 @@ enum{AUTIL__ARR_HEADER_OFFSET_ = sizeof(struct autil__arr_header_)};
     ((autil_arr_count(arr_) == autil_arr_capacity(arr_))                       \
          ? (arr_) = autil__arr_grw_(sizeof(*(arr_)), arr_)                     \
          : (arr_))
-#define AUTIL__ARR_APPEND_VAL_(arr_, val_)                                     \
-    ((arr_)[AUTIL__ARR_PHEADER_MUTBL_(arr_)->cnt_++] = (val_))
+#define AUTIL__ARR_APPEND_(arr_, ...)                                          \
+    ((arr_)[AUTIL__ARR_PHEADER_MUTBL_(arr_)->cnt_++] = (__VA_ARGS__))
 AUTIL_API void* autil__arr_rsv_(size_t elemsize, void* arr, size_t cap);
 AUTIL_API void* autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt);
 AUTIL_API void* autil__arr_grw_(size_t elemsize, void* arr);
