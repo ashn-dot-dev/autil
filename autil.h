@@ -635,7 +635,7 @@ autil_string_trim(struct autil_string* self);
 // Bytes of the string are decoded using the "C" locale.
 // Parameter res will be populated with the collection of resulting strings.
 // Example:
-//      "A B\tC  D " ===split===> "A" "B" "C"
+//      "A B\tC  D " ===split===> "A" "B" "C" "D"
 AUTIL_API void
 autil_string_split_to_vec(
     struct autil_string const* self,
