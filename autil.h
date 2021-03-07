@@ -267,13 +267,14 @@ struct autil_vstr
 
 // Initializer for a vstring literal from a cstring literal.
 // Example:
-//      static struct autil_vstr const foo = AUTIL_VSTR_INIT_LITERAL("foo");
+//      static struct autil_vstr const foo =
+//          AUTIL_VSTR_INIT_STR_LITERAL("foo");
 // Example:
 //      struct autil_vstr bar = {0};
 //      // some time later...
-//      bar = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("bar");
+//      bar = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("bar");
 // clang-format off
-#define AUTIL_VSTR_INIT_LITERAL(cstr_literal)                                  \
+#define AUTIL_VSTR_INIT_STR_LITERAL(cstr_literal)                                  \
     {cstr_literal, AUTIL_CSTR_COUNT(cstr_literal)}
 // clang-format on
 

@@ -17,37 +17,37 @@ main(void)
     EXPECT(autil_vstr_cmp(&lhs, &rhs) == 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) == 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
-    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) == 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) == 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
-    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("AA");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("AA");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("AA");
-    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("AA");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
-    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("B");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("B");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("B");
-    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("A");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("B");
+    rhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("A");
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("FooBar");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("FooBar");
     rhs = (struct autil_vstr){"Fo\0Bar", 6};
     EXPECT(autil_vstr_cmp(&lhs, &rhs) > 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) > 0);
 
-    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_LITERAL("Fo\0\0ar");
+    lhs = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("Fo\0\0ar");
     rhs = (struct autil_vstr){"Fo\0Bar", 6};
     EXPECT(autil_vstr_cmp(&lhs, &rhs) < 0);
     EXPECT(autil_vstr_vpcmp(&lhs, &rhs) < 0);
