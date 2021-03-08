@@ -2,8 +2,9 @@ Unreleased
 --------------------------------
 + Add autil_cstr_new_cstr, autil_cstr_starts_with, and autil_cstr_ends_with.
 + Add autil_string_append, autil_string_append_fmt, and autil_string_append_fmt.
-+ Rename AUTIL_VSTR_INIT_LITERAL to AUTIL_VSTR_INIT_STR_LITERAL.
 + Rename AUTIL_CSTR_COUNT to AUTIL_STR_LITERAL_COUNT.
++ Rename AUTIL_VSTR_INIT_LITERAL to AUTIL_VSTR_INIT_STR_LITERAL.
++ Rename AUTIL_VSTR_LOCAL_PTR_LITERAL to AUTIL_VSTR_LOCAL_PTR_STR_LITERAL.
 + The functions autil_bigint_new* and autil_bigint_to_new_cstr can now parse
   and stringify octal numbers (prefixed with "0o").
 + The macros autil_arr_reserve, autil_arr_resize, and autil_arr_push may now be

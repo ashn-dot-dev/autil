@@ -263,7 +263,7 @@ struct autil_vstr
 // Produce a pointer of type struct autil_vstr* from the provided cstring
 // literal. This pointer has automatic storage duration associated with the
 // enclosing block.
-#define AUTIL_VSTR_LOCAL_PTR_LITERAL(str_literal)                              \
+#define AUTIL_VSTR_LOCAL_PTR_STR_LITERAL(str_literal)                              \
     AUTIL_VSTR_LOCAL_PTR(str_literal, AUTIL_STR_LITERAL_COUNT(str_literal))
 
 // Initializer for a vstring literal from a cstring literal.
@@ -520,7 +520,7 @@ autil_bigint_divrem(
     struct autil_bigint const* rhs);
 
 // Returns an autil_xalloc-allocated cstring representation of the provided
-// bigint using using specified by the format string.
+// bigint as specified by the provided format string.
 // If fmt is NULL then default formatting is used.
 //
 // Returns a NUL-terminated string on success.

@@ -74,13 +74,13 @@ main(void)
     // Some vstr tests.
     string = autil_string_new_cstr("ABCBB");
     autil_string_split_to_vec_on_vstr(
-        string, AUTIL_VSTR_LOCAL_PTR_LITERAL("B"), split);
+        string, AUTIL_VSTR_LOCAL_PTR_STR_LITERAL("B"), split);
     dump(string, split);
     cleanup(string, split);
 
     string = autil_string_new_cstr("ABC");
     autil_string_split_to_vec_on_vstr(
-        string, AUTIL_VSTR_LOCAL_PTR_LITERAL("FOOBAR"), split);
+        string, AUTIL_VSTR_LOCAL_PTR_STR_LITERAL("FOOBAR"), split);
     dump(string, split);
     cleanup(string, split);
 
