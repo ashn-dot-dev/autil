@@ -93,10 +93,10 @@ v0.2.0 - 2020-09-16
 v0.1.0 - 2020-07-30
 --------------------------------
 + Initial release.
-+ Add type vpcmp_fn and functions str_vpcmp and int_vpcmp.
++ Add type vpcmp_fn and associated functions str_vpcmp and int_vpcmp.
 + Add LOCAL_PTR and DEREF_PTR.
 + Add errorf and fatalf.
-+ Add xalloc and xallocn and XALLOC_FREE.
++ Add xalloc, xallocn, and XALLOC_FREE.
 + Add file_read and file_write.
 + Add type vec and associated functions: vec_new, vec_del, vec_count,
   vec_capacity, vec_reserve, vec_resize, vec_set, vec_get, vec_insert, and
