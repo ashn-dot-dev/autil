@@ -570,6 +570,9 @@ autil_string_new(char const* start, size_t count);
 // If cstr is NULL then string will be initialized to the empty string.
 AUTIL_API struct autil_string*
 autil_string_new_cstr(char const* cstr);
+// Allocate and initialize a string from the provided formated text.
+AUTIL_API struct autil_string*
+autil_string_new_fmt(char const* fmt, ...);
 // Deinitialize and free the string.
 // Does nothing if self == NULL.
 AUTIL_API void
@@ -2358,6 +2361,21 @@ autil_string_new_cstr(char const* cstr)
     return autil_string_new(cstr, strlen(cstr));
 }
 
+AUTIL_API struct autil_string*
+autil_string_new_fmt(char const* fmt, ...)
+{
+    assert(fmt != NULL);
+
+    struct autil_string* const self = autil_string_new(NULL, 0);
+
+    va_list args;
+    va_start(args, fmt);
+    autil_string_append_vfmt(self, fmt, args);
+    va_end(args);
+
+    return self;
+}
+
 AUTIL_API void
 autil_string_del(struct autil_string* self)
 {
@@ -2483,11 +2501,12 @@ autil_string_append(struct autil_string* self, char const* start, size_t count)
 AUTIL_API void
 autil_string_append_fmt(struct autil_string* self, char const* fmt, ...)
 {
+    assert(self != NULL);
+    assert(fmt != NULL);
+
     va_list args;
     va_start(args, fmt);
-
     autil_string_append_vfmt(self, fmt, args);
-
     va_end(args);
 }
 
@@ -2495,6 +2514,9 @@ AUTIL_API void
 autil_string_append_vfmt(
     struct autil_string* self, char const* fmt, va_list args)
 {
+    assert(self != NULL);
+    assert(fmt != NULL);
+
     va_list copy;
     va_copy(copy, args);
     int const len = vsnprintf(NULL, 0, fmt, copy);
