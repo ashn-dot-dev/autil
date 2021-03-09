@@ -621,7 +621,9 @@ autil_string_remove(struct autil_string* self, size_t idx, size_t count);
 // Append count bytes of start onto the end of the string.
 AUTIL_API void
 autil_string_append(struct autil_string* self, char const* start, size_t count);
-
+// Append the provided NUL-terminated cstring onto the end of the string.
+AUTIL_API void
+autil_string_append_cstr(struct autil_string* self, char const* cstr);
 // Append the formatted text to the end of the string.
 AUTIL_API void
 autil_string_append_fmt(struct autil_string* self, char const* fmt, ...);
@@ -2515,6 +2517,14 @@ autil_string_append(struct autil_string* self, char const* start, size_t count)
     assert(self != NULL);
 
     autil_string_insert(self, autil_string_count(self), start, count);
+}
+
+AUTIL_API void
+autil_string_append_cstr(struct autil_string* self, char const* cstr)
+{
+    assert(self != NULL);
+
+    autil_string_insert(self, autil_string_count(self), cstr, strlen(cstr));
 }
 
 AUTIL_API void
