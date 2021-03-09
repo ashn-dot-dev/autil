@@ -320,6 +320,9 @@ autil_vstr_ends_with(
 //      // The declaration:
 //      //      TYPE* identifier = NULL;
 //      // creates an empty strechy buffer holding TYPE values.
+//      // An equivalent declaration:
+//      //      autil_arr(TYPE) identifier = NULL;
+//      // may also be used in most cases.
 //      int* vals = NULL;
 //      printf("count == %zu\n", autil_arr_count(vals));  /* count == 0 */
 //
@@ -337,6 +340,17 @@ autil_vstr_ends_with(
 //      // Free memory allocated to the arr.
 //      // This is safe to call even if vals == NULL.
 //      autil_arr_fini(vals);
+
+// Convenience macros used to explicitly annotate a pointer as a stretchy
+// buffer. Type annotations for types such as stack-allocated arrays and
+// function pointers are not supported by this macro due to the complicated
+// nature of C variable/type declarations.
+//
+// Example:
+//      autil_arr(int) arr = NULL;
+//      autil_arr_push(arr, 1);
+#define autil_arr(TYPE) TYPE*
+#define autil_arr_const(TYPE) TYPE const*
 
 // void autil_arr_fini(TYPE* arr)
 // ------------------------------------------------------------

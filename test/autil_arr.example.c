@@ -97,10 +97,44 @@ variadic_macros(void)
     autil_arr_fini(a);
 }
 
+static void
+mutate_ints(autil_arr(int) arr)
+{
+    for (size_t i = 0; i < autil_arr_count(arr); ++i) {
+        arr[i] += 10;
+    }
+}
+
+static void
+print_ints(autil_arr_const(int) arr)
+{
+    for (size_t i = 0; i < autil_arr_count(arr); ++i) {
+        printf("%d\n", arr[i]);
+    }
+}
+
+static void
+alternative_declaration(void)
+{
+    autil_arr(int) arr = NULL;
+    autil_arr_push(arr, 1);
+    autil_arr_push(arr, 2);
+    autil_arr_push(arr, 3);
+    autil_arr_push(arr, 4);
+    autil_arr_push(arr, 5);
+
+    print_ints(arr);
+    mutate_ints(arr);
+    print_ints(arr);
+
+    autil_arr_fini(arr);
+}
+
 int
 main(void)
 {
     basics();
     variadic_macros();
+    alternative_declaration();
     return EXIT_SUCCESS;
 }
