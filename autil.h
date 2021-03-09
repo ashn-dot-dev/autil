@@ -263,7 +263,7 @@ struct autil_vstr
 // Produce a pointer of type struct autil_vstr* from the provided cstring
 // literal. This pointer has automatic storage duration associated with the
 // enclosing block.
-#define AUTIL_VSTR_LOCAL_PTR_STR_LITERAL(str_literal)                              \
+#define AUTIL_VSTR_LOCAL_PTR_STR_LITERAL(str_literal)                          \
     AUTIL_VSTR_LOCAL_PTR(str_literal, AUTIL_STR_LITERAL_COUNT(str_literal))
 
 // Initializer for a vstring literal from a cstring literal.
@@ -748,6 +748,25 @@ autil_vec_insert(struct autil_vec* self, size_t idx, void const* data);
 // Fatally exits after printing an error message if idx is out of bounds.
 AUTIL_API void
 autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem);
+
+// Create or advance an iterator over elements of a vec.
+// If parameter iter is NULL then a new iterator pointing to the first element
+// of the vec is returned. A NULL value signaling end-of-iteration will be
+// returned for a vec with no elements or a vec containing zero-sized elements.
+// If parameter iter is non-NULL then the element following iter is returned.
+// End-of-iteration is signaled by a NULL return value.
+//
+// Example (using a const-iterator):
+//      struct autil_vec* const v = autil_vec_new(sizeof(TYPE));
+//      // some time later...
+//      TYPE const* iter = autil_vec_next_const(v, NULL);
+//      for (; iter != NULL; iter = autil_vec_next_const(v, iter)) {
+//          do_thing(*iter);
+//      }
+AUTIL_API void*
+autil_vec_next(struct autil_vec* self, void const* iter);
+AUTIL_API void const*
+autil_vec_next_const(struct autil_vec const* self, void const* iter);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// MAP ///////////////////////////////////////////////////////////////////
@@ -2862,6 +2881,46 @@ autil_vec_remove(struct autil_vec* self, size_t idx, void* oldelem)
     void* const move_src = ((char*)move_dst) + 1 * self->elemsize;
     memmove(move_dst, move_src, move_size);
     self->count -= 1;
+}
+
+AUTIL_API void*
+autil_vec_next(struct autil_vec* self, void const* iter)
+{
+    assert(self != NULL);
+
+    if (self->count == 0 || self->elemsize == 0) {
+        return NULL;
+    }
+
+    if (iter == NULL) {
+        return autil_vec_ref(self, 0);
+    }
+
+    size_t const iter_idx =
+        ((size_t)((char*)iter - (char*)self->start)) / self->elemsize;
+    size_t const next_idx = iter_idx + 1;
+    assert(next_idx <= self->count);
+    return next_idx != self->count ? autil_vec_ref(self, next_idx) : NULL;
+}
+
+AUTIL_API void const*
+autil_vec_next_const(struct autil_vec const* self, void const* iter)
+{
+    assert(self != NULL);
+
+    if (self->count == 0 || self->elemsize == 0) {
+        return NULL;
+    }
+
+    if (iter == NULL) {
+        return autil_vec_ref_const(self, 0);
+    }
+
+    size_t const iter_idx =
+        ((size_t)((char*)iter - (char*)self->start)) / self->elemsize;
+    size_t const next_idx = iter_idx + 1;
+    assert(next_idx <= self->count);
+    return next_idx != self->count ? autil_vec_ref_const(self, next_idx) : NULL;
 }
 
 struct autil_map
