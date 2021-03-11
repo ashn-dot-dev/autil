@@ -449,11 +449,11 @@ autil_bigint_new(struct autil_bigint const* othr);
 // The cstring *must* not have any leading or trailing whitespace.
 AUTIL_API struct autil_bigint*
 autil_bigint_new_cstr(char const* cstr);
-// Allocate and initialize a bigint from the provided UTF-8 string.
-// Returns NULL if the UTF-8 string could not be parsed.
+// Allocate and initialize a bigint from the provided string slice.
+// Returns NULL if the string could not be parsed.
 // This function uses the same string-grammar as autil_bigint_new_cstr().
 AUTIL_API struct autil_bigint*
-autil_bigint_new_utf8(void const* utf8, size_t utf8_size);
+autil_bigint_new_text(char const* start, size_t count);
 // Deinitialize and free the bigint.
 // Does nothing if self == NULL.
 AUTIL_API void
@@ -1562,16 +1562,16 @@ autil_bigint_new_cstr(char const* cstr)
 {
     assert(cstr != NULL);
 
-    return autil_bigint_new_utf8(cstr, strlen(cstr));
+    return autil_bigint_new_text(cstr, strlen(cstr));
 }
 
 AUTIL_API struct autil_bigint*
-autil_bigint_new_utf8(void const* utf8, size_t utf8_size)
+autil_bigint_new_text(char const* start, size_t count)
 {
-    assert(utf8 != NULL);
+    assert(start != NULL);
 
     struct autil_bigint* self = NULL;
-    unsigned char const* const end = (unsigned char const*)utf8 + utf8_size;
+    char const* const end = start + count;
 
     // Default to decimal radix.
     int radix = 10;
@@ -1579,7 +1579,7 @@ autil_bigint_new_utf8(void const* utf8, size_t utf8_size)
     int (*radix_isdigit)(int c) = autil_isdigit;
 
     // Begin iterating over the string from left to right.
-    unsigned char const* cur = utf8;
+    char const* cur = start;
     goto sign;
 
 sign:
@@ -1635,7 +1635,7 @@ digits:
         // No digits.
         goto error;
     }
-    unsigned char const* const digits_start = cur;
+    char const* const digits_start = cur;
     while (cur != end) {
         if (!radix_isdigit(*cur)) {
             // Invalid digit.
