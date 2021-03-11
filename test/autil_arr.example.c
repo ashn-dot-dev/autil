@@ -97,16 +97,20 @@ variadic_macros(void)
     autil_arr_fini(a);
 }
 
+// clang-format off
 static void
 mutate_ints(autil_arr(int) arr)
+// clang-format on
 {
     for (size_t i = 0; i < autil_arr_count(arr); ++i) {
         arr[i] += 10;
     }
 }
 
+// clang-format off
 static void
 print_ints(autil_arr_const(int) arr)
+// clang-format on
 {
     for (size_t i = 0; i < autil_arr_count(arr); ++i) {
         printf("%d\n", arr[i]);
