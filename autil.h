@@ -298,48 +298,48 @@ autil_vstr_ends_with(
     struct autil_vstr const* vstr, struct autil_vstr const* target);
 
 ////////////////////////////////////////////////////////////////////////////////
-//////// ARR ///////////////////////////////////////////////////////////////////
+//////// STRETCHY BUFFER ///////////////////////////////////////////////////////
 // General purpose type-safe dynamic array (a.k.a stretchy buffer).
 //
 // A stretchy buffer works by storing metadata about the number of allocated and
 // in-use elements in a header just before the address of the buffer's first
 // element. The ith element of a stretchy buffer may be accessed using the array
-// index operator, arr[i], and a stretchy buffer containing elements of type T
+// index operator, sbuf[i], and a stretchy buffer containing elements of type T
 // may be passed to subroutines as if it were regular array-like pointer of type
 // T* or T const*. The address of a stretchy buffer may change when a resizing
 // operation is performed, similar to resizing operations done with realloc, so
 // the address of a stretchy buffer should not be considered stable.
 //
-// +--------+--------+--------+--------+--
-// | HEADER | ARR[0] | ARR[1] | ARR[2] | ...
-// +--------+--------+--------+--------+--
+// +--------+---------+---------+---------+--
+// | HEADER | SBUF[0] | SBUF[1] | SBUF[2] | ...
+// +--------+---------+---------+---------+--
 //          ^
-//          Pointer manipulated by the user / autil_arr_* macros.
+//          Pointer manipulated by the user / autil_sbuf_* macros.
 //
 // Example:
 //      // The declaration:
 //      //      TYPE* identifier = NULL;
-//      // creates an empty strechy buffer holding TYPE values.
+//      // creates an empty stretchy buffer holding TYPE values.
 //      // An equivalent declaration:
-//      //      autil_arr(TYPE) identifier = NULL;
+//      //      autil_sbuf(TYPE) identifier = NULL;
 //      // may also be used in most cases.
 //      int* vals = NULL;
-//      printf("count == %zu\n", autil_arr_count(vals));  /* count == 0 */
+//      printf("count == %zu\n", autil_sbuf_count(vals));  /* count == 0 */
 //
 //      for (int i = 0; i < 3; ++i) {
-//          autil_arr_push(vals, (i + 1) * 2);
+//          autil_sbuf_push(vals, (i + 1) * 2);
 //      }
-//      printf("count == %zu\n", autil_arr_count(vals)); /* count == 3 */
+//      printf("count == %zu\n", autil_sbuf_count(vals)); /* count == 3 */
 //      printf("vals[0] == %d\n", vals[0]); /* vals[0] == 2 */
 //      printf("vals[1] == %d\n", vals[1]); /* vals[1] == 4 */
 //      printf("vals[2] == %d\n", vals[2]); /* vals[2] == 6 */
 //
-//      printf("popped == %d\n", autil_arr_pop(vals)); /* popped == 6 */
-//      printf("count == %zu\n", autil_arr_count(vals)); /* count == 2 */
+//      printf("popped == %d\n", autil_sbuf_pop(vals)); /* popped == 6 */
+//      printf("count == %zu\n", autil_sbuf_count(vals)); /* count == 2 */
 //
-//      // Free memory allocated to the arr.
+//      // Free memory allocated to the sbuf.
 //      // This is safe to call even if vals == NULL.
-//      autil_arr_fini(vals);
+//      autil_sbuf_fini(vals);
 
 // Convenience macros used to explicitly annotate a pointer as a stretchy
 // buffer. Type annotations for types such as stack-allocated arrays and
@@ -347,79 +347,79 @@ autil_vstr_ends_with(
 // nature of C variable/type declarations.
 //
 // Example:
-//      autil_arr(int) arr = NULL;
-//      autil_arr_push(arr, 1);
-#define autil_arr(TYPE) TYPE*
-#define autil_arr_const(TYPE) TYPE const*
+//      autil_sbuf(int) sbuf = NULL;
+//      autil_sbuf_push(sbuf, 1);
+#define autil_sbuf(TYPE) TYPE*
+#define autil_sbuf_const(TYPE) TYPE const*
 
-// void autil_arr_fini(TYPE* arr)
+// void autil_sbuf_fini(TYPE* sbuf)
 // ------------------------------------------------------------
-// Free resources associated with the arr.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_fini(arr)                                                    \
-    ((void)((arr) != NULL ? AUTIL__ARR_FREE_NON_NULL_HEADER_(arr) : NULL))
+// Free resources associated with the stretchy buffer.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_fini(sbuf)                                                  \
+    ((void)((sbuf) != NULL ? AUTIL__SBUF_FREE_NON_NULL_HEAD_(sbuf) : NULL))
 
-// size_t autil_arr_count(TYPE* arr)
+// size_t autil_sbuf_count(TYPE* sbuf)
 // ------------------------------------------------------------
-// The number of elements in the arr.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_count(arr)                                                   \
-    ((size_t)((arr) != NULL ? AUTIL__ARR_PHEADER_CONST_(arr)->cnt_ : (size_t)0))
-// size_t autil_arr_capacity(TYPE* arr)
+// The number of elements in the stretchy buffer.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_count(sbuf)                                                 \
+    ((size_t)((sbuf) != NULL ? AUTIL__SBUF_PHEAD_CONST_(sbuf)->cnt_ : 0u))
+// size_t autil_sbuf_capacity(TYPE* sbuf)
 // ------------------------------------------------------------
-// The number of elements the allocated in the arr.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_capacity(arr)                                                \
-    ((size_t)((arr) != NULL ? AUTIL__ARR_PHEADER_CONST_(arr)->cap_ : (size_t)0))
+// The number of elements the allocated in the sbuf.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_capacity(sbuf)                                              \
+    ((size_t)((sbuf) != NULL ? AUTIL__SBUF_PHEAD_CONST_(sbuf)->cap_ : 0u))
 
-// void autil_arr_reserve(TYPE* arr, size_t n)
+// void autil_sbuf_reserve(TYPE* sbuf, size_t n)
 // ------------------------------------------------------------
-// Update the minimum capacity of the arr to n elements.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_reserve(arr, /*n*/...)                                       \
-    ((void)((arr) = autil__arr_rsv_(sizeof(*(arr)), arr, __VA_ARGS__)))
-// void autil_arr_resize(TYPE* arr, size_t n)
+// Update the minimum capacity of the stretchy buffer to n elements.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_reserve(sbuf, /*n*/...)                                     \
+    ((void)((sbuf) = autil__sbuf_rsv_(sizeof(*(sbuf)), sbuf, __VA_ARGS__)))
+// void autil_sbuf_resize(TYPE* sbuf, size_t n)
 // ------------------------------------------------------------
-// Update the count of the arr to n elements.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_resize(arr, /*n*/...)                                        \
-    ((void)((arr) = autil__arr_rsz_(sizeof(*(arr)), arr, __VA_ARGS__)))
+// Update the count of the stretchy buffer to n elements.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_resize(sbuf, /*n*/...)                                      \
+    ((void)((sbuf) = autil__sbuf_rsz_(sizeof(*(sbuf)), sbuf, __VA_ARGS__)))
 
-// void autil_arr_push(TYPE* arr, TYPE val)
+// void autil_sbuf_push(TYPE* sbuf, TYPE val)
 // ------------------------------------------------------------
-// Append val as the last element of arr.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_push(arr, /*val*/...)                                        \
-    ((void)(AUTIL__ARR_MAYBE_GROW_(arr), AUTIL__ARR_APPEND_(arr, __VA_ARGS__)))
-// TYPE autil_arr_pop(TYPE* arr)
+// Append val as the last element of the stretchy buffer.
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_push(sbuf, /*val*/...)                                      \
+    ((void)(AUTIL__SBUF_MAYBE_GROW_(sbuf), AUTIL__SBUF_APPEND_(sbuf, __VA_ARGS__)))
+// TYPE autil_sbuf_pop(TYPE* sbuf)
 // ------------------------------------------------------------
-// Remove and return the last element of arr.
+// Remove and return the last element of the stretchy buffer.
 // This macro does *not* perform bounds checking.
-// Macro parameter arr is evaluated multiple times.
-#define autil_arr_pop(arr) ((arr)[--AUTIL__ARR_PHEADER_MUTBL_(arr)->cnt_])
+// Macro parameter sbuf is evaluated multiple times.
+#define autil_sbuf_pop(sbuf) ((sbuf)[--AUTIL__SBUF_PHEAD_MUTBL_(sbuf)->cnt_])
 
 // Internal utilities that must be visible to other header/source files that
-// wish to use the autil_arr_* API. Do not use these directly!
+// wish to use the autil_sbuf_* API. Do not use these directly!
 // clang-format off
-struct autil__arr_header_{size_t cnt_; size_t cap_; autil_max_align_type _[];};
-enum{AUTIL__ARR_HEADER_OFFSET_ = sizeof(struct autil__arr_header_)};
-#define AUTIL__ARR_PHEADER_MUTBL_(arr_)                                        \
-    ((struct autil__arr_header_      *)                                        \
-     ((char      *)(arr_)-AUTIL__ARR_HEADER_OFFSET_))
-#define AUTIL__ARR_PHEADER_CONST_(arr_)                                        \
-    ((struct autil__arr_header_ const*)                                        \
-     ((char const*)(arr_)-AUTIL__ARR_HEADER_OFFSET_))
-#define AUTIL__ARR_FREE_NON_NULL_HEADER_(arr_)                                 \
-    (autil_xalloc(AUTIL__ARR_PHEADER_MUTBL_(arr_), AUTIL_XALLOC_FREE))
-#define AUTIL__ARR_MAYBE_GROW_(arr_)                                           \
-    ((autil_arr_count(arr_) == autil_arr_capacity(arr_))                       \
-         ? (arr_) = autil__arr_grw_(sizeof(*(arr_)), arr_)                     \
-         : (arr_))
-#define AUTIL__ARR_APPEND_(arr_, ...)                                          \
-    ((arr_)[AUTIL__ARR_PHEADER_MUTBL_(arr_)->cnt_++] = (__VA_ARGS__))
-AUTIL_API void* autil__arr_rsv_(size_t elemsize, void* arr, size_t cap);
-AUTIL_API void* autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt);
-AUTIL_API void* autil__arr_grw_(size_t elemsize, void* arr);
+struct autil__sbuf_header_{size_t cnt_; size_t cap_; autil_max_align_type _[];};
+enum{AUTIL__SBUF_HEADER_OFFSET_ = sizeof(struct autil__sbuf_header_)};
+#define AUTIL__SBUF_PHEAD_MUTBL_(sbuf_)                                        \
+    ((struct autil__sbuf_header_      *)                                       \
+     ((char      *)(sbuf_)-AUTIL__SBUF_HEADER_OFFSET_))
+#define AUTIL__SBUF_PHEAD_CONST_(sbuf_)                                        \
+    ((struct autil__sbuf_header_ const*)                                       \
+     ((char const*)(sbuf_)-AUTIL__SBUF_HEADER_OFFSET_))
+#define AUTIL__SBUF_FREE_NON_NULL_HEAD_(sbuf_)                                 \
+    (autil_xalloc(AUTIL__SBUF_PHEAD_MUTBL_(sbuf_), AUTIL_XALLOC_FREE))
+#define AUTIL__SBUF_MAYBE_GROW_(sbuf_)                                         \
+    ((autil_sbuf_count(sbuf_) == autil_sbuf_capacity(sbuf_))                   \
+         ? (sbuf_) = autil__sbuf_grw_(sizeof(*(sbuf_)), sbuf_)                 \
+         : (sbuf_))
+#define AUTIL__SBUF_APPEND_(sbuf_, ...)                                        \
+    ((sbuf_)[AUTIL__SBUF_PHEAD_MUTBL_(sbuf_)->cnt_++] = (__VA_ARGS__))
+AUTIL_API void* autil__sbuf_rsv_(size_t elemsize, void* sbuf, size_t cap);
+AUTIL_API void* autil__sbuf_rsz_(size_t elemsize, void* sbuf, size_t cnt);
+AUTIL_API void* autil__sbuf_grw_(size_t elemsize, void* sbuf);
 // clang-format on
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1330,60 +1330,60 @@ autil_vstr_ends_with(
 }
 
 AUTIL_STATIC_ASSERT(
-    ARR_HEADER_OFFSET_IS_ALIGNED,
-    AUTIL__ARR_HEADER_OFFSET_ % AUTIL_ALIGNOF(autil_max_align_type) == 0);
+    SBUF_HEADER_OFFSET_IS_ALIGNED,
+    AUTIL__SBUF_HEADER_OFFSET_ % AUTIL_ALIGNOF(autil_max_align_type) == 0);
 
 /* reserve */
 AUTIL_API void*
-autil__arr_rsv_(size_t elemsize, void* arr, size_t cap)
+autil__sbuf_rsv_(size_t elemsize, void* sbuf, size_t cap)
 {
     assert(elemsize != 0);
 
-    if (cap <= autil_arr_capacity(arr)) {
-        return arr;
+    if (cap <= autil_sbuf_capacity(sbuf)) {
+        return sbuf;
     }
 
     assert(cap != 0);
-    size_t const size = AUTIL__ARR_HEADER_OFFSET_ + elemsize * cap;
-    struct autil__arr_header_* const header =
-        autil_xalloc(arr != NULL ? AUTIL__ARR_PHEADER_MUTBL_(arr) : NULL, size);
-    header->cnt_ = arr != NULL ? header->cnt_ : 0;
+    size_t const size = AUTIL__SBUF_HEADER_OFFSET_ + elemsize * cap;
+    struct autil__sbuf_header_* const header = autil_xalloc(
+        sbuf != NULL ? AUTIL__SBUF_PHEAD_MUTBL_(sbuf) : NULL, size);
+    header->cnt_ = sbuf != NULL ? header->cnt_ : 0;
     header->cap_ = cap;
-    return (char*)header + AUTIL__ARR_HEADER_OFFSET_;
+    return (char*)header + AUTIL__SBUF_HEADER_OFFSET_;
 }
 
 /* resize */
 AUTIL_API void*
-autil__arr_rsz_(size_t elemsize, void* arr, size_t cnt)
+autil__sbuf_rsz_(size_t elemsize, void* sbuf, size_t cnt)
 {
     assert(elemsize != 0);
 
     if (cnt == 0) {
-        autil_arr_fini(arr);
+        autil_sbuf_fini(sbuf);
         return NULL;
     }
 
-    if (cnt > autil_arr_capacity(arr)) {
-        arr = autil__arr_rsv_(elemsize, arr, cnt);
+    if (cnt > autil_sbuf_capacity(sbuf)) {
+        sbuf = autil__sbuf_rsv_(elemsize, sbuf, cnt);
     }
-    assert(arr != NULL);
-    AUTIL__ARR_PHEADER_MUTBL_(arr)->cnt_ = cnt;
-    return arr;
+    assert(sbuf != NULL);
+    AUTIL__SBUF_PHEAD_MUTBL_(sbuf)->cnt_ = cnt;
+    return sbuf;
 }
 
 /* grow capacity by doubling */
 AUTIL_API void*
-autil__arr_grw_(size_t elemsize, void* arr)
+autil__sbuf_grw_(size_t elemsize, void* sbuf)
 {
     assert(elemsize != 0);
 
-    size_t const cap = autil_arr_capacity(arr);
-    assert(autil_arr_count(arr) == cap);
+    size_t const cap = autil_sbuf_capacity(sbuf);
+    assert(autil_sbuf_count(sbuf) == cap);
 
     static size_t const GROWTH_FACTOR = 2;
     static size_t const DEFAULT_CAPACITY = 8;
     size_t const new_cap = cap ? cap * GROWTH_FACTOR : DEFAULT_CAPACITY;
-    return autil__arr_rsv_(elemsize, arr, new_cap);
+    return autil__sbuf_rsv_(elemsize, sbuf, new_cap);
 }
 
 // The internals of struct autil_bigint are designed such that initializing an
