@@ -1417,10 +1417,10 @@ struct autil_bigint
 // machine uint8_t and uint16_t values will implicitly cast up to unsigned int
 // values cleanly which makes addition and multiplication of limbs work without
 // needing to think too hard.
-#define AUTIL__BIGINT_BITS_PER_LIMB_ ((size_t)8)
+#define AUTIL__BIGINT_LIMB_BITS_ ((size_t)8)
 AUTIL_STATIC_ASSERT(
     correct_bits_per_limb,
-    AUTIL__BIGINT_BITS_PER_LIMB_
+    AUTIL__BIGINT_LIMB_BITS_
         == (sizeof(*((struct autil_bigint*)0)->limbs) * CHAR_BIT));
 
 struct autil_bigint const* const AUTIL_BIGINT_ZERO =
@@ -1774,8 +1774,8 @@ autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    autil__bigint_shiftl_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
-    for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
+    autil__bigint_shiftl_limbs_(self, nbits / AUTIL__BIGINT_LIMB_BITS_);
+    for (size_t n = 0; n < nbits % AUTIL__BIGINT_LIMB_BITS_; ++n) {
         if (self->limbs[self->count - 1] & 0x80) {
             self->count += 1;
             self->limbs = autil_xalloc(self->limbs, self->count);
@@ -1805,8 +1805,8 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    autil__bigint_shiftr_limbs_(self, nbits / AUTIL__BIGINT_BITS_PER_LIMB_);
-    for (size_t n = 0; n < nbits % AUTIL__BIGINT_BITS_PER_LIMB_; ++n) {
+    autil__bigint_shiftr_limbs_(self, nbits / AUTIL__BIGINT_LIMB_BITS_);
+    for (size_t n = 0; n < nbits % AUTIL__BIGINT_LIMB_BITS_; ++n) {
         // [limb0 >> 1 | lsbit(limb1)][limb1 >> 1 | lsbit(limb2)]...
         for (size_t i = 0; i < self->count - 1; ++i) {
             self->limbs[i] = (uint8_t)(self->limbs[i] >> 1u);
@@ -1835,7 +1835,7 @@ autil_bigint_bit_count(struct autil_bigint const* self)
         top_bit_count += 1;
         top = top >> 1;
     }
-    return (self->count - 1) * AUTIL__BIGINT_BITS_PER_LIMB_ + top_bit_count;
+    return (self->count - 1) * AUTIL__BIGINT_LIMB_BITS_ + top_bit_count;
 }
 
 AUTIL_API int
@@ -1843,12 +1843,12 @@ autil_bigint_bit_get(struct autil_bigint const* self, size_t n)
 {
     assert(self != NULL);
 
-    if (n >= (self->count * AUTIL__BIGINT_BITS_PER_LIMB_)) {
+    if (n >= (self->count * AUTIL__BIGINT_LIMB_BITS_)) {
         return 0;
     }
 
-    uint8_t const limb = self->limbs[n / AUTIL__BIGINT_BITS_PER_LIMB_];
-    uint8_t const mask = (uint8_t)(1u << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
+    uint8_t const limb = self->limbs[n / AUTIL__BIGINT_LIMB_BITS_];
+    uint8_t const mask = (uint8_t)(1u << (n % AUTIL__BIGINT_LIMB_BITS_));
     return (limb & mask) != 0;
 }
 
@@ -1857,7 +1857,7 @@ autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value)
 {
     assert(self != NULL);
 
-    size_t const limb_idx = (n / AUTIL__BIGINT_BITS_PER_LIMB_);
+    size_t const limb_idx = (n / AUTIL__BIGINT_LIMB_BITS_);
     if (limb_idx >= self->count) {
         if (!value) {
             // The abstact unallocated bit is already zero so re-setting it to
@@ -1870,7 +1870,7 @@ autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value)
     }
 
     uint8_t* const plimb = self->limbs + limb_idx;
-    uint8_t const mask = (uint8_t)(1 << (n % AUTIL__BIGINT_BITS_PER_LIMB_));
+    uint8_t const mask = (uint8_t)(1 << (n % AUTIL__BIGINT_LIMB_BITS_));
     *plimb = (uint8_t)(value ? *plimb | mask : *plimb & ~mask);
     if (self->sign == 0 && value) {
         // If the integer was zero (i.e. had sign zero) before and a bit was
@@ -2241,8 +2241,8 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     // Digits.
     void* digits = NULL;
     size_t digits_size = 0;
-    char digit_buf
-        [AUTIL__BIGINT_BITS_PER_LIMB_ + AUTIL_STR_LITERAL_COUNT("\0")] = {0};
+    char digit_buf[AUTIL__BIGINT_LIMB_BITS_ + AUTIL_STR_LITERAL_COUNT("\0")] = {
+        0};
     if (specifier == 'd') {
         struct autil_bigint DEC = {0};
         struct autil_bigint SELF = {0};
