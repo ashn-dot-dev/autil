@@ -451,6 +451,10 @@ autil_bitarr_get(struct autil_bitarr const* self, size_t n);
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
 // Arbitrary precision integer.
+// A bigint conceptually consists of the following components:
+// (1) sign: The arithmetic sign of the integer (+, -, or 0).
+// (2) magnitude: The absolute value of the bigint, presented through this API
+//     as an infinitely long sequence of bits with little endian ordering.
 
 extern struct autil_bigint const* const AUTIL_BIGINT_ZERO; // 0
 extern struct autil_bigint const* const AUTIL_BIGINT_POS_ONE; // +1
@@ -719,9 +723,9 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 //////// VEC ///////////////////////////////////////////////////////////////////
 // General purpose generic resizeable array.
 // A vec conceptually consists of the following components:
-// (1) data - An array containing the elements of the vec.
-// (2) count - The number of elements in the vec.
-// (3) capacity - The total number of elements allocated in the data array.
+// (1) data: An array containing the elements of the vec.
+// (2) count: The number of elements in the vec.
+// (3) capacity: The total number of elements allocated in the data array.
 //     This value is always greater than or equal to the count of the vec.
 
 // Allocate and initialize a vec holding elements of size elemsize.
