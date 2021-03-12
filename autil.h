@@ -65,6 +65,7 @@ LICENSE
 #include <stdio.h> /* FILE*, printf-family */
 
 struct autil_vstr;
+struct autil_bitarr;
 struct autil_bigint;
 struct autil_string;
 struct autil_vec;
@@ -421,6 +422,31 @@ AUTIL_API void* autil__sbuf_rsv_(size_t elemsize, void* sbuf, size_t cap);
 AUTIL_API void* autil__sbuf_rsz_(size_t elemsize, void* sbuf, size_t cnt);
 AUTIL_API void* autil__sbuf_grw_(size_t elemsize, void* sbuf);
 // clang-format on
+
+////////////////////////////////////////////////////////////////////////////////
+//////// BIT ARRAY /////////////////////////////////////////////////////////////
+
+// Allocate and initialize a bit array with count bits.
+// The bit array in initially zeroed.
+AUTIL_API struct autil_bitarr*
+autil_bitarr_new(size_t count);
+
+// Deinitialize and free the bit array.
+// Does nothing if self == NULL.
+AUTIL_API void
+autil_bitarr_del(struct autil_bitarr* self);
+
+// Returns the number of bits in this bit array.
+AUTIL_API size_t
+autil_bitarr_count(struct autil_bitarr const* self);
+// Set the nth bit (zero indexed) of self to value.
+// Fatally exits after printing an error message if n is out of bounds.
+AUTIL_API void
+autil_bitarr_set(struct autil_bitarr* self, size_t n, int value);
+// Returns the value (one or zero) of the nth bit (zero indexed) of self.
+// Fatally exits after printing an error message if n is out of bounds.
+AUTIL_API int
+autil_bitarr_get(struct autil_bitarr const* self, size_t n);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
@@ -1384,6 +1410,93 @@ autil__sbuf_grw_(size_t elemsize, void* sbuf)
     static size_t const DEFAULT_CAPACITY = 8;
     size_t const new_cap = cap ? cap * GROWTH_FACTOR : DEFAULT_CAPACITY;
     return autil__sbuf_rsv_(elemsize, sbuf, new_cap);
+}
+
+#define AUTIL__BITARR_WORD_TYPE_ unsigned long
+#define AUTIL__BITARR_WORD_SIZE_ sizeof(AUTIL__BITARR_WORD_TYPE_)
+#define AUTIL__BITARR_WORD_BITS_ (AUTIL__BITARR_WORD_SIZE_ * CHAR_BIT)
+struct autil_bitarr
+{
+    size_t count;
+    AUTIL__BITARR_WORD_TYPE_ words[];
+};
+
+static inline size_t
+autil__bitarr_word_count_(size_t count)
+{
+    return (count / AUTIL__BITARR_WORD_SIZE_)
+        + (count % AUTIL__BITARR_WORD_SIZE_ != 0);
+}
+
+static inline size_t
+autil__bitarr_size_(size_t count)
+{
+    return sizeof(struct autil_bitarr)
+        + (autil__bitarr_word_count_(count) * AUTIL__BITARR_WORD_SIZE_);
+}
+
+AUTIL_API struct autil_bitarr*
+autil_bitarr_new(size_t count)
+{
+    size_t const size = autil__bitarr_size_(count);
+    struct autil_bitarr* const self = autil_xalloc(NULL, size);
+    memset(self, 0x00, size);
+
+    self->count = count;
+    return self;
+}
+
+AUTIL_API void
+autil_bitarr_del(struct autil_bitarr* self)
+{
+    if (self == NULL) {
+        return;
+    }
+
+    size_t const size = autil__bitarr_size_(self->count);
+    memset(self, 0x00, size); // scrub
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
+}
+
+AUTIL_API size_t
+autil_bitarr_count(struct autil_bitarr const* self)
+{
+    assert(self != NULL);
+
+    return self->count;
+}
+
+AUTIL_API void
+autil_bitarr_set(struct autil_bitarr* self, size_t n, int value)
+{
+    assert(self != NULL);
+
+    if (n >= self->count) {
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, n);
+    }
+
+    AUTIL__BITARR_WORD_TYPE_* const pword =
+        &self->words[n / AUTIL__BITARR_WORD_SIZE_];
+    AUTIL__BITARR_WORD_TYPE_ const mask = (AUTIL__BITARR_WORD_TYPE_)1u
+        << (n % AUTIL__BITARR_WORD_SIZE_);
+    *pword = (AUTIL__BITARR_WORD_TYPE_)(value ? *pword | mask : *pword & ~mask);
+}
+
+AUTIL_API int
+autil_bitarr_get(struct autil_bitarr const* self, size_t n)
+{
+    assert(self != NULL);
+
+    if (n >= self->count) {
+        autil_fatalf("[%s] Index out of bounds (%zu)", __func__, n);
+    }
+
+    AUTIL__BITARR_WORD_TYPE_ const word =
+        self->words[n / AUTIL__BITARR_WORD_SIZE_];
+    AUTIL__BITARR_WORD_TYPE_ const mask = (AUTIL__BITARR_WORD_TYPE_)1u
+        << (n % AUTIL__BITARR_WORD_SIZE_);
+
+    return (word & mask) != 0;
 }
 
 // The internals of struct autil_bigint are designed such that initializing an

@@ -75,6 +75,9 @@ TESTS = \
 	test/autil_vstr_ends_with.test \
 	test/autil_vstr.example.test \
 	test/autil_sbuf.example.test \
+	test/autil_bitarr_count.test \
+	test/autil_bitarr_set.test \
+	test/autil_bitarr_get.test \
 	test/autil_bigint_new_cstr.test \
 	test/autil_bigint_cmp.test \
 	test/autil_bigint_to_new_cstr.test \
