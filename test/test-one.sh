@@ -10,8 +10,14 @@ TESTPROG="${TESTNAME}.test"      # Compiled test program
 EXPECTED="${TESTNAME}.expected"  # Expected output of $TESTPROG
 TEARDOWN="${TESTNAME}.teardown"  # Script run after the test
 
-[ -z "${TESTPROG}" ] && echo "error: Missing '${TESTPROG}'" && exit 1
-[ -z "${EXPECTED}" ] && echo "error: Missing '${EXPECTED}'" && exit 1
+if [ -z "${TESTPROG}" ]; then
+    echo "error: Missing '${TESTPROG}'"
+    exit 1
+fi
+if [ ! -f "${EXPECTED}" ]; then
+    EXPECTED=/dev/null
+fi
+
 
 echo "[= RUN ${TESTNAME} =]"
 RESULT='PASS'
