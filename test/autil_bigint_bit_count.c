@@ -14,7 +14,7 @@ main(void)
     x = autil_bigint_new_cstr("0b1");
     ASSERT(autil_bigint_bit_count(x) == 1);
     for (size_t i = 2; i <= 1000; ++i) {
-        autil_bigint_shiftl(x, 1);
+        autil_bigint_magnitude_shiftl(x, 1);
         ASSERT(autil_bigint_bit_count(x) == i);
     }
     autil_bigint_del(x);

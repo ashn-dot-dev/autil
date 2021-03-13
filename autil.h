@@ -506,11 +506,11 @@ autil_bigint_negate(struct autil_bigint* self);
 AUTIL_API void
 autil_bigint_abs(struct autil_bigint* self);
 
-// self = self << nbits (logical shift left)
+// self.magnitude = self.magnitude << nbits (a.k.a logical shift left)
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
-autil_bigint_shiftl(struct autil_bigint* self, size_t nbits);
-// self = self >> nbits (logical shift right)
+autil_bigint_magnitude_shiftl(struct autil_bigint* self, size_t nbits);
+// self.magnitude = self.magnitude >> nbits (a.k.a logical shift right)
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
@@ -518,11 +518,12 @@ autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API size_t
 autil_bigint_bit_count(struct autil_bigint const* self);
-// Returns the value (one or zero) of the nth bit (zero indexed) of self.
+// Returns the value (one or zero) of the nth bit (zero indexed) of the
+// magnitude of self.
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API int
 autil_bigint_bit_get(struct autil_bigint const* self, size_t n);
-// Set the nth bit (zero indexed) of self to value.
+// Set the nth bit (zero indexed) of the magnitude of self to value.
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_bit_set(struct autil_bigint* self, size_t n, int value);
@@ -1881,7 +1882,7 @@ autil_bigint_abs(struct autil_bigint* self)
 }
 
 AUTIL_API void
-autil_bigint_shiftl(struct autil_bigint* self, size_t nbits)
+autil_bigint_magnitude_shiftl(struct autil_bigint* self, size_t nbits)
 {
     assert(self != NULL);
     if (nbits == 0) {
@@ -2244,7 +2245,7 @@ autil_bigint_divrem(
     autil_bigint_abs(&D);
     size_t const n = autil_bigint_bit_count(lhs);
     for (size_t i = n - 1; i < n; --i) {
-        autil_bigint_shiftl(&R, 1);
+        autil_bigint_magnitude_shiftl(&R, 1);
         autil_bigint_bit_set(&R, 0, autil_bigint_bit_get(&N, i));
         if (autil_bigint_cmp(&R, &D) >= 0) {
             autil_bigint_sub(&R, &R, &D);
