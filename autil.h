@@ -513,7 +513,7 @@ autil_bigint_magnitude_shiftl(struct autil_bigint* self, size_t nbits);
 // self.magnitude = self.magnitude >> nbits (a.k.a logical shift right)
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
-autil_bigint_shiftr(struct autil_bigint* self, size_t nbits);
+autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits);
 // Returns the number of bits required to store the magnitude of self.
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API size_t
@@ -1911,7 +1911,7 @@ autil_bigint_magnitude_shiftl(struct autil_bigint* self, size_t nbits)
 }
 
 AUTIL_API void
-autil_bigint_shiftr(struct autil_bigint* self, size_t nbits)
+autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits)
 {
     assert(self != NULL);
     if (nbits == 0) {

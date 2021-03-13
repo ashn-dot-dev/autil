@@ -13,6 +13,7 @@ Unreleased
 + Rename autil_arr* functions and macros to autil_sbuf*.
 + Rename autil_bigint_new_utf8 to autil_bigint_new_text.
 + Rename autil_bigint_shiftl to autil_bigint_magnitude_shiftl.
++ Rename autil_bigint_shiftr to autil_bigint_magnitude_shiftr.
 + The functions autil_bigint_new* and autil_bigint_to_new_cstr can now parse
   and stringify octal numbers (prefixed with "0o").
 + The macros autil_sbuf_reserve, autil_sbuf_resize, and autil_sbuf_push may now

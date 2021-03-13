@@ -21,11 +21,11 @@ main(void)
 
     x = autil_bigint_new_cstr("0b101");
     ASSERT(autil_bigint_bit_count(x) == 3);
-    autil_bigint_shiftr(x, 1);
+    autil_bigint_magnitude_shiftr(x, 1);
     ASSERT(autil_bigint_bit_count(x) == 2);
-    autil_bigint_shiftr(x, 1);
+    autil_bigint_magnitude_shiftr(x, 1);
     ASSERT(autil_bigint_bit_count(x) == 1);
-    autil_bigint_shiftr(x, 1);
+    autil_bigint_magnitude_shiftr(x, 1);
     ASSERT(autil_bigint_bit_count(x) == 0);
     autil_bigint_del(x);
 
