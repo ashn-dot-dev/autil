@@ -517,7 +517,7 @@ autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits);
 // Returns the number of bits required to store the magnitude of self.
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API size_t
-autil_bigint_bit_count(struct autil_bigint const* self);
+autil_bigint_magnitude_bit_count(struct autil_bigint const* self);
 // Returns the value (one or zero) of the nth bit (zero indexed) of the
 // magnitude of self.
 // This function is sign-oblivious (the sign of self is not considered).
@@ -1918,7 +1918,7 @@ autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits)
         return;
     }
 
-    if (nbits >= autil_bigint_bit_count(self)) {
+    if (nbits >= autil_bigint_magnitude_bit_count(self)) {
         autil_bigint_assign(self, AUTIL_BIGINT_ZERO);
         return;
     }
@@ -1939,7 +1939,7 @@ autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits)
 }
 
 AUTIL_API size_t
-autil_bigint_bit_count(struct autil_bigint const* self)
+autil_bigint_magnitude_bit_count(struct autil_bigint const* self)
 {
     assert(self != NULL);
 
@@ -2243,7 +2243,7 @@ autil_bigint_divrem(
     struct autil_bigint D = {0}; // abs(rhs)
     autil_bigint_assign(&D, rhs);
     autil_bigint_abs(&D);
-    size_t const n = autil_bigint_bit_count(lhs);
+    size_t const n = autil_bigint_magnitude_bit_count(lhs);
     for (size_t i = n - 1; i < n; --i) {
         autil_bigint_magnitude_shiftl(&R, 1);
         autil_bigint_bit_set(&R, 0, autil_bigint_bit_get(&N, i));

@@ -83,7 +83,7 @@ TESTS = \
 	test/autil_bigint_to_new_cstr.test \
 	test/autil_bigint_magnitude_shiftl.test \
 	test/autil_bigint_magnitude_shiftr.test \
-	test/autil_bigint_bit_count.test \
+	test/autil_bigint_magnitude_bit_count.test \
 	test/autil_bigint_bit_get.test \
 	test/autil_bigint_bit_set.test \
 	test/autil_bigint_add.test \
