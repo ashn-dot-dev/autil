@@ -236,6 +236,10 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size);
 ////////////////////////////////////////////////////////////////////////////////
 //////// CSTR //////////////////////////////////////////////////////////////////
 
+// Returns an autil_xalloc-allocated cstring of the first count bytes of start.
+// This function behaves similarly to the POSIX strdupn function.
+AUTIL_API char*
+autil_cstr_new(char const* start, size_t count);
 // Returns an autil_xalloc-allocated copy of the provided cstring.
 // This function behaves similarly to the POSIX strdup function.
 AUTIL_API char*
@@ -1309,14 +1313,24 @@ autil_stream_read_line(FILE* stream, void** buf, size_t* buf_size)
 }
 
 AUTIL_API char*
+autil_cstr_new(char const* start, size_t count)
+{
+    assert(start != NULL || count == 0);
+
+    char* const s = autil_xalloc(NULL, count + AUTIL_STR_LITERAL_COUNT("\0"));
+    autil_memmove(s, start, count);
+    s[count] = '\0';
+    return s;
+}
+
+AUTIL_API char*
 autil_cstr_new_cstr(char const* cstr)
 {
     assert(cstr != NULL);
 
     size_t const count = strlen(cstr);
-    char* const dest =
-        autil_xalloc(NULL, count + AUTIL_STR_LITERAL_COUNT("\0"));
-    return strcpy(dest, cstr);
+    char* const s = autil_xalloc(NULL, count + AUTIL_STR_LITERAL_COUNT("\0"));
+    return strcpy(s, cstr);
 }
 
 AUTIL_API int

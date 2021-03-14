@@ -1,6 +1,7 @@
 Unreleased
 --------------------------------
-+ Add autil_cstr_new_cstr, autil_cstr_starts_with, and autil_cstr_ends_with.
++ Add autil_cstr_new, autil_cstr_new_cstr, autil_cstr_starts_with,
+  and autil_cstr_ends_with.
 + Add autil_sbuf and autil_sbuf_const declaration macros.
 + Add type autil_bitarr and associated functions: autil_bitarr_new,
   autil_bitarr_del, autil_bitarr_count, autil_bitarr_set, autil_bitarr_get,
