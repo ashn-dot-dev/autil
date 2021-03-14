@@ -522,7 +522,7 @@ autil_bigint_magnitude_bit_count(struct autil_bigint const* self);
 // magnitude of self.
 // This function is sign-oblivious (the sign of self is not considered).
 AUTIL_API int
-autil_bigint_bit_get(struct autil_bigint const* self, size_t n);
+autil_bigint_magnitude_bit_get(struct autil_bigint const* self, size_t n);
 // Set the nth bit (zero indexed) of the magnitude of self to value.
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
@@ -1957,7 +1957,7 @@ autil_bigint_magnitude_bit_count(struct autil_bigint const* self)
 }
 
 AUTIL_API int
-autil_bigint_bit_get(struct autil_bigint const* self, size_t n)
+autil_bigint_magnitude_bit_get(struct autil_bigint const* self, size_t n)
 {
     assert(self != NULL);
 
@@ -2246,7 +2246,7 @@ autil_bigint_divrem(
     size_t const n = autil_bigint_magnitude_bit_count(lhs);
     for (size_t i = n - 1; i < n; --i) {
         autil_bigint_magnitude_shiftl(&R, 1);
-        autil_bigint_magnitude_bit_set(&R, 0, autil_bigint_bit_get(&N, i));
+        autil_bigint_magnitude_bit_set(&R, 0, autil_bigint_magnitude_bit_get(&N, i));
         if (autil_bigint_cmp(&R, &D) >= 0) {
             autil_bigint_sub(&R, &R, &D);
             autil_bigint_magnitude_bit_set(&Q, i, 1);
