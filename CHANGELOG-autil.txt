@@ -42,13 +42,13 @@ v0.7.0 - 2021-02-15
 + Add autil_string_split_to_vec_on_vstr.
 + Fix UB when applying zero offset to null pointer in autil_vec_ref and
   autil_vec_ref_const.
-+ Rename autil_bigint_to_cstr to autil_bigint_to_new_cstr
++ Rename autil_bigint_to_cstr to autil_bigint_to_new_cstr.
 
 v0.6.1 - 2021-01-18
 --------------------------------
 + Remove AUTIL_BIT.
 + Replace AUTIL_VSTR_LITERAL and AUTIL_VSTR_LITERAL_INIT with
-  AUTIL_VSTR_INIT_LITERAL
+  AUTIL_VSTR_INIT_LITERAL.
 
 v0.6.0 - 2020-12-28
 --------------------------------
@@ -61,8 +61,7 @@ v0.5.0 - 2020-12-13
 + Add AUTIL_ALIGNOF and AUTIL_STATIC_ASSERT
 + Add autil_max_align_type typedef.
 + Add autil_memcmp and autil_memmove.
-+ Add autil_string_split_to_vec_on and
-  autil_string_split_to_vec_on_cstr.
++ Add autil_string_split_to_vec_on and autil_string_split_to_vec_on_cstr.
 + Add autil_arr macros: autil_arr_fini, autil_arr_count, autil_arr_capacity,
   autil_arr_reserve, autil_arr_resize, autil_arr_push, and autil_arr_pop.
 + Rename autil_str_vpcmp to autil_cstr_vpcmp.
