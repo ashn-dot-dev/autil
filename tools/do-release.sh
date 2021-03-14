@@ -15,7 +15,7 @@ usage() {
     echo "  \$ git commit --message='Release \${VERSION}'"
     echo "  \$ git push \${REMOTE(s)} master"
     echo "  \$ git tag \${VERSION}"
-    echo "  \$ git push origin \${VERSION}"
+    echo "  \$ git push \${REMOTE(s)} \${VERSION}"
 }
 
 if [ $# != '1' ]; then
