@@ -695,7 +695,7 @@ autil_string_trim(struct autil_string* self);
 AUTIL_API void
 autil_string_split_to_vec(
     struct autil_string const* self,
-    struct autil_vec /* struct autil_string* */* res);
+    struct autil_vec /*<struct autil_string*>*/* res);
 // Split the string on all occurrences of the provided separator.
 // Empty strings are *NOT* removed from the result.
 // Parameter res will be populated with the collection of resulting strings.
@@ -705,17 +705,17 @@ autil_string_split_to_vec_on(
     struct autil_string const* self,
     char const* separator,
     size_t separator_size,
-    struct autil_vec /* struct autil_string* */* res);
+    struct autil_vec /*<struct autil_string*>*/* res);
 AUTIL_API void
 autil_string_split_to_vec_on_vstr(
     struct autil_string const* self,
     struct autil_vstr const* separator,
-    struct autil_vec /* struct autil_string* */* res);
+    struct autil_vec /*<struct autil_string*>*/* res);
 AUTIL_API void
 autil_string_split_to_vec_on_cstr(
     struct autil_string const* self,
     char const* separator,
-    struct autil_vec /* struct autil_string* */* res);
+    struct autil_vec /*<struct autil_string*>*/* res);
 
 // Wrapper functions for an autil_vec of autil_string*.
 // Useful for initializing and deinitializing a vec passed to
