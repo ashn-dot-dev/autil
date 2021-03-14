@@ -462,6 +462,24 @@ autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 // not equal.
 AUTIL_API void
 autil_bitarr_compl(struct autil_bitarr* res, struct autil_bitarr const* rhs);
+// res = lhs << nbits (logical shift left)
+// Fatally exits after printing an error message if the count of res and lhs are
+// not equal.
+AUTIL_API void
+autil_bitarr_shiftl(
+    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
+// res = lhs >> nbits (logical shift right)
+// Fatally exits after printing an error message if the count of res and lhs are
+// not equal.
+AUTIL_API void
+autil_bitarr_shiftr(
+    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
+// res = lhs << nbits (logical shift left)
+// Fatally exits after printing an error message if the count of res and lhs are
+// not equal.
+AUTIL_API void
+autil_bitarr_shiftl(
+    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
 // res = lhs & rhs
 // Fatally exits after printing an error message if the count of res, lhs, and
 // rhs are not equal.
@@ -580,11 +598,11 @@ autil_bigint_divrem(
     struct autil_bigint const* lhs,
     struct autil_bigint const* rhs);
 
-// self.magnitude = self.magnitude << nbits (a.k.a logical shift left)
+// self.magnitude = self.magnitude << nbits (logical shift left)
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_magnitude_shiftl(struct autil_bigint* self, size_t nbits);
-// self.magnitude = self.magnitude >> nbits (a.k.a logical shift right)
+// self.magnitude = self.magnitude >> nbits (logical shift right)
 // This function is sign-oblivious (the sign of self is not altered).
 AUTIL_API void
 autil_bigint_magnitude_shiftr(struct autil_bigint* self, size_t nbits);
@@ -1587,6 +1605,56 @@ autil_bitarr_compl(struct autil_bitarr* res, struct autil_bitarr const* rhs)
 
     for (size_t i = 0; i < autil__bitarr_word_count_(res->count); ++i) {
         res->words[i] = ~rhs->words[i];
+    }
+}
+
+AUTIL_API void
+autil_bitarr_shiftl(
+    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+
+    if (res->count != lhs->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu)",
+            __func__,
+            res->count,
+            lhs->count);
+    }
+
+    size_t const count = autil_bitarr_count(res);
+    autil_bitarr_assign(res, lhs);
+    for (size_t n = 0; n < nbits; ++n) {
+        for (size_t i = count - 1; i != 0; --i) {
+            autil_bitarr_set(res, i, autil_bitarr_get(res, i-1u));
+        }
+        autil_bitarr_set(res, 0u, 0);
+    }
+}
+
+AUTIL_API void
+autil_bitarr_shiftr(
+    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+
+    if (res->count != lhs->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu)",
+            __func__,
+            res->count,
+            lhs->count);
+    }
+
+    size_t const count = autil_bitarr_count(res);
+    autil_bitarr_assign(res, lhs);
+    for (size_t n = 0; n < nbits; ++n) {
+        for (size_t i = 0; i < count - 1; ++i) {
+            autil_bitarr_set(res, i, autil_bitarr_get(res, i+1u));
+        }
+        autil_bitarr_set(res, count - 1, 0);
     }
 }
 

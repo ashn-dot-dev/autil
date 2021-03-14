@@ -80,6 +80,8 @@ TESTS = \
 	test/autil_bitarr_set.test \
 	test/autil_bitarr_get.test \
 	test/autil_bitarr_assign.test \
+	test/autil_bitarr_shiftl.test \
+	test/autil_bitarr_shiftr.test \
 	test/autil_bitarr_compl.test \
 	test/autil_bitarr_and.test \
 	test/autil_bitarr_or.test \
