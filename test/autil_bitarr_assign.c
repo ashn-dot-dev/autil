@@ -33,7 +33,7 @@ main(void)
     autil_bitarr_del(a);
     autil_bitarr_del(b);
 
-    // Make sure that arrays of differnt counts will cause an error.
+    // Make sure that arrays of different counts will cause an error.
     a = autil_bitarr_new(11);
     b = autil_bitarr_new(24);
     autil_bitarr_assign(b, a);
