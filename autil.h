@@ -454,6 +454,8 @@ AUTIL_API void
 autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 
 // res = lhs & rhs
+// Fatally exits after printing an error message if the count of res, lhs, and
+// rhs are not equal.
 AUTIL_API void
 autil_bitarr_and(
     struct autil_bitarr* res,
