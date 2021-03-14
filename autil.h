@@ -529,13 +529,12 @@ autil_bigint_cmp(
 AUTIL_API void
 autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr);
 
-// res = -1 * rhs
+// res = -rhs
 AUTIL_API void
 autil_bigint_neg(struct autil_bigint* res, struct autil_bigint const* rhs);
-// self = abs(self)
+// res = abs(rhs)
 AUTIL_API void
-autil_bigint_abs(struct autil_bigint* self);
-
+autil_bigint_abs(struct autil_bigint* res, struct autil_bigint const* rhs);
 // res = lhs + rhs
 AUTIL_API void
 autil_bigint_add(
@@ -1994,14 +1993,16 @@ autil_bigint_neg(struct autil_bigint* res, struct autil_bigint const* rhs)
 }
 
 AUTIL_API void
-autil_bigint_abs(struct autil_bigint* self)
+autil_bigint_abs(struct autil_bigint* res, struct autil_bigint const* rhs)
 {
-    assert(self != NULL);
+    assert(res != NULL);
+    assert(rhs != NULL);
 
+    autil_bigint_assign(res, rhs);
     // +1 * +1 == +1
     // -1 * -1 == +1
     //  0 *  0 ==  0
-    self->sign = self->sign * self->sign;
+    res->sign = rhs->sign * rhs->sign;
 }
 
 AUTIL_API void
@@ -2238,11 +2239,9 @@ autil_bigint_divrem(
     struct autil_bigint Q = {0}; // abs(res)
     struct autil_bigint R = {0}; // abs(rem)
     struct autil_bigint N = {0}; // abs(lhs)
-    autil_bigint_assign(&N, lhs);
-    autil_bigint_abs(&N);
+    autil_bigint_abs(&N, lhs);
     struct autil_bigint D = {0}; // abs(rhs)
-    autil_bigint_assign(&D, rhs);
-    autil_bigint_abs(&D);
+    autil_bigint_abs(&D, rhs);
     size_t const n = autil_bigint_magnitude_bit_count(lhs);
     for (size_t i = n - 1; i < n; --i) {
         autil_bigint_magnitude_shiftl(&R, 1);
@@ -2483,8 +2482,7 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     if (specifier == 'd') {
         struct autil_bigint DEC = {0};
         struct autil_bigint SELF = {0};
-        autil_bigint_assign(&SELF, self);
-        autil_bigint_abs(&SELF);
+        autil_bigint_abs(&SELF, self);
         while (autil_bigint_cmp(&SELF, AUTIL_BIGINT_ZERO) != 0) {
             autil_bigint_divrem(&SELF, &DEC, &SELF, AUTIL_BIGINT_DEC);
             assert(DEC.count <= 1);
@@ -2516,8 +2514,7 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     else if (specifier == 'o') {
         struct autil_bigint OCT = {0};
         struct autil_bigint SELF = {0};
-        autil_bigint_assign(&SELF, self);
-        autil_bigint_abs(&SELF);
+        autil_bigint_abs(&SELF, self);
         while (autil_bigint_cmp(&SELF, AUTIL_BIGINT_ZERO) != 0) {
             autil_bigint_divrem(&SELF, &OCT, &SELF, AUTIL_BIGINT_OCT);
             assert(OCT.count <= 1);
