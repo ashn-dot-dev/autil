@@ -430,7 +430,6 @@ AUTIL_API void* autil__sbuf_grw_(size_t elemsize, void* sbuf);
 // The bit array in initially zeroed.
 AUTIL_API struct autil_bitarr*
 autil_bitarr_new(size_t count);
-
 // Deinitialize and free the bit array.
 // Does nothing if self == NULL.
 AUTIL_API void
@@ -447,6 +446,12 @@ autil_bitarr_set(struct autil_bitarr* self, size_t n, int value);
 // Fatally exits after printing an error message if n is out of bounds.
 AUTIL_API int
 autil_bitarr_get(struct autil_bitarr const* self, size_t n);
+
+// self = othr
+// Fatally exits after printing an error message if the count of self is not
+// equal to the count of othr.
+AUTIL_API void
+autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
@@ -1502,6 +1507,25 @@ autil_bitarr_get(struct autil_bitarr const* self, size_t n)
         << (n % AUTIL__BITARR_WORD_SIZE_);
 
     return (word & mask) != 0;
+}
+
+AUTIL_API void
+autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr)
+{
+    assert(self != NULL);
+    assert(othr != NULL);
+
+    if (self->count != othr->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu)",
+            __func__,
+            self->count,
+            othr->count);
+    }
+
+    assert(
+        autil__bitarr_size_(self->count) == autil__bitarr_size_(othr->count));
+    autil_memmove(self, othr, autil__bitarr_size_(othr->count));
 }
 
 // The internals of struct autil_bigint are designed such that initializing an
