@@ -38,5 +38,6 @@ main(void)
     b = autil_bitarr_new(24);
     autil_bitarr_assign(b, a);
 
+    puts("UNREACHABLE");
     return EXIT_SUCCESS;
 }

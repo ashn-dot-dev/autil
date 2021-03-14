@@ -453,6 +453,13 @@ autil_bitarr_get(struct autil_bitarr const* self, size_t n);
 AUTIL_API void
 autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 
+// res = lhs & rhs
+AUTIL_API void
+autil_bitarr_and(
+    struct autil_bitarr* res,
+    struct autil_bitarr const* lhs,
+    struct autil_bitarr const* rhs);
+
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
 // Arbitrary precision integer.
@@ -1526,6 +1533,30 @@ autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr)
     assert(
         autil__bitarr_size_(self->count) == autil__bitarr_size_(othr->count));
     autil_memmove(self, othr, autil__bitarr_size_(othr->count));
+}
+
+AUTIL_API void
+autil_bitarr_and(
+    struct autil_bitarr* res,
+    struct autil_bitarr const* lhs,
+    struct autil_bitarr const* rhs)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    if (res->count != lhs->count || res->count != rhs->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu, %zu)",
+            __func__,
+            res->count,
+            lhs->count,
+            rhs->count);
+    }
+
+    for (size_t i = 0; i < autil__bitarr_word_count_(res->count); ++i) {
+        res->words[i] = lhs->words[i] & rhs->words[i];
+    }
 }
 
 // The internals of struct autil_bigint are designed such that initializing an
