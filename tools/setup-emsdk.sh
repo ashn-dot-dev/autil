@@ -3,7 +3,7 @@
 set -e
 
 usage() {
-    echo "Usage: $0"
+    echo "Usage: $(basename $0)"
     echo "Download and activate the latest version of the Emscripten toolchain."
     echo "This script should be run from the autil project root directory."
 }
