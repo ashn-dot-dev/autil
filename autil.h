@@ -529,9 +529,9 @@ autil_bigint_cmp(
 AUTIL_API void
 autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr);
 
-// self = -1 * self
+// res = -1 * rhs
 AUTIL_API void
-autil_bigint_negate(struct autil_bigint* self);
+autil_bigint_neg(struct autil_bigint* res, struct autil_bigint const* rhs);
 // self = abs(self)
 AUTIL_API void
 autil_bigint_abs(struct autil_bigint* self);
@@ -1981,14 +1981,16 @@ autil_bigint_assign(struct autil_bigint* self, struct autil_bigint const* othr)
 }
 
 AUTIL_API void
-autil_bigint_negate(struct autil_bigint* self)
+autil_bigint_neg(struct autil_bigint* res, struct autil_bigint const* rhs)
 {
-    assert(self != NULL);
+    assert(res != NULL);
+    assert(rhs != NULL);
 
+    autil_bigint_assign(res, rhs);
     // +1 * -1 == -1
     // -1 * -1 == +1
     //  0 * -1 ==  0
-    self->sign *= -1;
+    res->sign *= -1;
 }
 
 AUTIL_API void
@@ -2025,8 +2027,7 @@ autil_bigint_add(
     // (+lhs) + (-rhs) == (+lhs) - (+rhs)
     if ((lhs->sign == +1) && (rhs->sign == -1)) {
         struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
-        autil_bigint_assign(RHS, rhs);
-        autil_bigint_negate(RHS);
+        autil_bigint_neg(RHS, rhs);
         autil_bigint_sub(res, lhs, RHS);
         autil_bigint_del(RHS);
         return;
@@ -2034,8 +2035,7 @@ autil_bigint_add(
     // (-lhs) + (+rhs) == (+rhs) - (+lhs)
     if ((lhs->sign == -1) && (rhs->sign == +1)) {
         struct autil_bigint* const LHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
-        autil_bigint_assign(LHS, lhs);
-        autil_bigint_negate(LHS);
+        autil_bigint_neg(LHS, lhs);
         autil_bigint_sub(res, rhs, LHS);
         autil_bigint_del(LHS);
         return;
@@ -2079,8 +2079,7 @@ autil_bigint_sub(
 
     // 0 - rhs == -(rhs)
     if (lhs->sign == 0) {
-        autil_bigint_assign(res, rhs);
-        autil_bigint_negate(res);
+        autil_bigint_neg(res, rhs);
         return;
     }
     // lhs - 0 == lhs
@@ -2091,8 +2090,7 @@ autil_bigint_sub(
     // (+lhs) - (-rhs) == (+lhs) + (+rhs)
     if ((lhs->sign == +1) && (rhs->sign == -1)) {
         struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
-        autil_bigint_assign(RHS, rhs);
-        autil_bigint_negate(RHS);
+        autil_bigint_neg(RHS, rhs);
         autil_bigint_add(res, lhs, RHS);
         autil_bigint_del(RHS);
         return;
@@ -2100,8 +2098,7 @@ autil_bigint_sub(
     // (-lhs) - (+rhs) == (-lhs) + (-rhs)
     if ((lhs->sign == -1) && (rhs->sign == +1)) {
         struct autil_bigint* const RHS = autil_bigint_new(AUTIL_BIGINT_ZERO);
-        autil_bigint_assign(RHS, rhs);
-        autil_bigint_negate(RHS);
+        autil_bigint_neg(RHS, rhs);
         autil_bigint_add(res, lhs, RHS);
         autil_bigint_del(RHS);
         return;
@@ -2142,7 +2139,7 @@ autil_bigint_sub(
     assert(borrow == 0);
 
     if (neg) {
-        autil_bigint_negate(&RES);
+        autil_bigint_neg(&RES, &RES);
     }
     autil__bigint_normalize_(&RES);
     autil_bigint_assign(res, &RES);
