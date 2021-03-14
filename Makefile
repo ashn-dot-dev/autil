@@ -81,6 +81,7 @@ TESTS = \
 	test/autil_bitarr_assign.test \
 	test/autil_bitarr_and.test \
 	test/autil_bitarr_or.test \
+	test/autil_bitarr_xor.test \
 	test/autil_bigint_new_cstr.test \
 	test/autil_bigint_cmp.test \
 	test/autil_bigint_to_new_cstr.test \

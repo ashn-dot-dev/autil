@@ -469,6 +469,14 @@ autil_bitarr_or(
     struct autil_bitarr* res,
     struct autil_bitarr const* lhs,
     struct autil_bitarr const* rhs);
+// res = lhs ^ rhs
+// Fatally exits after printing an error message if the count of res, lhs, and
+// rhs are not equal.
+AUTIL_API void
+autil_bitarr_xor(
+    struct autil_bitarr* res,
+    struct autil_bitarr const* lhs,
+    struct autil_bitarr const* rhs);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// BIG INTEGER ///////////////////////////////////////////////////////////
@@ -1590,6 +1598,30 @@ autil_bitarr_or(
 
     for (size_t i = 0; i < autil__bitarr_word_count_(res->count); ++i) {
         res->words[i] = lhs->words[i] | rhs->words[i];
+    }
+}
+
+AUTIL_API void
+autil_bitarr_xor(
+    struct autil_bitarr* res,
+    struct autil_bitarr const* lhs,
+    struct autil_bitarr const* rhs)
+{
+    assert(res != NULL);
+    assert(lhs != NULL);
+    assert(rhs != NULL);
+
+    if (res->count != lhs->count || res->count != rhs->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu, %zu)",
+            __func__,
+            res->count,
+            lhs->count,
+            rhs->count);
+    }
+
+    for (size_t i = 0; i < autil__bitarr_word_count_(res->count); ++i) {
+        res->words[i] = lhs->words[i] ^ rhs->words[i];
     }
 }
 
