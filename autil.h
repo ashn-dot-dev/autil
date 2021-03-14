@@ -1627,7 +1627,7 @@ autil_bitarr_shiftl(
     autil_bitarr_assign(res, lhs);
     for (size_t n = 0; n < nbits; ++n) {
         for (size_t i = count - 1; i != 0; --i) {
-            autil_bitarr_set(res, i, autil_bitarr_get(res, i-1u));
+            autil_bitarr_set(res, i, autil_bitarr_get(res, i - 1u));
         }
         autil_bitarr_set(res, 0u, 0);
     }
@@ -1652,7 +1652,7 @@ autil_bitarr_shiftr(
     autil_bitarr_assign(res, lhs);
     for (size_t n = 0; n < nbits; ++n) {
         for (size_t i = 0; i < count - 1; ++i) {
-            autil_bitarr_set(res, i, autil_bitarr_get(res, i+1u));
+            autil_bitarr_set(res, i, autil_bitarr_get(res, i + 1u));
         }
         autil_bitarr_set(res, count - 1, 0);
     }
