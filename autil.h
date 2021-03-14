@@ -457,6 +457,11 @@ autil_bitarr_get(struct autil_bitarr const* self, size_t n);
 AUTIL_API void
 autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 
+// res = ~rhs
+// Fatally exits after printing an error message if the count of res and rhs are
+// not equal.
+AUTIL_API void
+autil_bitarr_compl(struct autil_bitarr* res, struct autil_bitarr const* rhs);
 // res = lhs & rhs
 // Fatally exits after printing an error message if the count of res, lhs, and
 // rhs are not equal.
@@ -1564,6 +1569,25 @@ autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr)
     assert(
         autil__bitarr_size_(self->count) == autil__bitarr_size_(othr->count));
     autil_memmove(self, othr, autil__bitarr_size_(othr->count));
+}
+
+AUTIL_API void
+autil_bitarr_compl(struct autil_bitarr* res, struct autil_bitarr const* rhs)
+{
+    assert(res != NULL);
+    assert(rhs != NULL);
+
+    if (res->count != rhs->count) {
+        autil_fatalf(
+            "[%s] Mismatched array counts (%zu, %zu)",
+            __func__,
+            res->count,
+            rhs->count);
+    }
+
+    for (size_t i = 0; i < autil__bitarr_word_count_(res->count); ++i) {
+        res->words[i] = ~rhs->words[i];
+    }
 }
 
 AUTIL_API void
