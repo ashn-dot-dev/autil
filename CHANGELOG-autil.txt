@@ -1,3 +1,8 @@
+Unreleased
+--------------------------------
++ Add type autil_sipool and associated functions: autil_sipool_new,
+  autil_sipool_del, autil_sipool_intern, and autil_sipool_intern_cstr.
+
 v0.9.0 - 2021-03-14
 --------------------------------
 + Add autil_cstr_new, autil_cstr_new_cstr, autil_cstr_starts_with,
