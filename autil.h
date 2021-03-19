@@ -475,12 +475,6 @@ autil_bitarr_shiftl(
 AUTIL_API void
 autil_bitarr_shiftr(
     struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
-// res = lhs << nbits (logical shift left)
-// Fatally exits after printing an error message if the count of res and lhs are
-// not equal.
-AUTIL_API void
-autil_bitarr_shiftl(
-    struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
 // res = lhs & rhs
 // Fatally exits after printing an error message if the count of res, lhs, and
 // rhs are not equal.
