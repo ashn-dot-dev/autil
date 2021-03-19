@@ -672,7 +672,7 @@ autil_string_new(char const* start, size_t count);
 // If cstr is NULL then string will be initialized to the empty string.
 AUTIL_API struct autil_string*
 autil_string_new_cstr(char const* cstr);
-// Allocate and initialize a string from the provided formated text.
+// Allocate and initialize a string from the provided formatted text.
 AUTIL_API struct autil_string*
 autil_string_new_fmt(char const* fmt, ...);
 // Deinitialize and free the string.
@@ -780,15 +780,20 @@ autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
 ////////////////////////////////////////////////////////////////////////////////
 //////// STRING INTERN POOL ////////////////////////////////////////////////////
 
+// Allocate and initialize a string intern pool.
 AUTIL_API struct autil_sipool*
 autil_sipool_new(void);
-
+// Deinitialize and free the string intern pool.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_sipool_del(struct autil_sipool* self);
 
+// Intern the string specified by the first count bytes of start.
+// Returns the canonical NUL-terminated representation of the interned string.
 AUTIL_API char const*
 autil_sipool_intern(struct autil_sipool* self, char const* start, size_t count);
-
+// Intern the string specified by the provided NUL-terminated cstring.
+// Returns the canonical NUL-terminated representation of the interned string.
 AUTIL_API char const*
 autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 
