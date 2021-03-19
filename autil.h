@@ -432,7 +432,7 @@ AUTIL_API void* autil__sbuf_grw_(size_t elemsize, void* sbuf);
 //////// BIT ARRAY /////////////////////////////////////////////////////////////
 
 // Allocate and initialize a bit array with count bits.
-// The bit array in initially zeroed.
+// The bit array is initially zeroed.
 AUTIL_API struct autil_bitarr*
 autil_bitarr_new(size_t count);
 // Deinitialize and free the bit array.
