@@ -109,7 +109,7 @@ typedef union
 
 // Number of elements in an array.
 #define AUTIL_ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
-// Number of characters in a string literal, excluding the null-terminator.
+// Number of characters in a string literal, excluding the NUL-terminator.
 #define AUTIL_STR_LITERAL_COUNT(str_literal)                                   \
     (AUTIL_ARRAY_COUNT(str_literal) - 1)
 // Number of characters in a formatted string.
