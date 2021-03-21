@@ -34,4 +34,6 @@ main(void)
     test_cstr("foo", "foo");
     test_cstr("foo\nbar", "foo\nbar");
     test_cstr("foo\0bar", "foo");
+
+    return EXIT_SUCCESS;
 }

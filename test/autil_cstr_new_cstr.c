@@ -17,4 +17,6 @@ main(void)
     test("foo", "foo");
     test("foo\nbar", "foo\nbar");
     test("foo\0bar", "foo");
+
+    return EXIT_SUCCESS;
 }

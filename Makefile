@@ -69,6 +69,7 @@ TESTS = \
 	test/autil_stream_read_line.test \
 	test/autil_cstr_new.test \
 	test/autil_cstr_new_cstr.test \
+	test/autil_cstr_new_fmt.test \
 	test/autil_cstr_starts_with.test \
 	test/autil_cstr_ends_with.test \
 	test/autil_vstr_cmp.test \

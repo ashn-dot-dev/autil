@@ -245,6 +245,9 @@ autil_cstr_new(char const* start, size_t count);
 // This function behaves similarly to the POSIX strdup function.
 AUTIL_API char*
 autil_cstr_new_cstr(char const* cstr);
+// Returns an autil_xalloc-allocated cstring from the provided formatted text.
+AUTIL_API char*
+autil_cstr_new_fmt(char const* fmt, ...);
 // Returns a non-zero value if cstr starts with target.
 AUTIL_API int
 autil_cstr_starts_with(char const* cstr, char const* target);
@@ -1369,6 +1372,31 @@ autil_cstr_new_cstr(char const* cstr)
     size_t const count = strlen(cstr);
     char* const s = autil_xalloc(NULL, count + AUTIL_STR_LITERAL_COUNT("\0"));
     return strcpy(s, cstr);
+}
+
+AUTIL_API char*
+autil_cstr_new_fmt(char const* fmt, ...)
+{
+    assert(fmt != NULL);
+
+    va_list args;
+    va_start(args, fmt);
+
+    va_list copy;
+    va_copy(copy, args);
+    int const len = vsnprintf(NULL, 0, fmt, copy);
+    va_end(copy);
+
+    if (len < 0) {
+        autil_fatalf("[%s] Formatting failure", __func__);
+    }
+
+    size_t size = (size_t)len + AUTIL_STR_LITERAL_COUNT("\0");
+    char* const buf = autil_xalloc(NULL, size);
+    vsnprintf(buf, size, fmt, args);
+    va_end(args);
+
+    return buf;
 }
 
 AUTIL_API int
