@@ -5,7 +5,6 @@
 int
 main(void)
 {
-
     char* const str0 = autil_cstr_new_fmt("");
     char* const str1 = autil_cstr_new_fmt("foo");
     char* const str2 = autil_cstr_new_fmt("foo\0bar");
@@ -23,4 +22,3 @@ main(void)
 
     return EXIT_SUCCESS;
 }
-
