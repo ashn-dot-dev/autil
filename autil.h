@@ -172,6 +172,7 @@ AUTIL_API int autil_toupper(int c);
 // clang-format off
 AUTIL_API int autil_memcmp(void const* s1, void const* s2, size_t n);
 AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
+AUTIL_API void* autil_memset(void* s, int c, size_t n);
 // clang-format on
 
 // General purpose allocator functions with out-of-memory error checking.
@@ -1133,6 +1134,17 @@ autil_memmove(void* dest, void const* src, size_t n)
         return dest;
     }
     return memmove(dest, src, n);
+}
+
+AUTIL_API void*
+autil_memset(void* s, int c, size_t n)
+{
+    assert(s != NULL || n == 0);
+
+    if (n == 0) {
+        return s;
+    }
+    return memset(s, c, n);
 }
 
 AUTIL_API void*
