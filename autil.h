@@ -175,6 +175,10 @@ AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
 AUTIL_API void* autil_memset(void* s, int c, size_t n);
 // clang-format on
 
+// Zero out the memory under the provided pointer parameter. The number of bytes
+// to zero is automatically determined by the sizeof(*ptr).
+#define AUTIL_MEMZERO(ptr) autil_memset(ptr, 0x00, sizeof(*ptr))
+
 // General purpose allocator functions with out-of-memory error checking.
 // The behavior of autil_xalloc and autil_xallocn is similar to libc realloc and
 // *BSD reallocarray with the following exceptions:

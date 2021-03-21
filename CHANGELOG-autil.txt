@@ -1,6 +1,7 @@
 Unreleased
 --------------------------------
 + Add autil_memset.
++ Add AUTIL_MEMZERO.
 + Add autil_cstr_new_fmt.
 + Add type autil_sipool and associated functions: autil_sipool_new,
   autil_sipool_del, autil_sipool_intern, and autil_sipool_intern_cstr.
