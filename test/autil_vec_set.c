@@ -20,8 +20,7 @@ main(void)
     autil_vec_set(v, 1, AUTIL_LOCAL_PTR(int, 42));
     ASSERT(*(int*)autil_vec_ref(v, 1) == 42);
 
-    struct
-    {
+    struct {
         int val;
     } C;
     C.val = 5;

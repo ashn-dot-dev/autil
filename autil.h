@@ -74,8 +74,7 @@ struct autil_map;
 
 // C99 compatible max_align_t.
 // clang-format off
-typedef union
-{
+typedef union {
     _Bool       bool_;
     char        char_;
     short       short_;
@@ -264,8 +263,7 @@ autil_cstr_ends_with(char const* cstr, char const* target);
 //////// VSTR //////////////////////////////////////////////////////////////////
 // Byte string view.
 
-struct autil_vstr
-{
+struct autil_vstr {
     char const* start;
     size_t count;
 };
@@ -1545,8 +1543,7 @@ autil__sbuf_grw_(size_t elemsize, void* sbuf)
 #define AUTIL__BITARR_WORD_TYPE_ unsigned long
 #define AUTIL__BITARR_WORD_SIZE_ sizeof(AUTIL__BITARR_WORD_TYPE_)
 #define AUTIL__BITARR_WORD_BITS_ (AUTIL__BITARR_WORD_SIZE_ * CHAR_BIT)
-struct autil_bitarr
-{
+struct autil_bitarr {
     size_t count;
     AUTIL__BITARR_WORD_TYPE_ words[];
 };
@@ -1796,8 +1793,7 @@ autil_bitarr_or(
 //      struct autil_bigint foo;
 //      memset(&foo, 0x00, sizeof(foo));
 // will create a bigint equal to zero without requiring heap allocation.
-struct autil_bigint
-{
+struct autil_bigint {
     // -1 if the integer <  0
     //  0 if the integer == 0
     // +1 if the integer >  0
@@ -2760,8 +2756,7 @@ autil_bigint_to_new_cstr(struct autil_bigint const* self, char const* fmt)
     return cstr;
 }
 
-struct autil_string
-{
+struct autil_string {
     char* start;
     size_t count;
 };
@@ -3109,8 +3104,7 @@ autil_vec_of_string_del(struct autil_vec* vec)
     autil_vec_del(vec);
 }
 
-struct autil_sipool
-{
+struct autil_sipool {
     // List of heap-allocated strings interned within this pool. The key and val
     // elements of the map member reference memory owned by this list.
     autil_sbuf(char*) strings;
@@ -3175,8 +3169,7 @@ autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr)
     return autil_sipool_intern(self, cstr, strlen(cstr));
 }
 
-struct autil_vec
-{
+struct autil_vec {
     void* start;
     size_t count;
     size_t capacity;
@@ -3412,8 +3405,7 @@ autil_vec_next_const(struct autil_vec const* self, void const* iter)
     return next_idx != self->count ? autil_vec_ref_const(self, next_idx) : NULL;
 }
 
-struct autil_map
-{
+struct autil_map {
     struct autil_vec* keys;
     struct autil_vec* vals;
     autil_vpcmp_fn keycmp;

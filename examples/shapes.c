@@ -12,17 +12,10 @@
 struct aengn_rgba const RGBA_WHITE = {0xff, 0xff, 0xff, 0xff};
 struct aengn_rgba const RGBA_PURPLE = {0xff, 0x22, 0xff, 0xff};
 
-struct shape
-{
-    enum shape_kind
-    {
-        SHAPE_POINT,
-        SHAPE_LINE,
-        SHAPE_RECT
-    } kind;
+struct shape {
+    enum shape_kind { SHAPE_POINT, SHAPE_LINE, SHAPE_RECT } kind;
 
-    struct point
-    {
+    struct point {
         int x;
         int y;
     } p1, p2;

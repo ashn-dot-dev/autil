@@ -124,8 +124,7 @@ aengn_screen_h(void);
 AENGN_API int
 aengn_pixel_scale(void);
 
-struct aengn_button_state
-{
+struct aengn_button_state {
     // Button was pressed this frame.
     bool pressed;
     // Button was released this frame.
@@ -156,8 +155,7 @@ aengn_mousepos_y(void);
 struct aengn_sprite;
 // Information for a 24-bit color depth value with 8-bit opacity (alpha) value
 // as represented by the RGBA color model.
-struct aengn_rgba
-{
+struct aengn_rgba {
     uint8_t r;
     uint8_t g;
     uint8_t b;
@@ -280,8 +278,7 @@ aengn_play_chunk(Mix_Chunk* chunk);
 
 static struct aengn_button_state AENGN_BUTTON_STATE_DEFAULT = {0};
 
-static struct
-{
+static struct {
     int img_is_init;
     int mix_is_init;
 
@@ -756,8 +753,7 @@ aengn_mousepos_y(void)
     return y / aengn__global_.pixel_scale;
 }
 
-struct aengn_sprite
-{
+struct aengn_sprite {
     int w;
     int h;
     SDL_Surface* surface;

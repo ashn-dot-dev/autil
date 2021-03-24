@@ -58,8 +58,7 @@ basics(void)
     autil_sbuf_fini(a);
 }
 
-struct point
-{
+struct point {
     int x;
     int y;
 };

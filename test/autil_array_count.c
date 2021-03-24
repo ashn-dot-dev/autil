@@ -3,10 +3,7 @@
 
 int arr3[] = {1, 2, 3};
 int arr5[] = {1, 2, 3, 4, 5};
-enum
-{
-    COMPILE_TIME_CONSTANT = AUTIL_ARRAY_COUNT(arr3)
-};
+enum { COMPILE_TIME_CONSTANT = AUTIL_ARRAY_COUNT(arr3) };
 
 int
 main(void)

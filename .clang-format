@@ -20,13 +20,13 @@ BreakBeforeBinaryOperators: NonAssignment
 BreakConstructorInitializers: AfterColon
 BreakStringLiterals: false
 BraceWrapping:
-  AfterClass:            true
+  AfterClass:            false
   AfterControlStatement: false
-  AfterEnum:             true
+  AfterEnum:             false
   AfterFunction:         true
-  AfterNamespace:        true
-  AfterStruct:           true
-  AfterUnion:            true
+  AfterNamespace:        false
+  AfterStruct:           false
+  AfterUnion:            false
   AfterExternBlock:      false
   BeforeCatch:           true
   BeforeElse:            true

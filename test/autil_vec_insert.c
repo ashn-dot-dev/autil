@@ -21,8 +21,7 @@ main(void)
     ASSERT(*(int*)autil_vec_ref(v, 1) == B);
 
     // [C][A][B]
-    struct
-    {
+    struct {
         int val;
     } C;
     C.val = 4;
