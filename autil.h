@@ -287,7 +287,7 @@ struct autil_vstr {
 //      // some time later...
 //      bar = (struct autil_vstr)AUTIL_VSTR_INIT_STR_LITERAL("bar");
 // clang-format off
-#define AUTIL_VSTR_INIT_STR_LITERAL(str_literal)                                  \
+#define AUTIL_VSTR_INIT_STR_LITERAL(str_literal)                               \
     {str_literal, AUTIL_STR_LITERAL_COUNT(str_literal)}
 // clang-format on
 
