@@ -65,10 +65,10 @@ LICENSE
 #include <stdio.h> /* FILE*, printf-family */
 
 struct autil_vstr;
+struct autil_sipool;
 struct autil_bitarr;
 struct autil_bigint;
 struct autil_string;
-struct autil_sipool;
 struct autil_vec;
 struct autil_map;
 
@@ -308,6 +308,26 @@ autil_vstr_starts_with(
 AUTIL_API int
 autil_vstr_ends_with(
     struct autil_vstr const* vstr, struct autil_vstr const* target);
+
+////////////////////////////////////////////////////////////////////////////////
+//////// CSTR INTERN POOL //////////////////////////////////////////////////////
+
+// Allocate and initialize a string intern pool.
+AUTIL_API struct autil_sipool*
+autil_sipool_new(void);
+// Deinitialize and free the string intern pool.
+// Does nothing if self == NULL.
+AUTIL_API void
+autil_sipool_del(struct autil_sipool* self);
+
+// Intern the string specified by the first count bytes of start.
+// Returns the canonical NUL-terminated representation of the interned string.
+AUTIL_API char const*
+autil_sipool_intern(struct autil_sipool* self, char const* start, size_t count);
+// Intern the string specified by the provided NUL-terminated cstring.
+// Returns the canonical NUL-terminated representation of the interned string.
+AUTIL_API char const*
+autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// STRETCHY BUFFER ///////////////////////////////////////////////////////
@@ -776,26 +796,6 @@ AUTIL_API struct autil_vec /*<struct autil_string*>*/*
 autil_vec_of_string_new(void);
 AUTIL_API void
 autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
-
-////////////////////////////////////////////////////////////////////////////////
-//////// STRING INTERN POOL ////////////////////////////////////////////////////
-
-// Allocate and initialize a string intern pool.
-AUTIL_API struct autil_sipool*
-autil_sipool_new(void);
-// Deinitialize and free the string intern pool.
-// Does nothing if self == NULL.
-AUTIL_API void
-autil_sipool_del(struct autil_sipool* self);
-
-// Intern the string specified by the first count bytes of start.
-// Returns the canonical NUL-terminated representation of the interned string.
-AUTIL_API char const*
-autil_sipool_intern(struct autil_sipool* self, char const* start, size_t count);
-// Intern the string specified by the provided NUL-terminated cstring.
-// Returns the canonical NUL-terminated representation of the interned string.
-AUTIL_API char const*
-autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -1481,6 +1481,71 @@ autil_vstr_ends_with(
     }
     char const* start = vstr->start + (vstr->count - target->count);
     return autil_memcmp(start, target->start, target->count) == 0;
+}
+
+struct autil_sipool {
+    // List of heap-allocated strings interned within this pool. The key and val
+    // elements of the map member reference memory owned by this list.
+    autil_sbuf(char*) strings;
+    // KEY TYPE: struct autil_vstr
+    // VAL TYPE: char const*
+    struct autil_map* map;
+};
+
+AUTIL_API struct autil_sipool*
+autil_sipool_new(void)
+{
+    struct autil_sipool* const self =
+        autil_xalloc(NULL, sizeof(struct autil_sipool));
+    self->strings = NULL;
+    self->map = autil_map_new(
+        sizeof(struct autil_vstr), sizeof(char const*), autil_vstr_vpcmp);
+    return self;
+}
+
+AUTIL_API void
+autil_sipool_del(struct autil_sipool* self)
+{
+    if (self == NULL) {
+        return;
+    }
+
+    for (size_t i = 0; i < autil_sbuf_count(self->strings); ++i) {
+        autil_xalloc(self->strings[i], AUTIL_XALLOC_FREE);
+    }
+    autil_sbuf_fini(self->strings);
+    autil_map_del(self->map);
+
+    memset(self, 0x00, sizeof(*self)); // scrub
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
+}
+
+AUTIL_API char const*
+autil_sipool_intern(struct autil_sipool* self, char const* start, size_t count)
+{
+    assert(self != NULL);
+    assert(start != NULL || count == 0);
+
+    char const* const* const pexisting =
+        autil_map_lookup_const(self->map, AUTIL_VSTR_LOCAL_PTR(start, count));
+    if (pexisting != NULL) {
+        return *pexisting;
+    }
+
+    char* str = autil_cstr_new(start, count);
+    autil_sbuf_push(self->strings, str);
+    autil_map_insert(
+        self->map, AUTIL_VSTR_LOCAL_PTR(str, count), &str, NULL, NULL);
+    return str;
+}
+
+AUTIL_API char const*
+autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr)
+{
+    assert(self != NULL);
+    assert(cstr != NULL);
+
+    return autil_sipool_intern(self, cstr, strlen(cstr));
 }
 
 AUTIL_STATIC_ASSERT(
@@ -3102,71 +3167,6 @@ autil_vec_of_string_del(struct autil_vec* vec)
         autil_string_del(*ref);
     }
     autil_vec_del(vec);
-}
-
-struct autil_sipool {
-    // List of heap-allocated strings interned within this pool. The key and val
-    // elements of the map member reference memory owned by this list.
-    autil_sbuf(char*) strings;
-    // KEY TYPE: struct autil_vstr
-    // VAL TYPE: char const*
-    struct autil_map* map;
-};
-
-AUTIL_API struct autil_sipool*
-autil_sipool_new(void)
-{
-    struct autil_sipool* const self =
-        autil_xalloc(NULL, sizeof(struct autil_sipool));
-    self->strings = NULL;
-    self->map = autil_map_new(
-        sizeof(struct autil_vstr), sizeof(char const*), autil_vstr_vpcmp);
-    return self;
-}
-
-AUTIL_API void
-autil_sipool_del(struct autil_sipool* self)
-{
-    if (self == NULL) {
-        return;
-    }
-
-    for (size_t i = 0; i < autil_sbuf_count(self->strings); ++i) {
-        autil_xalloc(self->strings[i], AUTIL_XALLOC_FREE);
-    }
-    autil_sbuf_fini(self->strings);
-    autil_map_del(self->map);
-
-    memset(self, 0x00, sizeof(*self)); // scrub
-    autil_xalloc(self, AUTIL_XALLOC_FREE);
-}
-
-AUTIL_API char const*
-autil_sipool_intern(struct autil_sipool* self, char const* start, size_t count)
-{
-    assert(self != NULL);
-    assert(start != NULL || count == 0);
-
-    char const* const* const pexisting =
-        autil_map_lookup_const(self->map, AUTIL_VSTR_LOCAL_PTR(start, count));
-    if (pexisting != NULL) {
-        return *pexisting;
-    }
-
-    char* str = autil_cstr_new(start, count);
-    autil_sbuf_push(self->strings, str);
-    autil_map_insert(
-        self->map, AUTIL_VSTR_LOCAL_PTR(str, count), &str, NULL, NULL);
-    return str;
-}
-
-AUTIL_API char const*
-autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr)
-{
-    assert(self != NULL);
-    assert(cstr != NULL);
-
-    return autil_sipool_intern(self, cstr, strlen(cstr));
 }
 
 struct autil_vec {
