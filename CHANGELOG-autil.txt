@@ -1,4 +1,4 @@
-Unreleased
+v0.10.0 - 2021-05-23
 --------------------------------
 + Add autil_memset.
 + Add AUTIL_MEMZERO.
