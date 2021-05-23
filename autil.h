@@ -175,7 +175,7 @@ AUTIL_API void* autil_memset(void* s, int c, size_t n);
 // clang-format on
 
 // Zero out the memory under the provided pointer parameter. The number of bytes
-// to zero is automatically determined by the sizeof(*ptr).
+// to be zeroed is automatically determined by the sizeof(*ptr).
 #define AUTIL_MEMZERO(ptr) autil_memset(ptr, 0x00, sizeof(*ptr))
 
 // General purpose allocator functions with out-of-memory error checking.
