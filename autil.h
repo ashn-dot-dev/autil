@@ -392,6 +392,12 @@ autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 #define autil_sbuf_fini(sbuf)                                                  \
     ((void)((sbuf) != NULL ? AUTIL__SBUF_FREE_NON_NULL_HEAD_(sbuf) : NULL))
 
+// void autil_sbuf_freeze(TYPE* sbuf, struct autil_freezer* freezer)
+// ------------------------------------------------------------
+// Register resources within bigint with the provided freezer.
+#define autil_sbuf_freeze(sbuf, freezer)                                       \
+    ((void)((sbuf) != NULL ? AUTIL__SBUF_FREEZE_NON_NULL_HEAD_(sbuf, freezer), NULL : NULL))
+
 // size_t autil_sbuf_count(TYPE* sbuf)
 // ------------------------------------------------------------
 // The number of elements in the stretchy buffer.
@@ -444,6 +450,8 @@ enum{AUTIL__SBUF_HEADER_OFFSET_ = sizeof(struct autil__sbuf_header_)};
      ((char const*)(sbuf_)-AUTIL__SBUF_HEADER_OFFSET_))
 #define AUTIL__SBUF_FREE_NON_NULL_HEAD_(sbuf_)                                 \
     (autil_xalloc(AUTIL__SBUF_PHEAD_MUTBL_(sbuf_), AUTIL_XALLOC_FREE))
+#define AUTIL__SBUF_FREEZE_NON_NULL_HEAD_(sbuf_, freezer)                      \
+    (autil_freezer_register(freezer, AUTIL__SBUF_PHEAD_MUTBL_(sbuf_)))
 #define AUTIL__SBUF_MAYBE_GROW_(sbuf_)                                         \
     ((autil_sbuf_count(sbuf_) == autil_sbuf_capacity(sbuf_))                   \
          ? (sbuf_) = autil__sbuf_grw_(sizeof(*(sbuf_)), sbuf_)                 \
