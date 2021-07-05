@@ -567,6 +567,9 @@ autil_bigint_new_text(char const* start, size_t count);
 // Does nothing if self == NULL.
 AUTIL_API void
 autil_bigint_del(struct autil_bigint* self);
+// Register resources within bigint with the provided freezer.
+AUTIL_API void
+autil_bigint_freeze(struct autil_bigint* self, struct autil_freezer* freezer);
 
 // Return an int less than, equal to, or greater than zero if lhs is
 // semantically less than, equal to, or greater than rhs, respectively.
@@ -2163,6 +2166,16 @@ autil_bigint_del(struct autil_bigint* self)
     autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
 
+AUTIL_API void
+autil_bigint_freeze(struct autil_bigint* self, struct autil_freezer* freezer)
+{
+    assert(self != NULL);
+    assert(freezer != NULL);
+
+    autil_freezer_register(freezer, self);
+    autil_freezer_register(freezer, self->limbs);
+}
+
 AUTIL_API int
 autil_bigint_cmp(struct autil_bigint const* lhs, struct autil_bigint const* rhs)
 {
@@ -3610,6 +3623,8 @@ autil_freezer_del(struct autil_freezer* self)
         autil_xalloc(self->ptrs[i], AUTIL_XALLOC_FREE);
     }
     autil_sbuf_fini(self->ptrs);
+
+    autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
 
 AUTIL_API void
