@@ -953,11 +953,16 @@ autil_map_remove(
 ////////////////////////////////////////////////////////////////////////////////
 //////// FREEZER ///////////////////////////////////////////////////////////////
 
+// Allocate and initialize a freezer.
 AUTIL_API struct autil_freezer*
 autil_freezer_new(void);
+// Deinitialize and free the freezer.
+// Does nothing if self == NULL.
 AUTIL_API void
 autil_freezer_del(struct autil_freezer* self);
 
+// Register a pointer to autil_xalloc-allocated memory to be freed when the
+// freezer is deinitialized.
 AUTIL_API void
 autil_freezer_register(struct autil_freezer* self, void* ptr);
 
