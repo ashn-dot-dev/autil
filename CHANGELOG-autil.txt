@@ -1,3 +1,8 @@
+Unreleased
+--------------------------------
++ Add type autil_freezer and associated functions: autil_freezer_new,
+  autil_freezer_del, and autil_freezer_register.
+
 v0.10.0 - 2021-05-23
 --------------------------------
 + Add autil_memset.

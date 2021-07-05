@@ -128,6 +128,7 @@ TESTS = \
 	tests/autil_map_lookup.test \
 	tests/autil_map.example.test \
 	tests/autil_map.zero_size_elements.test \
+	tests/autil_freezer.example.test \
 	tests/atest.example.test
 
 PERFS = \
@@ -189,8 +190,8 @@ examples/shapes.html: examples/shapes.c
 format:
 	clang-format -i \
 		*.h \
-		$$(find test/ -type f -name '*.h') \
-		$$(find test/ -type f -name '*.c') \
+		$$(find tests/ -type f -name '*.h') \
+		$$(find tests/ -type f -name '*.c') \
 		$$(find perf/ -type f -name '*.h') \
 		$$(find perf/ -type f -name '*.c') \
 		$$(find examples/ -type f -name '*.h') \

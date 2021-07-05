@@ -71,6 +71,7 @@ struct autil_bigint;
 struct autil_string;
 struct autil_vec;
 struct autil_map;
+struct autil_freezer;
 
 // C99 compatible max_align_t.
 // clang-format off
@@ -948,6 +949,17 @@ autil_map_insert(
 AUTIL_API int
 autil_map_remove(
     struct autil_map* self, void const* key, void* oldkey, void* oldval);
+
+////////////////////////////////////////////////////////////////////////////////
+//////// FREEZER ///////////////////////////////////////////////////////////////
+
+AUTIL_API struct autil_freezer*
+autil_freezer_new(void);
+AUTIL_API void
+autil_freezer_del(struct autil_freezer* self);
+
+AUTIL_API void
+autil_freezer_register(struct autil_freezer* self, void* ptr);
 
 #endif // AUTIL_H_INCLUDED
 
@@ -3565,6 +3577,42 @@ autil_map_remove(
     autil_vec_remove(self->keys, idx, oldkey);
     autil_vec_remove(self->vals, idx, oldval);
     return 1;
+}
+
+struct autil_freezer {
+    // List of heap-allocated pointers to be freed when objects are cleaned out
+    // of the freezer.
+    autil_sbuf(void*) ptrs;
+};
+
+AUTIL_API struct autil_freezer*
+autil_freezer_new(void)
+{
+    struct autil_freezer* const self =
+        autil_xalloc(NULL, sizeof(struct autil_sipool));
+    self->ptrs = NULL;
+    return self;
+}
+
+AUTIL_API void
+autil_freezer_del(struct autil_freezer* self)
+{
+    if (self == NULL) {
+        return;
+    }
+
+    for (size_t i = 0; i < autil_sbuf_count(self->ptrs); ++i) {
+        autil_xalloc(self->ptrs[i], AUTIL_XALLOC_FREE);
+    }
+    autil_sbuf_fini(self->ptrs);
+}
+
+AUTIL_API void
+autil_freezer_register(struct autil_freezer* self, void* ptr)
+{
+    assert(self != NULL);
+
+    autil_sbuf_push(self->ptrs, ptr);
 }
 
 #endif // AUTIL_IMPLEMENTATION
