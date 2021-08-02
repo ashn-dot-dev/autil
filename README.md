@@ -34,9 +34,7 @@ builds. SDL2 and its extension libraries are provided by most package managers,
 and can be installed on Debian-based distros with:
 
 ```sh
-$ apt-get install libsdl2-dev
-$ apt-get install libsdl2-image-dev
-$ apt-get install libsdl2-mixer-dev
+$ apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
 ```
 
 The Emscripten toolchain can be downloaded and activated with:
@@ -50,7 +48,7 @@ $ source ./emsdk_env.sh   # Setup envrionment (source this every time)
 ```
 
 *NOTE*: Currently `aengn.h` and aengn example programs are known to compile on
-Debian stable using `CC=gcc` or `CC=clang`, but fail to compile with
+Debian Stable using `CC=gcc` or `CC=clang`, but fail to compile with
 `CC=musl-gcc` and `CC=tcc`.
 
 
