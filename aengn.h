@@ -202,7 +202,7 @@ AENGN_API int
 aengn_sprite_update_texture(struct aengn_sprite* self);
 
 // Load and create an SDL_Surface from a file with the provided path.
-// This suface must be explicitly deinitialized with SDL_FreeSurface.
+// This surface must be explicitly deinitialized with SDL_FreeSurface.
 // Path must reference a JPEG (.jpg) or PNG (.png) file.
 // Returns NULL on error.
 AENGN_API SDL_Surface*
