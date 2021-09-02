@@ -5,6 +5,8 @@ Unreleased
 + Add autil_bigint_freeze.
 + Add autil_string_freeze.
 + Add autil_sbuf_freeze.
++ Add autil_vec_freeze.
++ Add autil_map_freeze.
 
 v0.10.0 - 2021-05-23
 --------------------------------
