@@ -14,9 +14,10 @@ DEPENDENCIES
     1. libm
     2. libSDL2
     3. libSDL2_image
+    4. libSDL2_mixer
 
     Linker flags (gcc/clang):
-        -lm -lSDL2 -lSDL2_image -lSDL_mixer
+        -lm -lSDL2 -lSDL2_image -lSDL2_mixer
 
     Installation (Debian/Ubuntu):
         $ apt-get install libsdl2-dev
