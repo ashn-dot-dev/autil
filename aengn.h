@@ -552,7 +552,7 @@ aengn_now(void)
 }
 
 static void
-process_event_(SDL_Event const* event)
+aengn__process_event_(SDL_Event const* event)
 {
     assert(event != NULL);
 
@@ -693,7 +693,7 @@ aengn_end_frame(void)
     // Process all new input state for the next frame.
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        process_event_(&event);
+        aengn__process_event_(&event);
     }
 }
 
