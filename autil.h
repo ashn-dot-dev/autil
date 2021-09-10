@@ -3500,6 +3500,7 @@ autil_map_del(struct autil_map* self)
     memset(self, 0x00, sizeof(*self)); // scrub
     autil_xalloc(self, AUTIL_XALLOC_FREE);
 }
+
 AUTIL_API void
 autil_map_freeze(struct autil_map* self, struct autil_freezer* freezer)
 {
