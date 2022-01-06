@@ -1,4 +1,4 @@
-Unreleased
+v0.11.0 - 2022-01-05
 --------------------------------
 + Add type autil_freezer and associated functions: autil_freezer_new,
   autil_freezer_del, and autil_freezer_register.
