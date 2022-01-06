@@ -2,6 +2,7 @@ Unreleased
 --------------------------------
 + Add type autil_freezer and associated functions: autil_freezer_new,
   autil_freezer_del, and autil_freezer_register.
++ Add autil_bitarr_freeze.
 + Add autil_bigint_freeze.
 + Add autil_string_freeze.
 + Add autil_sbuf_freeze.

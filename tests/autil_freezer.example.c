@@ -13,6 +13,9 @@ main(void)
     struct autil_bigint* const bigint = autil_bigint_new_cstr("0x123");
     autil_bigint_freeze(bigint, f);
 
+    struct autil_bitarr* const bitarr = autil_bitarr_new(1024);
+    autil_bitarr_freeze(bitarr, f);
+
     autil_sbuf(int) sbuf = NULL;
     for (int i = 0; i < 100; ++i) {
         autil_sbuf_push(sbuf, i);
