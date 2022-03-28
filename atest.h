@@ -58,10 +58,12 @@ LICENSE
 // diagnostic message to stderr.
 #define ATEST_FAIL(/* error message (fmt & args) */...)                        \
     atest__fail_(__FILE__, __LINE__, __VA_ARGS__)
+
 // Fail the currently running test if the provided expression does not evaluate
 // as truthy, then continue execution of the test.
 #define ATEST_EXPECT(expr)                                                     \
     ATEST__IFNOT_(expr, ATEST_FAIL("expect failure: " #expr);)
+
 // Fail the currently running test if the provided expression does not evaluate
 // as truthy, in which case control will immediately return from the test.
 #define ATEST_ASSERT(expr)                                                     \
@@ -69,6 +71,7 @@ LICENSE
 
 // Run a test with the provided identifier.
 #define ATEST_RUN(ident) atest__run_(#ident, ident, NULL, NULL)
+
 // Run a test with the provided identifier, calling test-fixture functions init
 // and fini before and after the test is run, respectively.
 // The functions init and fini should have type void (*func)(void).
@@ -78,6 +81,7 @@ LICENSE
 // The total number of tests that have been run.
 ATEST_API int
 atest_tests_run(void);
+
 // The total number of tests that have failed.
 ATEST_API int
 atest_tests_failed(void);

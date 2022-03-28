@@ -87,7 +87,8 @@ LICENSE
 #define AENGN_MOUSEBUTTON_COUNT  ((size_t)3)
 // clang-format on
 
-// Returns non-zero if should quit.
+// Function run once per tick of the main application loop.
+// Returns non-zero if the main loop should quit.
 typedef int (*aengn_runtick_fn)(void* ctx);
 
 // Initialize the engine and create a window with screen_w and screen_h virtual
@@ -100,7 +101,7 @@ aengn_init(int screen_w, int screen_h, int pixel_scale);
 AENGN_API void
 aengn_fini(void);
 // Start the main application loop, calling the user-provided runtick function
-// once per tick of the main loop.
+// once per tick of the main application loop.
 AENGN_API void
 aengn_run(aengn_runtick_fn runtick, void* ctx);
 // Returns the number of seconds elapsed since the invocation of aengn_run.
