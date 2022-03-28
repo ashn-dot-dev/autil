@@ -25,7 +25,6 @@ $ make test CC=clang CFLAGS='$(GNU_DBG) $(SANITIZE)'  # Debug with Address
 $ make test CC=clang CFLAGS='$(GNU_REL)'              # Release
 ```
 
-
 ## Building and Running Examples
 ### Dependencies
 Applications built using `aengn.h` link against `SDL2`, `SDL2_image`, and
@@ -47,11 +46,6 @@ $ ./emsdk activate latest # Make the latest SDK active (do this once)
 $ source ./emsdk_env.sh   # Setup envrionment (source this every time)
 ```
 
-*NOTE*: Currently `aengn.h` and aengn example programs are known to compile on
-Debian Stable using `CC=gcc` or `CC=clang`, but fail to compile with
-`CC=musl-gcc` and `CC=tcc`.
-
-
 ### Building
 ```sh
 $ make examples CFLAGS='$(C99_DBG)'  # Debug   (c99)
@@ -71,7 +65,6 @@ $ (cd examples/ && ./example-name)
 ```
 which will set the working directory to `example/` for applications that load
 assets via relative paths.
-
 
 ## License
 All content in this repository is licensed under the Zero-Clause BSD license.
