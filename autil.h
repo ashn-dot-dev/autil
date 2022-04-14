@@ -1535,8 +1535,7 @@ struct autil_sipool {
 AUTIL_API struct autil_sipool*
 autil_sipool_new(void)
 {
-    struct autil_sipool* const self =
-        autil_xalloc(NULL, sizeof(struct autil_sipool));
+    struct autil_sipool* const self = autil_xalloc(NULL, sizeof(*self));
     self->strings = NULL;
     self->map = autil_map_new(
         sizeof(struct autil_vstr), sizeof(char const*), autil_vstr_vpcmp);
@@ -2063,8 +2062,7 @@ autil_bigint_new(struct autil_bigint const* othr)
 {
     assert(othr != NULL);
 
-    struct autil_bigint* const self =
-        autil_xalloc(NULL, sizeof(struct autil_bigint));
+    struct autil_bigint* const self = autil_xalloc(NULL, sizeof(*self));
     *self = *AUTIL_BIGINT_ZERO;
     autil_bigint_assign(self, othr);
     return self;
@@ -2891,8 +2889,7 @@ autil_string_new(char const* start, size_t count)
 {
     assert(start != NULL || count == 0);
 
-    struct autil_string* const self =
-        autil_xalloc(NULL, sizeof(struct autil_string));
+    struct autil_string* const self = autil_xalloc(NULL, sizeof(*self));
 
     self->start = autil_xalloc(NULL, AUTIL_STRING_SIZE_(count));
     self->count = count;
@@ -3248,7 +3245,7 @@ struct autil_vec {
 AUTIL_API struct autil_vec*
 autil_vec_new(size_t elemsize)
 {
-    struct autil_vec* const self = autil_xalloc(NULL, sizeof(struct autil_vec));
+    struct autil_vec* const self = autil_xalloc(NULL, sizeof(*self));
     self->start = NULL;
     self->count = 0;
     self->capacity = 0;
@@ -3493,7 +3490,7 @@ struct autil_map {
 AUTIL_API struct autil_map*
 autil_map_new(size_t keysize, size_t valsize, autil_vpcmp_fn keycmp)
 {
-    struct autil_map* const self = autil_xalloc(NULL, sizeof(struct autil_map));
+    struct autil_map* const self = autil_xalloc(NULL, sizeof(*self));
     self->keys = autil_vec_new(keysize);
     self->vals = autil_vec_new(valsize);
     self->keycmp = keycmp;
