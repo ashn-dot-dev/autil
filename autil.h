@@ -3666,8 +3666,7 @@ struct autil_freezer {
 AUTIL_API struct autil_freezer*
 autil_freezer_new(void)
 {
-    struct autil_freezer* const self =
-        autil_xalloc(NULL, sizeof(struct autil_sipool));
+    struct autil_freezer* const self = autil_xalloc(NULL, sizeof(*self));
     self->ptrs = NULL;
     return self;
 }
