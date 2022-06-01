@@ -1899,7 +1899,7 @@ autil_bitarr_or(
     }
 }
 
-// The internals of struct autil_bigint are designed such that initializing an
+// The internals of struct autil_bigint are designed such that initializing a
 // autil_bigint with:
 //      struct autil_bigint foo = {0};
 // or
