@@ -1,3 +1,7 @@
+Unreleased
+--------------------------------
++ Fix potential index out-of-bounds in autil_bigint_mul.
+
 v1.0.1 - 2022-04-13
 --------------------------------
 + Fix incorrect sizeof expression in autil_freezer_new.
