@@ -1,7 +1,6 @@
 image: debian/stable
 packages:
   - clang
-  - dash
   - gcc
   - tcc
   - libsdl2-dev

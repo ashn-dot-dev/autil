@@ -1,6 +1,7 @@
 image: fedora/rawhide
 packages:
   - clang
+  - gcc
   - diffutils
   - SDL2-devel
   - SDL2_image-devel
