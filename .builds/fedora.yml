@@ -1,0 +1,32 @@
+image: fedora/rawhide
+packages:
+  - clang
+  - SDL2-devel
+  - SDL2_image-devel
+  - SDL2_mixer-devel
+sources:
+  - https://git.sr.ht/~ashn/autil
+tasks:
+  - test-clang-debug: |
+      cd autil
+      make clean test CC=clang CFLAGS='$(GNU_DBG) $(SANITIZE)'
+  - test-clang-release: |
+      cd autil
+      make clean test CC=clang CFLAGS='$(GNU_REL)'
+  - test-gcc-debug: |
+      cd autil
+      make clean test CC=gcc CFLAGS='$(GNU_DBG) $(SANITIZE)'
+  - test-gcc-release: |
+      cd autil
+      make clean test CC=gcc CFLAGS='$(GNU_REL)'
+  - examples-clang: |
+      cd autil
+      make clean examples CC=clang CFLAGS='$(GNU_REL)'
+  - examples-gcc: |
+      cd autil
+      make clean examples CC=gcc CFLAGS='$(GNU_REL)'
+triggers:
+  - action: email
+    condition: failure
+    to: "<me@ashn.dev>"
+
