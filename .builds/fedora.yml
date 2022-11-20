@@ -1,6 +1,7 @@
 image: fedora/rawhide
 packages:
   - clang
+  - diffutils
   - SDL2-devel
   - SDL2_image-devel
   - SDL2_mixer-devel
@@ -15,7 +16,7 @@ tasks:
       make clean test CC=clang CFLAGS='$(GNU_REL)'
   - test-gcc-debug: |
       cd autil
-      make clean test CC=gcc CFLAGS='$(GNU_DBG) $(SANITIZE)'
+      make clean test CC=gcc CFLAGS='$(GNU_DBG)'
   - test-gcc-release: |
       cd autil
       make clean test CC=gcc CFLAGS='$(GNU_REL)'
@@ -29,4 +30,3 @@ triggers:
   - action: email
     condition: failure
     to: "<me@ashn.dev>"
-

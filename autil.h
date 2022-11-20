@@ -86,7 +86,6 @@ typedef union {
     double      double_;
     long double long_double_;
     void*       void_ptr_;
-    void        (*fn_ptr_)();
 } autil_max_align_type;
 // clang-format on
 
