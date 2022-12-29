@@ -393,7 +393,7 @@ autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 
 // void autil_sbuf_freeze(TYPE* sbuf, struct autil_freezer* freezer)
 // ------------------------------------------------------------
-// Register resources within bigint with the provided freezer.
+// Register resources within sbuf with the provided freezer.
 #define autil_sbuf_freeze(sbuf, freezer)                                       \
     ((void)((sbuf) != NULL ? AUTIL__SBUF_FREEZE_NON_NULL_HEAD_(sbuf, freezer), NULL : NULL))
 
