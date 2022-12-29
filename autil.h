@@ -914,7 +914,7 @@ autil_vec_next_const(struct autil_vec const* self, void const* iter);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// MAP ///////////////////////////////////////////////////////////////////
-// General purpose generic ordered map.
+// General purpose generic ordered split flatmap.
 // Maps keys of some key-type to values of some value-type.
 
 // Allocate and initialize a map.
