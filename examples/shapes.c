@@ -65,10 +65,11 @@ runtick(void* ctx)
     }
     // AENGN_MOUSEBUTTON_LEFT pressed => Finish drawing the currently selected shape.
     if (aengn_mousebutton_state(AENGN_MOUSEBUTTON_LEFT)->released) {
-        struct shape const s = {.kind = selected,
-                                .p1 = tmp_shape_start,
-                                .p2 = (struct point){.x = aengn_mousepos_x(),
-                                                     .y = aengn_mousepos_y()}};
+        struct shape const s = {
+            .kind = selected,
+            .p1 = tmp_shape_start,
+            .p2 = (struct point){
+                .x = aengn_mousepos_x(), .y = aengn_mousepos_y()}};
         autil_vec_insert(shapes, autil_vec_count(shapes), &s);
     }
 
@@ -98,10 +99,11 @@ runtick(void* ctx)
         aengn_draw_shape(autil_vec_ref(shapes, i));
     }
     if (aengn_mousebutton_state(AENGN_MOUSEBUTTON_LEFT)->down) {
-        struct shape const s = {.kind = selected,
-                                .p1 = tmp_shape_start,
-                                .p2 = (struct point){.x = aengn_mousepos_x(),
-                                                     .y = aengn_mousepos_y()}};
+        struct shape const s = {
+            .kind = selected,
+            .p1 = tmp_shape_start,
+            .p2 = (struct point){
+                .x = aengn_mousepos_x(), .y = aengn_mousepos_y()}};
         // The shape itself.
         aengn_draw_shape(&s);
         // Start point.

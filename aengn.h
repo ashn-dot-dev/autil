@@ -1014,10 +1014,11 @@ aengn_draw_point(int x, int y, struct aengn_rgba const* color)
 
     SDL_SetRenderDrawColor(
         aengn__global_.renderer, color->r, color->g, color->b, color->a);
-    SDL_Rect const rect = {.x = x * aengn__global_.pixel_scale,
-                           .y = y * aengn__global_.pixel_scale,
-                           .w = aengn__global_.pixel_scale,
-                           .h = aengn__global_.pixel_scale};
+    SDL_Rect const rect = {
+        .x = x * aengn__global_.pixel_scale,
+        .y = y * aengn__global_.pixel_scale,
+        .w = aengn__global_.pixel_scale,
+        .h = aengn__global_.pixel_scale};
     int const err = SDL_RenderFillRect(aengn__global_.renderer, &rect);
     if (err) {
         autil_errorf("[%s][SDL_RenderFillRect] %s", __func__, SDL_GetError());
@@ -1126,10 +1127,11 @@ aengn_draw_texture(SDL_Texture* tex, int x, int y)
     int w;
     int h;
     SDL_QueryTexture(tex, NULL, NULL, &w, &h);
-    SDL_Rect dst = {.x = x * aengn__global_.pixel_scale,
-                    .y = y * aengn__global_.pixel_scale,
-                    .w = w * aengn__global_.pixel_scale,
-                    .h = h * aengn__global_.pixel_scale};
+    SDL_Rect dst = {
+        .x = x * aengn__global_.pixel_scale,
+        .y = y * aengn__global_.pixel_scale,
+        .w = w * aengn__global_.pixel_scale,
+        .h = h * aengn__global_.pixel_scale};
     int const err = SDL_RenderCopy(aengn__global_.renderer, tex, NULL, &dst);
     if (err) {
         autil_errorf("[%s][SDL_RenderCopy] %s", __func__, SDL_GetError());
