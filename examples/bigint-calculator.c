@@ -67,17 +67,18 @@ void
 eval_line(char const* line, size_t line_size)
 {
     struct autil_string* const string = autil_string_new(line, line_size);
-    struct autil_vec* const tokens = autil_vec_of_string_new();
     struct autil_vec* const stack = autil_vec_new(sizeof(struct autil_bigint*));
 
     autil_string_trim(string);
-    autil_string_split_to_vec(string, tokens);
+    autil_sbuf(struct autil_string*) const tokens =
+        autil_string_split(string, " ", 1);
 
     int err = 0;
-    for (size_t i = 0; i < autil_vec_count(tokens); ++i) {
-        struct autil_string* const tok =
-            AUTIL_DEREF_PTR(struct autil_string*, autil_vec_ref(tokens, i));
-        if ((err = eval_token(stack, autil_string_start(tok)))) {
+    for (size_t i = 0; i < autil_sbuf_count(tokens); ++i) {
+        if (autil_string_count(tokens[i]) == 0) {
+            continue;
+        }
+        if ((err = eval_token(stack, autil_string_start(tokens[i])))) {
             break;
         }
     }
@@ -86,7 +87,10 @@ eval_line(char const* line, size_t line_size)
     }
 
     autil_string_del(string);
-    autil_vec_of_string_del(tokens);
+    for (size_t i = 0; i < autil_sbuf_count(tokens); ++i) {
+        autil_string_del(tokens[i]);
+    }
+    autil_sbuf_fini(tokens);
     for (size_t i = 0; i < autil_vec_count(stack); ++i) {
         autil_bigint_del(
             AUTIL_DEREF_PTR(struct autil_bigint*, autil_vec_ref(stack, i)));
