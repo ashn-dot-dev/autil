@@ -1,3 +1,7 @@
+Unreleased
+--------------------------------
++ Replace autil_string_split* functions with a single autil_string_split.
+
 v1.0.2 - 2022-06-03
 --------------------------------
 + Fix potential index out-of-bounds in autil_bigint_mul.

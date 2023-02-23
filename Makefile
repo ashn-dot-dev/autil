@@ -112,8 +112,7 @@ TESTS = \
 	tests/autil_string_append_cstr.test \
 	tests/autil_string_append_fmt.test \
 	tests/autil_string_trim.test \
-	tests/autil_string_split_to_vec.test \
-	tests/autil_string_split_to_vec_on.test \
+	tests/autil_string_split.test \
 	tests/autil_sipool.example.test \
 	tests/autil_vec_reserve.test \
 	tests/autil_vec_resize.test \

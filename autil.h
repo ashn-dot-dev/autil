@@ -776,44 +776,17 @@ autil_string_append_vfmt(
 AUTIL_API void
 autil_string_trim(struct autil_string* self);
 
-// Split the string on all occurrences of whitespace.
-// Empty strings are removed from the result.
-// Bytes of the string are decoded using the "C" locale.
-// Parameter res will be populated with the collection of resulting strings.
+// Split the string on all occurrences of the provided separator. Empty strings
+// are *NOT* removed from the result. This function returns a stretchy buffer
+// of newly allocated string pointers containing the results of the split.
+//
 // Example:
-//      "A B\tC  D " ===split===> "A" "B" "C" "D"
-AUTIL_API void
-autil_string_split_to_vec(
-    struct autil_string const* self,
-    struct autil_vec /*<struct autil_string*>*/* res);
-// Split the string on all occurrences of the provided separator.
-// Empty strings are *NOT* removed from the result.
-// Parameter res will be populated with the collection of resulting strings.
 //      "ABCBB" ===split on "B"===> "A" "C" "" ""
-AUTIL_API void
-autil_string_split_to_vec_on(
+AUTIL_API struct autil_string** /* sbuf */
+autil_string_split(
     struct autil_string const* self,
     char const* separator,
-    size_t separator_size,
-    struct autil_vec /*<struct autil_string*>*/* res);
-AUTIL_API void
-autil_string_split_to_vec_on_vstr(
-    struct autil_string const* self,
-    struct autil_vstr const* separator,
-    struct autil_vec /*<struct autil_string*>*/* res);
-AUTIL_API void
-autil_string_split_to_vec_on_cstr(
-    struct autil_string const* self,
-    char const* separator,
-    struct autil_vec /*<struct autil_string*>*/* res);
-
-// Wrapper functions for an autil_vec of autil_string*.
-// Useful for initializing and deinitializing a vec passed to
-// autil_string_split_* functions.
-AUTIL_API struct autil_vec /*<struct autil_string*>*/*
-autil_vec_of_string_new(void);
-AUTIL_API void
-autil_vec_of_string_del(struct autil_vec /*<struct autil_string*>*/* vec);
+    size_t separator_size);
 
 ////////////////////////////////////////////////////////////////////////////////
 //////// VEC ///////////////////////////////////////////////////////////////////
@@ -3136,115 +3109,35 @@ autil_string_trim(struct autil_string* self)
     autil_string_resize(self, n);
 }
 
-// Should be equivalent to str.split(sep=None) from Python3.
-AUTIL_API void
-autil_string_split_to_vec(
-    struct autil_string const* self, struct autil_vec* res)
-{
-    assert(self != NULL);
-    assert(res != NULL);
-    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
-
-    autil_vec_resize(res, 0);
-
-    size_t first = 0;
-    while (first < self->count) {
-        if (autil_isspace(self->start[first])) {
-            first += 1;
-            continue;
-        }
-
-        size_t end = first;
-        while (end < self->count && !autil_isspace(self->start[end])) {
-            end += 1;
-        }
-        struct autil_string* const s =
-            autil_string_new(self->start + first, end - first);
-        autil_vec_insert(res, autil_vec_count(res), &s);
-        first = end;
-    }
-}
-
-AUTIL_API void
-autil_string_split_to_vec_on(
+AUTIL_API struct autil_string**
+autil_string_split(
     struct autil_string const* self,
     char const* separator,
-    size_t separator_size,
-    struct autil_vec* res)
+    size_t separator_size)
 {
     assert(self != NULL);
-    assert(res != NULL);
-    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
+    autil_sbuf(struct autil_string*) res = NULL;
 
-    autil_vec_resize(res, 0);
     if (separator_size == 0) {
-        struct autil_string* const s =
-            autil_string_new(self->start, self->count);
-        autil_vec_insert(res, autil_vec_count(res), &s);
-        return;
+        autil_sbuf_push(res, autil_string_new(self->start, self->count));
+        return res;
     }
 
     char const* const end_of_string = self->start + self->count;
     char const* beg = self->start;
     char const* end = beg;
     while ((size_t)(end_of_string - end) >= separator_size) {
-        if (memcmp(end, separator, separator_size) != 0) {
+        if (autil_memcmp(end, separator, separator_size) != 0) {
             end += 1;
             continue;
         }
-        struct autil_string* const s =
-            autil_string_new(beg, (size_t)(end - beg));
-        autil_vec_insert(res, autil_vec_count(res), &s);
+        autil_sbuf_push(res, autil_string_new(beg, (size_t)(end - beg)));
         beg = end + separator_size;
         end = beg;
     }
-    struct autil_string* const s =
-        autil_string_new(beg, (size_t)(end_of_string - beg));
-    autil_vec_insert(res, autil_vec_count(res), &s);
-}
 
-AUTIL_API void
-autil_string_split_to_vec_on_vstr(
-    struct autil_string const* self,
-    struct autil_vstr const* separator,
-    struct autil_vec /* struct autil_string* */* res)
-{
-    assert(self != NULL);
-    assert(separator != NULL);
-    assert(res != NULL);
-    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
-
-    autil_string_split_to_vec_on(self, separator->start, separator->count, res);
-}
-
-AUTIL_API void
-autil_string_split_to_vec_on_cstr(
-    struct autil_string const* self,
-    char const* separator,
-    struct autil_vec* res)
-{
-    assert(self != NULL);
-    assert(separator != NULL);
-    assert(res != NULL);
-    assert(autil_vec_elemsize(res) == sizeof(struct autil_string*));
-
-    autil_string_split_to_vec_on(self, separator, strlen(separator), res);
-}
-
-AUTIL_API struct autil_vec*
-autil_vec_of_string_new(void)
-{
-    return autil_vec_new(sizeof(struct autil_string*));
-}
-
-AUTIL_API void
-autil_vec_of_string_del(struct autil_vec* vec)
-{
-    for (size_t i = 0; i < autil_vec_count(vec); ++i) {
-        struct autil_string** const ref = autil_vec_ref(vec, i);
-        autil_string_del(*ref);
-    }
-    autil_vec_del(vec);
+    autil_sbuf_push(res, autil_string_new(beg, (size_t)(end_of_string - beg)));
+    return res;
 }
 
 struct autil_vec {
