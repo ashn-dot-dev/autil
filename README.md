@@ -13,16 +13,16 @@ See individual header files for usage instructions.
 ## Building and Running Unit/Integration Tests
 ### POSIX c99
 ```sh
-$ make test CFLAGS='$(C99_DBG)'  # Debug
-$ make test                      # Release
+$ make check CFLAGS='$(C99_DBG)'  # Debug
+$ make check                      # Release
 ```
 
 ### GCC or Clang
 ```sh
-$ make test CC=clang CFLAGS='$(GNU_DBG)'              # Debug
-$ make test CC=clang CFLAGS='$(GNU_DBG) $(SANITIZE)'  # Debug with Address
-                                                      # Sanitizer (glibc only)
-$ make test CC=clang CFLAGS='$(GNU_REL)'              # Release
+$ make check CC=clang CFLAGS='$(GNU_DBG)'              # Debug
+$ make check CC=clang CFLAGS='$(GNU_DBG) $(SANITIZE)'  # Debug with Address
+                                                       # Sanitizer (glibc only)
+$ make check CC=clang CFLAGS='$(GNU_REL)'              # Release
 ```
 
 ## Building and Running Examples

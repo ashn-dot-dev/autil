@@ -9,9 +9,9 @@ Defaults to CC=clang.
 
 Examples:
   $(basename $0)
-  $(basename $0) test
-  CC=tcc $(basename $0) test
-  CC=gcc $(basename $0) test
+  $(basename $0) check
+  CC=tcc $(basename $0) check
+  CC=gcc $(basename $0) check
 
 Options:
   -h --help     Print this help message and exit.
@@ -31,7 +31,7 @@ esac
 done
 
 TARGETS="$@"
-if [ -z "${TARGETS}" ]; then TARGETS="clean test"; fi
+if [ -z "${TARGETS}" ]; then TARGETS="check"; fi
 if [ -z "${CC}" ]; then CC=clang; fi
 
 CFLAGS='$(C99_DBG)'
@@ -42,4 +42,4 @@ elif [ "${CC}" = 'gcc' ]; then
 fi
 
 set -x
-make ${TARGETS} CC="${CC}" CFLAGS="${CFLAGS}"
+make -j $(nproc) ${TARGETS} CC="${CC}" CFLAGS="${CFLAGS}"

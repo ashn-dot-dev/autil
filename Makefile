@@ -156,9 +156,9 @@ EXAMPLES_WEB = \
 	examples/life.html \
 	examples/shapes.html
 
-all: test perf examples examples-web
+all: check perf examples examples-web
 
-test: $(TESTS)
+check: $(TESTS)
 	(cd tests/ && sh test-all.sh)
 
 perf: $(PERFS)
