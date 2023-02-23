@@ -50,9 +50,9 @@ LICENSE
     WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
     MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
     SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
-    OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
-    CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,8 +196,8 @@ aengn_sprite_get_pixel(
 // This process is expensive, so calls to aengn_sprite_set_pixel will *not*
 // update GPU memory until this function is called.
 // This function is automatically called from within aengn_draw_sprite if the
-// underlying SDL_Texture has not been explicitly updated since the last call to
-// aengn_sprite_set_pixel.
+// underlying SDL_Texture has not been explicitly updated since the last call
+// to aengn_sprite_set_pixel.
 // Returns a non-zero value on error.
 AENGN_API int
 aengn_sprite_update_texture(struct aengn_sprite* self);
@@ -292,7 +292,7 @@ static struct {
     struct autil_map* scankey_map;
     // SDL_Keycode  => struct aengn_button_state
     struct autil_map* virtkey_map;
-    // Array mapping AENGN-supported mouse buttons => struct aengn_button_state.
+    // Maps AENGN-supported mouse buttons => struct aengn_button_state.
     struct aengn_button_state mousebutton_state[AENGN_MOUSEBUTTON_COUNT];
 
     SDL_Window* window;
@@ -442,8 +442,8 @@ aengn_init(int screen_w, int screen_h, int pixel_scale)
         mix_ver->minor,
         mix_ver->patch);
     // NOTE: Calling Mix_Init with bitwise ORed flags of audio formats will
-    // always fail with the error "<FORMAT> support not available". Despite what
-    // the documentation says, the actual way to initialize the SDL_Mixer
+    // always fail with the error "<FORMAT> support not available". Despite
+    // what the documentation says, the actual way to initialize the SDL_Mixer
     // library is with the Mix_OpenAudio call below.
     int const frequency = MIX_DEFAULT_FREQUENCY;
     Uint16 const format = MIX_DEFAULT_FORMAT;

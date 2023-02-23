@@ -44,9 +44,9 @@ LICENSE
     WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
     MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
     SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
-    OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
-    CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,12 +174,12 @@ AUTIL_API void* autil_memmove(void* dest, void const* src, size_t n);
 AUTIL_API void* autil_memset(void* s, int c, size_t n);
 // clang-format on
 
-// Zero out the memory under the provided pointer parameter. The number of bytes
-// to be zeroed is automatically determined by the sizeof(*ptr).
+// Zero out the memory under the provided pointer parameter. The number of
+// bytes to be zeroed is automatically determined by the sizeof(*ptr).
 #define AUTIL_MEMZERO(ptr) autil_memset(ptr, 0x00, sizeof(*ptr))
 
-// General purpose allocator functions with out-of-memory error checking.
-// The behavior of autil_xalloc and autil_xallocn is similar to libc realloc and
+// General purpose allocator functions with out-of-memory error checking. The
+// behavior of autil_xalloc and autil_xallocn is similar to libc realloc and
 // *BSD reallocarray with the following exceptions:
 // (1) On allocation failure an error message will be printed followed by
 //     program termination with EXIT_FAILURE status.
@@ -333,14 +333,15 @@ autil_sipool_intern_cstr(struct autil_sipool* self, char const* cstr);
 //////// STRETCHY BUFFER ///////////////////////////////////////////////////////
 // General purpose type-safe dynamic array (a.k.a stretchy buffer).
 //
-// A stretchy buffer works by storing metadata about the number of allocated and
-// in-use elements in a header just before the address of the buffer's first
-// element. The ith element of a stretchy buffer may be accessed using the array
-// index operator, sbuf[i], and a stretchy buffer containing elements of type T
-// may be passed to subroutines as if it were regular array-like pointer of type
-// T* or T const*. The address of a stretchy buffer may change when a resizing
-// operation is performed, similar to resizing operations done with realloc, so
-// the address of a stretchy buffer should not be considered stable.
+// A stretchy buffer works by storing metadata about the number of allocated
+// and in-use elements in a header just before the address of the buffer's
+// first element. The ith element of a stretchy buffer may be accessed using
+// the array index operator, sbuf[i], and a stretchy buffer containing elements
+// of type T may be passed to subroutines as if it were regular array-like
+// pointer of type T* or T const*. The address of a stretchy buffer may change
+// when a resizing operation is performed, similar to resizing operations done
+// with realloc, so the address of a stretchy buffer should not be considered
+// stable.
 //
 // +--------+---------+---------+---------+--
 // | HEADER | SBUF[0] | SBUF[1] | SBUF[2] | ...
@@ -496,19 +497,19 @@ AUTIL_API void
 autil_bitarr_assign(struct autil_bitarr* self, struct autil_bitarr const* othr);
 
 // res = ~rhs
-// Fatally exits after printing an error message if the count of res and rhs are
-// not equal.
+// Fatally exits after printing an error message if the count of res and rhs
+// are not equal.
 AUTIL_API void
 autil_bitarr_compl(struct autil_bitarr* res, struct autil_bitarr const* rhs);
 // res = lhs << nbits (logical shift left)
-// Fatally exits after printing an error message if the count of res and lhs are
-// not equal.
+// Fatally exits after printing an error message if the count of res and lhs
+// are not equal.
 AUTIL_API void
 autil_bitarr_shiftl(
     struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
 // res = lhs >> nbits (logical shift right)
-// Fatally exits after printing an error message if the count of res and lhs are
-// not equal.
+// Fatally exits after printing an error message if the count of res and lhs
+// are not equal.
 AUTIL_API void
 autil_bitarr_shiftr(
     struct autil_bitarr* res, struct autil_bitarr const* lhs, size_t nbits);
@@ -620,8 +621,8 @@ autil_bigint_mul(
 // If res is NULL then the result will not be written to res.
 // If rem is NULL then the remainder will not be written to rem.
 //
-// This function matches the behavior of the / and % operators as defined by the
-// C99 standard, satisfying the expression:
+// This function matches the behavior of the / and % operators as defined by
+// the C99 standard, satisfying the expression:
 //      (lhs/rhs)*rhs + lhs%rhs == lhs
 // where:
 //      lhs/rhs == res
@@ -675,14 +676,14 @@ autil_bigint_magnitude_bit_set(struct autil_bigint* self, size_t n, int value);
 //          Default behavior is to pad with spaces.
 //   +      Prefix the numeric representation of the output string with a plus
 //          or minus sign (+ or -), even for positive numbers.
-//          Default behavior is to only add the minus sign for negative numbers.
+//          Default behavior will only emit a minus sign for negative numbers.
 //   -      Left justify the output string within the provided field width.
 //   space  Prefix the numeric representation of the output string with a space
 //          if no sign would be written otherwise.
 //
 // Width (optional):
-//   Decimal digit string with nonzero first digit specifying the minimum length
-//   of the output string.
+//   Decimal digit string with nonzero first digit specifying the minimum
+//   length of the output string.
 //
 // Specifier (required):
 //   d      The provided bigint will be represented using decimal notation.
@@ -881,7 +882,8 @@ AUTIL_API void const*
 autil_vec_ref_const(struct autil_vec const* self, size_t idx);
 
 // Insert a copy of the value at data into the vec at position idx.
-// Elements with position greater than or equal to idx are moved back one place.
+// Elements with position greater than or equal to idx are moved back one
+// place.
 // Fatally exits after printing an error message if idx is greater than the
 // count of the vec.
 AUTIL_API void
@@ -953,8 +955,8 @@ autil_map_lookup_const(struct autil_map const* self, void const* key);
 //
 // If oldkey is not NULL then the removed key will be copied into oldkey.
 // If oldval is not NULL then the removed value will be copied into oldval.
-// Returns a non-zero value if a key-value pair associated with key was replaced
-// by the provided key and value.
+// Returns a non-zero value if a key-value pair associated with key was
+// replaced by the provided key and value.
 AUTIL_API int
 autil_map_insert(
     struct autil_map* self,
@@ -967,7 +969,8 @@ autil_map_insert(
 //
 // If oldkey is not NULL then the removed key will be copied into oldkey.
 // If oldval is not NULL then the removed value will be copied into oldval.
-// Returns a non-zero value if a key-value pair associated with key was removed.
+// Returns a non-zero value if a key-value pair associated with key was
+// removed.
 AUTIL_API int
 autil_map_remove(
     struct autil_map* self, void const* key, void* oldkey, void* oldval);
@@ -1341,8 +1344,8 @@ autil_file_write(char const* path, void const* buf, size_t buf_size)
         // According to the C99 standard:
         // > Any unwritten buffered data for the stream are delivered to the
         // > host environment to be written to the file; any unread buffered
-        // > data are discarded. Whether or not the call succeeds, the stream is
-        // > disassociated from the file...
+        // > data are discarded. Whether or not the call succeeds, the stream
+        // > is disassociated from the file...
         // Cautiously assume that the buffer was not fully written to disk.
         return -1;
     }
@@ -1523,8 +1526,8 @@ autil_vstr_ends_with(
 }
 
 struct autil_sipool {
-    // List of heap-allocated strings interned within this pool. The key and val
-    // elements of the map member reference memory owned by this list.
+    // List of heap-allocated strings interned within this pool. The key and
+    // val elements of the map member reference memory owned by this list.
     autil_sbuf(char*) strings;
     // KEY TYPE: struct autil_vstr
     // VAL TYPE: char const*
@@ -3555,9 +3558,9 @@ autil_map_vals(struct autil_map const* self)
 }
 
 // Returns the (positive) index of key if it exists in self.
-// Returns a negative number that, if negated and subtracting one from, would be
-// the index of key if inserted (I.E -1 means insert at 0 and -42 means insert
-// at 41).
+// Returns a negative number that, if negated and subtracting one from, would
+// be the index of key if inserted (I.E -1 means insert at 0 and -42 means
+// insert at 41).
 static long
 autil_map_find_(struct autil_map const* self, void const* key)
 {
