@@ -113,7 +113,6 @@ TESTS = \
 	tests/autil_string_append_fmt.test \
 	tests/autil_string_trim.test \
 	tests/autil_string_split.test \
-	tests/autil_sipool.example.test \
 	tests/autil_vec_reserve.test \
 	tests/autil_vec_resize.test \
 	tests/autil_vec_insert.test \
