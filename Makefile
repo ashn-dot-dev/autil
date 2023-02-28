@@ -2,7 +2,7 @@
 .SUFFIXES:
 .PHONY: \
 	all \
-	test \
+	check \
 	perf \
 	examples \
 	examples-web \
