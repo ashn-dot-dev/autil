@@ -2,6 +2,7 @@ Unreleased
 --------------------------------
 + Replace autil_string_split* functions with a single autil_string_split.
 + Remove autil_sipool and associated functions.
++ Remove AUTIL_ALIGNOF
 
 v1.0.2 - 2022-06-03
 --------------------------------

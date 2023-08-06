@@ -61,7 +61,7 @@ LICENSE
 #endif
 
 #include <stdarg.h> /* va_list */
-#include <stddef.h> /* size_t, NULL, offsetof */
+#include <stddef.h> /* size_t, NULL */
 #include <stdio.h> /* FILE*, printf-family */
 
 struct autil_vstr;
@@ -112,12 +112,6 @@ typedef union {
     (AUTIL_ARRAY_COUNT(str_literal) - 1)
 // Number of characters in a formatted string.
 #define AUTIL_FMT_COUNT(fmt, ...) ((size_t)snprintf(NULL, 0, fmt, __VA_ARGS__))
-
-// C99 compatible _Alignof operator.
-// Produces an integer constant expression.
-// clang-format off
-#define AUTIL_ALIGNOF(type) offsetof(struct{char _; type ty;}, ty)
-// clang-format on
 
 // C99 compatible(ish) _Static_assert.
 // Macro parameter what should be a valid identifier describing the assertion.
@@ -1476,10 +1470,6 @@ autil_vstr_ends_with(
     char const* start = vstr->start + (vstr->count - target->count);
     return autil_memcmp(start, target->start, target->count) == 0;
 }
-
-AUTIL_STATIC_ASSERT(
-    SBUF_HEADER_OFFSET_IS_ALIGNED,
-    AUTIL__SBUF_HEADER_OFFSET_ % AUTIL_ALIGNOF(autil_max_align_type) == 0);
 
 /* reserve */
 AUTIL_API void*
