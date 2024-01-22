@@ -1,4 +1,4 @@
-Unreleased
+v2.0.0 - 2024-01-22
 --------------------------------
 + Replace autil_string_split* functions with a single autil_string_split.
 + Remove autil_sipool and associated functions.
